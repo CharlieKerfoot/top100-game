@@ -38,6 +38,15 @@ export interface PublicParty {
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL
   || (import.meta.env.DEV ? 'http://localhost:3001' : undefined);
 
+function getOrCreatePlayerId(): string {
+  let id = sessionStorage.getItem('top100_player_id');
+  if (!id) {
+    id = crypto.randomUUID();
+    sessionStorage.setItem('top100_player_id', id);
+  }
+  return id;
+}
+
 export function createMultiplayerState() {
   let socket = $state<Socket | null>(null);
   let phase = $state<AppPhase>('home');
@@ -65,8 +74,10 @@ export function createMultiplayerState() {
   // Browse
   let publicParties = $state<PublicParty[]>([]);
 
+  const playerId = getOrCreatePlayerId();
+
   // Derived
-  const myId = $derived(socket?.id ?? '');
+  const myId = $derived(playerId);
   const isHost = $derived(myId === hostId);
   const category = $derived(categories.find(c => c.id === categoryId) ?? categories[0]);
   const currentPlayerId = $derived(playerOrder[currentPlayerIndex] ?? '');
@@ -83,17 +94,30 @@ export function createMultiplayerState() {
   function connect() {
     if (socket?.connected) return;
 
-    const opts = { transports: ['websocket'] as const };
+    const opts = { transports: ['websocket'] as string[] };
     const s = SOCKET_URL ? io(SOCKET_URL, opts) : io(opts);
     socket = s;
 
     s.on('connect', () => {
       error = '';
+      // Register with stable playerId on every connect/reconnect
+      s.emit('register', { playerId });
+    });
+
+    s.on('registered', () => {
+      // Fresh connection, no existing party
+    });
+
+    s.on('rejoin', ({ phase: p, party, game }: { phase: string; party: any; game: any }) => {
+      applyPartyState(party);
+      if (game) applyGameState(game);
+      phase = p as AppPhase;
+      error = '';
     });
 
     s.on('disconnect', () => {
-      phase = 'home';
-      error = 'Disconnected from server';
+      // Don't reset to home on disconnect, we might reconnect
+      error = 'Reconnecting...';
     });
 
     s.on('error-msg', ({ message }: { message: string }) => {
@@ -252,6 +276,9 @@ export function createMultiplayerState() {
   function leaveParty() {
     socket?.emit('leave-party');
   }
+
+  // Auto-connect on creation to enable reconnect on page refresh
+  connect();
 
   return {
     get phase() { return phase; },
