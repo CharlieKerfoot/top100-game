@@ -34,7 +34,9 @@ export interface PublicParty {
   phase: string;
 }
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
+// In production, Socket.IO runs on the same origin. In dev, separate port.
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL
+  || (import.meta.env.DEV ? 'http://localhost:3001' : undefined);
 
 export function createMultiplayerState() {
   let socket = $state<Socket | null>(null);
@@ -81,7 +83,7 @@ export function createMultiplayerState() {
   function connect() {
     if (socket?.connected) return;
 
-    const s = io(SOCKET_URL);
+    const s = SOCKET_URL ? io(SOCKET_URL) : io();
     socket = s;
 
     s.on('connect', () => {
