@@ -1,5 +1,6 @@
 import { Server } from 'socket.io';
 import { categories } from '../src/lib/categories/index.ts';
+import { FIVE_LETTER_WORDS } from './words.ts';
 
 // ── Types ──────────────────────────────────────────────────
 
@@ -48,17 +49,22 @@ interface Party {
 // ── State ──────────────────────────────────────────────────
 
 const parties = new Map<string, Party>();
-const playerParty = new Map<string, string>();
+const playerParty = new Map<string, string>(); // playerId -> partyCode
+const socketToPlayer = new Map<string, string>(); // socketId -> playerId
+const playerToSocket = new Map<string, string>(); // playerId -> socketId
+const disconnectTimers = new Map<string, ReturnType<typeof setTimeout>>(); // playerId -> timeout
 
 // ── Helpers ────────────────────────────────────────────────
 
+function getPlayerId(socketId: string): string | undefined {
+  return socketToPlayer.get(socketId);
+}
+
 function generateCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   for (let attempt = 0; attempt < 100; attempt++) {
-    let code = '';
-    for (let i = 0; i < 6; i++) {
-      code += chars[Math.floor(Math.random() * chars.length)];
-    }
+    const word = FIVE_LETTER_WORDS[Math.floor(Math.random() * FIVE_LETTER_WORDS.length)].toUpperCase();
+    const num = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+    const code = `${word}-${num}`;
     if (!parties.has(code)) return code;
   }
   throw new Error('Could not generate unique code');
@@ -154,31 +160,32 @@ function isGameOver(party: Party): boolean {
   }
 }
 
-function removePlayerFromParty(socketId: string, io: Server) {
-  const code = playerParty.get(socketId);
+function removePlayerFromParty(playerId: string, io: Server) {
+  const code = playerParty.get(playerId);
   if (!code) return;
 
   const party = parties.get(code);
   if (!party) {
-    playerParty.delete(socketId);
+    playerParty.delete(playerId);
     return;
   }
 
-  party.players.delete(socketId);
-  playerParty.delete(socketId);
+  party.players.delete(playerId);
+  playerParty.delete(playerId);
+  playerToSocket.delete(playerId);
 
   if (party.players.size === 0) {
     parties.delete(code);
     return;
   }
 
-  if (party.hostId === socketId) {
+  if (party.hostId === playerId) {
     const newHost = party.players.keys().next().value!;
     party.hostId = newHost;
   }
 
   if (party.game) {
-    const orderIdx = party.game.playerOrder.indexOf(socketId);
+    const orderIdx = party.game.playerOrder.indexOf(playerId);
     if (orderIdx !== -1) {
       if (orderIdx < party.game.currentPlayerIndex) {
         party.game.currentPlayerIndex--;
@@ -214,47 +221,84 @@ export function setupSocketServer(io: Server) {
   io.on('connection', (socket) => {
     console.log(`[+] ${socket.id}`);
 
+    // Register maps the client's stable playerId to this socket
+    socket.on('register', ({ playerId }: { playerId: string }) => {
+      socketToPlayer.set(socket.id, playerId);
+      playerToSocket.set(playerId, socket.id);
+
+      // Cancel any pending disconnect removal
+      const timer = disconnectTimers.get(playerId);
+      if (timer) {
+        clearTimeout(timer);
+        disconnectTimers.delete(playerId);
+      }
+
+      // Check if this player is already in a party (reconnecting)
+      const code = playerParty.get(playerId);
+      if (code) {
+        const party = parties.get(code);
+        if (party && party.players.has(playerId)) {
+          socket.join(code);
+          socket.emit('rejoin', {
+            phase: party.phase,
+            party: serializeParty(party),
+            game: serializeGameState(party),
+          });
+          console.log(`[reconnect] ${playerId} rejoined ${code}`);
+          return;
+        }
+      }
+
+      socket.emit('registered');
+    });
+
     socket.on('create-party', ({ playerName, isPublic }: { playerName: string; isPublic: boolean }) => {
-      removePlayerFromParty(socket.id, io);
+      const playerId = getPlayerId(socket.id);
+      if (!playerId) return;
+
+      removePlayerFromParty(playerId, io);
 
       const code = generateCode();
       const player: Player = {
-        id: socket.id, name: playerName,
+        id: playerId, name: playerName,
         score: 0, strikes: 0, eliminated: false, guesses: 0,
       };
 
       const party: Party = {
-        code, hostId: socket.id, isPublic,
-        players: new Map([[socket.id, player]]),
+        code, hostId: playerId, isPublic,
+        players: new Map([[playerId, player]]),
         settings: { categoryId: categories[0].id, mode: 'strikes', maxStrikes: 3, maxTurns: 10 },
         game: null, phase: 'lobby',
       };
 
       parties.set(code, party);
-      playerParty.set(socket.id, code);
+      playerParty.set(playerId, code);
       socket.join(code);
       socket.emit('party-created', { party: serializeParty(party) });
       console.log(`[party] ${code} created by ${playerName}`);
     });
 
     socket.on('join-party', ({ code, playerName }: { code: string; playerName: string }) => {
+      const playerId = getPlayerId(socket.id);
+      if (!playerId) return;
+
       const party = parties.get(code.toUpperCase());
       if (!party) { socket.emit('error-msg', { message: 'Party not found' }); return; }
       if (party.phase !== 'lobby') { socket.emit('error-msg', { message: 'Game already in progress' }); return; }
       if (party.players.size >= 8) { socket.emit('error-msg', { message: 'Party is full (max 8 players)' }); return; }
 
-      removePlayerFromParty(socket.id, io);
+      removePlayerFromParty(playerId, io);
 
       const player: Player = {
-        id: socket.id, name: playerName,
+        id: playerId, name: playerName,
         score: 0, strikes: 0, eliminated: false, guesses: 0,
       };
 
-      party.players.set(socket.id, player);
-      playerParty.set(socket.id, code);
-      socket.join(code);
-      io.to(code).emit('party-updated', { party: serializeParty(party), game: null });
-      console.log(`[party] ${playerName} joined ${code}`);
+      party.players.set(playerId, player);
+      playerParty.set(playerId, party.code);
+      socket.join(party.code);
+      io.to(party.code).emit('party-updated', { party: serializeParty(party), game: null });
+      console.log(`[party] ${playerName} joined ${party.code}`);
     });
 
     socket.on('browse-parties', () => {
@@ -262,10 +306,12 @@ export function setupSocketServer(io: Server) {
     });
 
     socket.on('update-settings', (settings: Partial<GameSettings> & { isPublic?: boolean }) => {
-      const code = playerParty.get(socket.id);
+      const playerId = getPlayerId(socket.id);
+      if (!playerId) return;
+      const code = playerParty.get(playerId);
       if (!code) return;
       const party = parties.get(code);
-      if (!party || party.hostId !== socket.id) return;
+      if (!party || party.hostId !== playerId) return;
 
       if (settings.categoryId !== undefined) party.settings.categoryId = settings.categoryId;
       if (settings.mode !== undefined) party.settings.mode = settings.mode;
@@ -277,10 +323,12 @@ export function setupSocketServer(io: Server) {
     });
 
     socket.on('start-game', () => {
-      const code = playerParty.get(socket.id);
+      const playerId = getPlayerId(socket.id);
+      if (!playerId) return;
+      const code = playerParty.get(playerId);
       if (!code) return;
       const party = parties.get(code);
-      if (!party || party.hostId !== socket.id) return;
+      if (!party || party.hostId !== playerId) return;
       if (party.players.size < 2) { socket.emit('error-msg', { message: 'Need at least 2 players' }); return; }
 
       for (const player of party.players.values()) {
@@ -304,13 +352,15 @@ export function setupSocketServer(io: Server) {
     });
 
     socket.on('submit-guess', ({ guess }: { guess: string }) => {
-      const code = playerParty.get(socket.id);
+      const playerId = getPlayerId(socket.id);
+      if (!playerId) return;
+      const code = playerParty.get(playerId);
       if (!code) return;
       const party = parties.get(code);
       if (!party || !party.game || party.phase !== 'playing') return;
 
       const game = party.game;
-      if (game.playerOrder[game.currentPlayerIndex] !== socket.id) return;
+      if (game.playerOrder[game.currentPlayerIndex] !== playerId) return;
 
       const cat = categories.find(c => c.id === party.settings.categoryId);
       if (!cat) return;
@@ -322,7 +372,7 @@ export function setupSocketServer(io: Server) {
       }
 
       const alreadyGuessed = foundIndex >= 0 && game.guessedItems.has(foundIndex);
-      const player = party.players.get(socket.id)!;
+      const player = party.players.get(playerId)!;
       let result: GuessResult;
 
       if (alreadyGuessed || foundIndex < 0) {
@@ -352,7 +402,9 @@ export function setupSocketServer(io: Server) {
     });
 
     socket.on('next-turn', () => {
-      const code = playerParty.get(socket.id);
+      const playerId = getPlayerId(socket.id);
+      if (!playerId) return;
+      const code = playerParty.get(playerId);
       if (!code) return;
       const party = parties.get(code);
       if (!party || !party.game || party.phase !== 'playing') return;
@@ -379,7 +431,9 @@ export function setupSocketServer(io: Server) {
     });
 
     socket.on('back-to-lobby', () => {
-      const code = playerParty.get(socket.id);
+      const playerId = getPlayerId(socket.id);
+      if (!playerId) return;
+      const code = playerParty.get(playerId);
       if (!code) return;
       const party = parties.get(code);
       if (!party) return;
@@ -393,13 +447,27 @@ export function setupSocketServer(io: Server) {
     });
 
     socket.on('leave-party', () => {
-      removePlayerFromParty(socket.id, io);
+      const playerId = getPlayerId(socket.id);
+      if (!playerId) return;
+      removePlayerFromParty(playerId, io);
       socket.emit('left-party');
     });
 
     socket.on('disconnect', () => {
-      console.log(`[-] ${socket.id}`);
-      removePlayerFromParty(socket.id, io);
+      const playerId = socketToPlayer.get(socket.id);
+      console.log(`[-] ${socket.id} (player: ${playerId ?? 'unknown'})`);
+      socketToPlayer.delete(socket.id);
+
+      if (!playerId) return;
+
+      // Grace period: wait 30s before removing the player
+      const timer = setTimeout(() => {
+        disconnectTimers.delete(playerId);
+        playerToSocket.delete(playerId);
+        removePlayerFromParty(playerId, io);
+        console.log(`[timeout] ${playerId} removed after disconnect grace period`);
+      }, 30_000);
+      disconnectTimers.set(playerId, timer);
     });
   });
 }
