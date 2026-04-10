@@ -7,7 +7,13 @@
     onsubmit: (value: string) => void;
   }
 
-  let { hints, value = $bindable(''), placeholder = '', disabled = false, onsubmit }: Props = $props();
+  let {
+    hints,
+    value = $bindable(""),
+    placeholder = "",
+    disabled = false,
+    onsubmit,
+  }: Props = $props();
 
   let selectedIndex = $state(-1);
   let open = $state(false);
@@ -16,36 +22,36 @@
   const filtered = $derived.by(() => {
     const q = value.trim().toLowerCase();
     if (!q) return [];
-    return hints
-      .filter(h => h.toLowerCase().includes(q))
-      .slice(0, 8);
+    return hints.filter((h) => h.toLowerCase().includes(q)).slice(0, 8);
   });
 
-  const showDropdown = $derived(open && filtered.length > 0 && value.trim().length > 0);
+  const showDropdown = $derived(
+    open && filtered.length > 0 && value.trim().length > 0,
+  );
 
   function handleKeydown(e: KeyboardEvent) {
     if (!showDropdown) {
-      if (e.key === 'Enter') {
+      if (e.key === "Enter") {
         e.preventDefault();
         submit(value);
       }
       return;
     }
 
-    if (e.key === 'ArrowDown') {
+    if (e.key === "ArrowDown") {
       e.preventDefault();
       selectedIndex = Math.min(selectedIndex + 1, filtered.length - 1);
-    } else if (e.key === 'ArrowUp') {
+    } else if (e.key === "ArrowUp") {
       e.preventDefault();
       selectedIndex = Math.max(selectedIndex - 1, -1);
-    } else if (e.key === 'Enter') {
+    } else if (e.key === "Enter") {
       e.preventDefault();
       if (selectedIndex >= 0 && selectedIndex < filtered.length) {
         submit(filtered[selectedIndex]);
       } else {
         submit(value);
       }
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       open = false;
       selectedIndex = -1;
     }
@@ -63,7 +69,7 @@
   function submit(val: string) {
     if (!val.trim()) return;
     onsubmit(val.trim());
-    value = '';
+    value = "";
     open = false;
     selectedIndex = -1;
   }
@@ -117,18 +123,18 @@
   .autocomplete input {
     width: 100%;
     padding: 0.6rem 0.75rem;
-    border: 1px solid #C4B48A;
-    background: #FFFEF2;
-    color: #1A1A1A;
+    border: 1px solid #c4b48a;
+    background: #fffef2;
+    color: #1a1a1a;
     font-size: 1rem;
     box-sizing: border-box;
     outline: none;
     transition: border-color 0.2s;
-    font-family: 'Source Serif 4', Georgia, serif;
+    font-family: "Source Serif 4", Georgia, serif;
   }
 
   .autocomplete input:focus {
-    border-color: #8B0000;
+    border-color: #8b0000;
   }
 
   .dropdown {
@@ -139,8 +145,8 @@
     margin: 0;
     padding: 0;
     list-style: none;
-    background: #FFFEF2;
-    border: 1px solid #C4B48A;
+    background: #fffef2;
+    border: 1px solid #c4b48a;
     margin-bottom: 4px;
     max-height: 280px;
     overflow-y: auto;
@@ -153,9 +159,9 @@
     cursor: pointer;
     color: #555;
     font-size: 0.95rem;
-    font-family: 'Source Serif 4', Georgia, serif;
+    font-family: "Source Serif 4", Georgia, serif;
     transition: background 0.1s;
-    border-bottom: 1px solid #EDE0C4;
+    border-bottom: 1px solid #ede0c4;
   }
 
   .dropdown li:last-child {
@@ -164,7 +170,7 @@
 
   .dropdown li:hover,
   .dropdown li.selected {
-    background: #F5E6C8;
-    color: #1A1A1A;
+    background: #f5e6c8;
+    color: #1a1a1a;
   }
 </style>
