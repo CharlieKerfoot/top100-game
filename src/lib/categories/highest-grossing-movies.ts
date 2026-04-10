@@ -1,10 +1,12 @@
 import type { Category } from './types';
+import { highestGrossingMoviesHints } from './hints';
 
 export const highestGrossingMovies: Category = {
   id: 'highest-grossing-movies',
   name: 'Highest Grossing Movies',
   description: 'All-time worldwide box office',
   tags: ['entertainment', 'movies'],
+  hints: highestGrossingMoviesHints,
   items: [
     "Avatar", "Avengers: Endgame", "Avatar: The Way of Water", "Titanic", "Star Wars: The Force Awakens",
     "Avengers: Infinity War", "Spider-Man: No Way Home", "Inside Out 2", "Jurassic World", "The Lion King",

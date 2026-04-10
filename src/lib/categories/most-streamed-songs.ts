@@ -1,10 +1,12 @@
 import type { Category } from './types';
+import { mostStreamedSongsHints } from './hints';
 
 export const mostStreamedSongs: Category = {
   id: 'most-streamed-songs',
   name: 'Most Streamed Songs on Spotify',
   description: 'All-time most streamed tracks',
   tags: ['entertainment', 'music'],
+  hints: mostStreamedSongsHints,
   items: [
     "Blinding Lights", "Shape of You", "Someone You Loved", "As It Was", "Sunflower",
     "Dance Monkey", "Starboy", "Closer", "One Dance", "Believer",

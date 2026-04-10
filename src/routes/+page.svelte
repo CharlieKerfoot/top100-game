@@ -1,6 +1,7 @@
 <script lang="ts">
   import { categories, getAllTags, searchCategories, type Category } from '$lib/categories/index';
   import { createMultiplayerState } from '$lib/multiplayer.svelte';
+  import Autocomplete from '$lib/Autocomplete.svelte';
 
   const mp = createMultiplayerState();
 
@@ -54,10 +55,15 @@
     previewSearch = '';
   }
 
-  function handleSubmitGuess(e: Event) {
-    e.preventDefault();
-    if (!guessInput.trim() || mp.showResult || !mp.isMyTurn) return;
-    mp.submitGuess(guessInput.trim());
+  const availableHints = $derived.by(() => {
+    const hints = mp.category.hints ?? mp.category.items;
+    const guessedNames = new Set(mp.guessedItems.map(g => g.name.toLowerCase()));
+    return hints.filter(h => !guessedNames.has(h.toLowerCase()));
+  });
+
+  function handleSubmitGuess(val: string) {
+    if (!val.trim() || mp.showResult || !mp.isMyTurn) return;
+    mp.submitGuess(val.trim());
     guessInput = '';
   }
 
@@ -398,10 +404,15 @@
           <div class="current-turn">
             <span class="turn-label">Your turn!</span>
           </div>
-          <form onsubmit={handleSubmitGuess}>
-            <input type="text" bind:value={guessInput} placeholder="Enter your guess..." autofocus />
-            <button type="submit" class="guess-btn" disabled={!guessInput.trim()}>Guess</button>
-          </form>
+          <div class="guess-form">
+            <Autocomplete
+              hints={availableHints}
+              bind:value={guessInput}
+              placeholder="Enter your guess..."
+              onsubmit={handleSubmitGuess}
+            />
+            <button class="guess-btn" disabled={!guessInput.trim()} onclick={() => handleSubmitGuess(guessInput)}>Guess</button>
+          </div>
         </div>
       {:else}
         <div class="guess-area waiting">
@@ -1247,6 +1258,7 @@
 
   form { display: flex; gap: 0.5rem; }
   form input { flex: 1; }
+  .guess-form { display: flex; gap: 0.5rem; }
 
   .guess-btn {
     padding: 0.6rem 1.25rem;

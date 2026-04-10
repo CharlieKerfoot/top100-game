@@ -1,10 +1,12 @@
 import type { Category } from './types';
+import { mostFollowedInstagramHints } from './hints';
 
 export const mostFollowedInstagram: Category = {
   id: 'most-followed-instagram',
   name: 'Most Followed Instagram Accounts',
   description: 'By follower count (2024)',
   tags: ['entertainment', 'social media'],
+  hints: mostFollowedInstagramHints,
   items: [
     "Instagram", "Cristiano Ronaldo", "Lionel Messi", "Selena Gomez", "Kylie Jenner",
     "Dwayne Johnson", "Ariana Grande", "Kim Kardashian", "Beyoncé", "Khloé Kardashian",

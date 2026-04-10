@@ -4,4 +4,5 @@ export interface Category {
   description: string;
   tags: string[];
   items: string[];
+  hints?: string[];
 }

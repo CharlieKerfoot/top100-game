@@ -1,10 +1,12 @@
 import type { Category } from './types';
+import { bestSellingVideoGamesHints } from './hints';
 
 export const bestSellingVideoGames: Category = {
   id: 'best-selling-video-games',
   name: 'Best Selling Video Games',
   description: 'All-time best sellers',
   tags: ['entertainment', 'gaming'],
+  hints: bestSellingVideoGamesHints,
   items: [
     "Minecraft", "Grand Theft Auto V", "Tetris", "Wii Sports", "PUBG: Battlegrounds",
     "Mario Kart 8", "Super Smash Bros. Ultimate", "Red Dead Redemption 2", "Overwatch", "The Witcher 3",

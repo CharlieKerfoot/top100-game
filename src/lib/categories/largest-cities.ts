@@ -1,10 +1,12 @@
 import type { Category } from './types';
+import { largestCitiesHints } from './hints';
 
 export const largestCities: Category = {
   id: 'largest-cities',
   name: 'Largest Cities by Population',
   description: "World's largest urban areas",
   tags: ['geography', 'world'],
+  hints: largestCitiesHints,
   items: [
     "Tokyo", "Delhi", "Shanghai", "Dhaka", "Cairo",
     "Beijing", "Mumbai", "Mexico City", "Osaka", "São Paulo",
