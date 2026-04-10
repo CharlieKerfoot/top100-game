@@ -115,7 +115,7 @@
             class="start-btn"
             disabled={!playerName.trim()}
             onclick={handleCreate}
-          >Create Party</button>
+          >{!playerName.trim() ? 'Enter your name above first' : 'Create Party'}</button>
         </div>
       {:else}
         <div class="setup-section">
@@ -130,9 +130,9 @@
           />
           <button
             class="start-btn"
-            disabled={!playerName.trim() || joinCode.trim().length < 4}
+            disabled={!playerName.trim() || !joinCode.trim()}
             onclick={() => handleJoin()}
-          >Join Party</button>
+          >{!playerName.trim() ? 'Enter your name above first' : 'Join Party'}</button>
         </div>
 
         <button class="browse-toggle" onclick={handleBrowse}>
@@ -157,7 +157,7 @@
                         class="pp-join-btn"
                         disabled={!playerName.trim()}
                         onclick={() => handleJoin(party.code)}
-                      >Join</button>
+                      >{!playerName.trim() ? 'Name first' : 'Join'}</button>
                     {:else}
                       <span class="pp-status">In Game</span>
                     {/if}
