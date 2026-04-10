@@ -334,7 +334,7 @@ export function setupSocketServer(io: Server) {
         }
       } else {
         const rank = foundIndex + 1;
-        const points = 101 - rank;
+        const points = rank;
         result = { guess, rank, points, isStrike: false, playerName: player.name };
         player.score += points;
         player.guesses++;

@@ -228,7 +228,7 @@
                   <div class="preview-item">
                     <span class="preview-rank">#{rank}</span>
                     <span class="preview-name">{item}</span>
-                    <span class="preview-points">{101 - rank} pts</span>
+                    <span class="preview-points">{rank} pts</span>
                   </div>
                 {/each}
                 {#if filteredPreviewItems.length === 0}
