@@ -22,6 +22,12 @@ import { mostStreamedSongs } from './most-streamed-songs';
 import { largestCities } from './largest-cities';
 import { mostFollowedInstagram } from './most-followed-instagram';
 import { bestSellingVideoGames } from './best-selling-video-games';
+import { mostSubscribedYoutube } from './most-subscribed-youtube';
+import { mostFollowedTwitter } from './most-followed-twitter';
+import { mostStreamedSpotifyArtists } from './most-streamed-spotify-artists';
+import { bestSellingBooks } from './best-selling-books';
+import { forbesBillionaires } from './forbes-billionaires';
+import { mostVisitedCountries } from './most-visited-countries';
 
 import type { Category } from './types';
 
@@ -32,6 +38,12 @@ export const categories: Category[] = [
   largestCities,
   mostFollowedInstagram,
   bestSellingVideoGames,
+  mostSubscribedYoutube,
+  mostFollowedTwitter,
+  mostStreamedSpotifyArtists,
+  bestSellingBooks,
+  forbesBillionaires,
+  mostVisitedCountries,
 ];
 
 export function getAllTags(): string[] {

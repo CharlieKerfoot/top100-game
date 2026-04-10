@@ -1,0 +1,32 @@
+import type { Category } from './types';
+import { bestSellingBooksHints } from './hints';
+
+export const bestSellingBooks: Category = {
+  id: 'best-selling-books',
+  name: 'Best-Selling Books of All Time',
+  description: 'Books ranked by estimated all-time copies sold',
+  tags: ['books', 'literature', 'entertainment'],
+  hints: bestSellingBooksHints,
+  items: [
+    "A Tale of Two Cities", "The Little Prince", "The Alchemist", "Harry Potter and the Philosopher's Stone", "And Then There Were None",
+    "Dream of the Red Chamber", "The Hobbit", "Alice's Adventures in Wonderland", "She: A History of Adventure", "The Da Vinci Code",
+    "Harry Potter and the Chamber of Secrets", "The Catcher in the Rye", "Harry Potter and the Prisoner of Azkaban", "Harry Potter and the Goblet of Fire", "Harry Potter and the Order of the Phoenix",
+    "Harry Potter and the Half-Blood Prince", "Harry Potter and the Deathly Hallows", "Sophie's World", "The Bridges of Madison County", "One Hundred Years of Solitude",
+    "Lolita", "Heidi", "The Common Sense Book of Baby and Child Care", "Anne of Green Gables", "Black Beauty",
+    "The Name of the Rose", "The Eagle Has Landed", "Watership Down", "The Hite Report", "Charlotte's Web",
+    "The Ginger Man", "The Purpose Driven Life", "The Tale of Peter Rabbit", "Jonathan Livingston Seagull", "The Very Hungry Caterpillar",
+    "A Message to Garcia", "To Kill a Mockingbird", "Flowers in the Attic", "Cosmos", "Angels & Demons",
+    "How to Win Friends and Influence People", "Alcoholics Anonymous", "Kane and Abel", "Fear of Flying", "How the Steel Was Tempered",
+    "War and Peace", "The Adventures of Pinocchio", "The Diary of a Young Girl", "Your Erroneous Zones", "The Thorn Birds",
+    "The Kite Runner", "Valley of the Dolls", "The Great Gatsby", "Gone with the Wind", "Rebecca",
+    "The Girl with the Dragon Tattoo", "The Lost Symbol", "The Hunger Games", "James and the Giant Peach", "Ben-Hur: A Tale of the Christ",
+    "Who Moved My Cheese?", "A Brief History of Time", "The Wind in the Willows", "The 7 Habits of Highly Effective People", "Totto-Chan: The Little Girl at the Window",
+    "The Celestine Prophecy", "The Fault in Our Stars", "The Girl on the Train", "The Shack", "The Godfather",
+    "Love Story", "Catching Fire", "Mockingjay", "Gone Girl", "The Bermuda Triangle",
+    "Things Fall Apart", "Dune", "Charlie and the Chocolate Factory", "Where the Wild Things Are", "The Power of Positive Thinking",
+    "The Secret", "Pride and Prejudice", "Adventures of Huckleberry Finn", "Kon-Tiki", "The Good Soldier Švejk",
+    "Paul et Virginie", "What to Expect When You're Expecting", "Love You Forever", "The Women's Room", "The Diary of Adrian Mole",
+    "Kitchen", "The Naked Ape", "The Revolt of Mamie Stover", "Inferno", "Twilight",
+    "The Notebook", "The Martian", "The Girl Who Kicked the Hornet's Nest", "Fifty Shades of Grey", "Think and Grow Rich",
+  ],
+};
