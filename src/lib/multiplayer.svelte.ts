@@ -83,7 +83,8 @@ export function createMultiplayerState() {
   function connect() {
     if (socket?.connected) return;
 
-    const s = SOCKET_URL ? io(SOCKET_URL) : io();
+    const opts = { transports: ['websocket'] as const };
+    const s = SOCKET_URL ? io(SOCKET_URL, opts) : io(opts);
     socket = s;
 
     s.on('connect', () => {
