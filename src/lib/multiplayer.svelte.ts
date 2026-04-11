@@ -54,6 +54,7 @@ export function createMultiplayerState() {
   let socket = $state<Socket | null>(null);
   let phase = $state<AppPhase>('home');
   let error = $state('');
+  let socketReady = $state(false); // true after registered or rejoin fires
 
   // Party state
   let partyCode = $state('');
@@ -95,7 +96,7 @@ export function createMultiplayerState() {
   });
 
   function connect() {
-    if (socket?.connected) return;
+    if (socket) return; // already created (may still be connecting)
 
     const opts = { transports: ['websocket'] as string[] };
     const s = SOCKET_URL ? io(SOCKET_URL, opts) : io(opts);
@@ -108,7 +109,7 @@ export function createMultiplayerState() {
     });
 
     s.on('registered', () => {
-      // Fresh connection, no existing party
+      socketReady = true;
     });
 
     s.on('rejoin', ({ phase: p, party, game }: { phase: string; party: any; game: any }) => {
@@ -122,7 +123,10 @@ export function createMultiplayerState() {
         phase = p as AppPhase;
       }
       error = '';
-      if (party.code) goto(`/${party.code}`);
+      socketReady = true;
+      if (party.code && window.location.pathname !== `/${party.code}`) {
+        goto(`/${party.code}`);
+      }
     });
 
     s.on('disconnect', () => {
@@ -143,11 +147,11 @@ export function createMultiplayerState() {
     });
 
     s.on('party-updated', ({ party, game }: { party: any; game: any }) => {
+      const wasHome = phase === 'home';
       applyPartyState(party);
       if (game) applyGameState(game);
-      // If we joined the party via URL, navigate to the party route
-      if (phase === 'home' && partyCode) {
-        phase = 'lobby';
+      // If we were on the home screen and just joined, navigate to the party
+      if (wasHome && partyCode && window.location.pathname !== `/${partyCode}`) {
         goto(`/${partyCode}`);
       }
     });
@@ -161,7 +165,9 @@ export function createMultiplayerState() {
       if (game) applyGameState(game);
       phase = 'sitting-out';
       error = '';
-      goto(`/${party.code}`);
+      if (window.location.pathname !== `/${party.code}`) {
+        goto(`/${party.code}`);
+      }
     });
 
     s.on('game-started', ({ party, game }: { party: any; game: any }) => {
@@ -327,6 +333,7 @@ export function createMultiplayerState() {
 
   return {
     get phase() { return phase; },
+    get socketReady() { return socketReady; },
     get error() { return error; },
     set error(v: string) { error = v; },
     get partyCode() { return partyCode; },

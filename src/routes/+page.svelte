@@ -8,7 +8,6 @@
   let createPublic = $state(true);
   let showBrowse = $state(false);
   let homeTab = $state<"create" | "join">("create");
-  let showRules = $state(false);
 
   function handleCreate() {
     if (!playerName.trim()) return;
@@ -44,52 +43,12 @@
 
 <div class="app">
   <header>
-    <div class="title-row">
-      <h1>Common Cents</h1>
-      <button
-        class="info-btn"
-        onclick={() => (showRules = true)}
-        title="How to play">i</button
-      >
-    </div>
+    <div class="header-rule"></div>
+    <h1>Common Cents</h1>
+    <p class="subtitle">The Top&nbsp;100 Ranking Game</p>
+    <div class="header-rule"></div>
+    <p class="tagline">Name things from a hidden Top&nbsp;100 list. Harder answers score more. Last one standing wins.</p>
   </header>
-
-  {#if showRules}
-    <div
-      class="modal-overlay"
-      onclick={() => (showRules = false)}
-      role="presentation"
-    >
-      <div class="modal" onclick={(e) => e.stopPropagation()} role="dialog">
-        <button class="modal-close" onclick={() => (showRules = false)}
-          >&times;</button
-        >
-        <h2>How to Play</h2>
-        <div class="rules-content">
-          <p>
-            Players take turns guessing items from a ranked list of 100. The
-            closer to #100 your guess is, the more points it's worth.
-          </p>
-          <h3>Strike Mode</h3>
-          <p>
-            Each wrong guess earns a strike. Reach the strike limit and you're
-            eliminated. Last player standing wins, or whoever has the most
-            points when all 100 are found.
-          </p>
-          <h3>Turns Mode</h3>
-          <p>
-            Each player gets a fixed number of turns. Use them wisely &mdash;
-            the player with the most points at the end wins.
-          </p>
-          <h3>Scoring</h3>
-          <p>
-            Points equal the item's rank: #1 = 1 point, #100 = 100 points.
-            Higher-ranked (harder) items are worth more.
-          </p>
-        </div>
-      </div>
-    </div>
-  {/if}
 
   {#if mp.error}
     <div class="error-banner">{mp.error}</div>
@@ -231,120 +190,45 @@
     padding: 1.5rem;
   }
 
+  /* ─── MASTHEAD ─── */
   header {
     text-align: center;
-    margin-bottom: 1.5rem;
-    border-bottom: 3px double #1a1a1a;
-    padding-bottom: 0.75rem;
+    margin-bottom: 2rem;
   }
 
-  .title-row {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
+  .header-rule {
+    border: none;
+    border-top: 3px double #1a1a1a;
+    margin: 0.35rem 0;
   }
 
   header h1 {
     font-family: "Playfair Display", Georgia, serif;
-    font-size: 2.4rem;
+    font-size: 3rem;
     font-weight: 900;
-    margin: 0;
+    margin: 0.3rem 0 0.15rem;
     color: #1a1a1a;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
     line-height: 1;
     text-transform: uppercase;
   }
 
-  .info-btn {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    border: 1.5px solid #999;
-    background: transparent;
-    color: #999;
-    font-family: "Playfair Display", Georgia, serif;
-    font-size: 0.75rem;
-    font-style: italic;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    flex-shrink: 0;
-  }
-
-  .info-btn:hover {
-    border-color: #1a1a1a;
-    color: #1a1a1a;
-  }
-
-  /* ─── RULES MODAL ─── */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    animation: fadeIn 0.15s ease-out;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  .modal {
-    background: #fffef2;
-    border: 1px solid #d4c5a0;
-    padding: 2rem;
-    max-width: 480px;
-    width: 90%;
-    max-height: 80vh;
-    overflow-y: auto;
-    position: relative;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-  }
-
-  .modal-close {
-    position: absolute;
-    top: 0.75rem;
-    right: 1rem;
-    border: none;
-    background: transparent;
-    font-size: 1.5rem;
-    color: #999;
-    cursor: pointer;
-    line-height: 1;
-  }
-
-  .modal-close:hover { color: #1a1a1a; }
-
-  .modal h2 {
-    font-family: "Playfair Display", Georgia, serif;
-    font-size: 1.4rem;
-    font-weight: 900;
-    margin: 0 0 1rem;
+  .subtitle {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 0.8rem;
+    color: #777;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    letter-spacing: 0.02em;
+    margin: 0.15rem 0;
   }
 
-  .rules-content h3 {
-    font-family: "Playfair Display", Georgia, serif;
+  .tagline {
     font-size: 0.95rem;
-    font-weight: 700;
-    margin: 1rem 0 0.25rem;
-    color: #8b0000;
-  }
-
-  .rules-content p {
-    margin: 0 0 0.5rem;
-    font-size: 0.9rem;
+    color: #555;
+    font-style: italic;
     line-height: 1.5;
-    color: #444;
+    margin: 0.75rem auto 0;
+    max-width: 420px;
   }
 
   /* Error */
@@ -408,6 +292,7 @@
   }
 
   .start-btn {
+    display: block;
     width: 100%;
     padding: 0.85rem 2rem;
     border: 2px solid #1a1a1a;
@@ -421,6 +306,7 @@
     margin-top: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    text-align: center;
   }
 
   .start-btn:hover:not(:disabled) {
@@ -435,7 +321,7 @@
 
   /* ─── HOME ─── */
   .home {
-    max-width: 420px;
+    max-width: 380px;
     margin: 0 auto;
   }
 

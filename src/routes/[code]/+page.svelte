@@ -26,19 +26,24 @@
   } | null>(null);
   let checking = $state(true);
 
-  // Check if party exists when we land on this route
+  // Check if party exists when we land on this route.
+  // Wait for socketReady so we don't race with a rejoin that restores state.
   $effect(() => {
+    if (!mp.socketReady) return; // wait for registered or rejoin before acting
     const code = routeCode;
-    // If we're already in this party, no need to check
+    // Already in this party — no need to check
     if (mp.partyCode === code && mp.phase !== "home") {
       checking = false;
       return;
     }
+    let active = true;
     checking = true;
     mp.checkParty(code).then((info) => {
+      if (!active) return;
       partyInfo = info;
       checking = false;
     });
+    return () => { active = false; };
   });
 
   const needsJoin = $derived(
@@ -108,24 +113,35 @@
     guessInput = "";
   }
 
+  let copied = $state(false);
+
   function copyCode() {
     navigator.clipboard.writeText(mp.partyCode);
+    copied = true;
+    setTimeout(() => { copied = false; }, 1500);
   }
 
-  function copyUrl() {
-    navigator.clipboard.writeText(window.location.href);
-  }
 </script>
 
 <div class="app">
   <header>
     <div class="title-row">
+      <div class="title-row-left">
+        {#if mp.phase !== "lobby"}
+          <button class="info-btn" onclick={() => (showRules = true)} title="How to play">i</button>
+        {/if}
+      </div>
       <a href="/" class="title-link"><h1>Common Cents</h1></a>
-      <button
-        class="info-btn"
-        onclick={() => (showRules = true)}
-        title="How to play">i</button
-      >
+      <div class="title-row-right">
+        {#if mp.phase === "lobby"}
+          <div class="header-code-block">
+            <span class="code-text">{mp.partyCode}</span>
+            <button class="copy-btn" class:copied onclick={copyCode}>
+              {copied ? "✓" : "Copy"}
+            </button>
+          </div>
+        {/if}
+      </div>
     </div>
     {#if !needsJoin && (mp.phase === "playing" || mp.phase === "results" || mp.phase === "sitting-out")}
       <div class="header-meta">
@@ -443,248 +459,225 @@
   <!-- ─── LOBBY SCREEN ─── -->
   {:else if mp.phase === "lobby"}
     <div class="lobby">
-      <div class="party-code-section">
-        <span class="code-label">Party Code</span>
-        <div class="code-display">
-          <span class="code-text">{mp.partyCode}</span>
-          <button class="copy-btn" onclick={copyCode}>Copy Code</button>
-          <button class="copy-btn" onclick={copyUrl}>Copy Link</button>
-        </div>
+
+      <!-- Column 1: Players + Game Mode -->
+      <div class="lobby-col lobby-col-info">
         {#if mp.isHost}
-          <div class="public-toggle small">
-            <button
-              class="toggle-btn small"
-              class:active={mp.isPublic}
-              onclick={() => mp.updateSettings({ isPublic: true })}
-              >Public</button
-            >
-            <button
-              class="toggle-btn small"
-              class:active={!mp.isPublic}
-              onclick={() => mp.updateSettings({ isPublic: false })}
-              >Private</button
-            >
+          <div class="visibility-row">
+            <button class="toggle-btn small" class:active={mp.isPublic} onclick={() => mp.updateSettings({ isPublic: true })}>Public</button>
+            <button class="toggle-btn small" class:active={!mp.isPublic} onclick={() => mp.updateSettings({ isPublic: false })}>Private</button>
           </div>
         {:else}
-          <span class="visibility-label"
-            >{mp.isPublic ? "Public" : "Private"} party</span
-          >
+          <span class="visibility-label">{mp.isPublic ? "Public" : "Private"} party</span>
         {/if}
-      </div>
 
-      <div class="setup-section">
-        <label>Players ({mp.players.length}/8)</label>
-        <div class="player-list">
-          {#each mp.players as player}
-            <div
-              class="lobby-player"
-              class:host={player.id === mp.hostId}
-              class:me={player.id === mp.myId}
-            >
-              <span class="lp-name">{player.name}</span>
-              {#if player.id === mp.hostId}<span class="lp-badge">Host</span>{/if}
-              {#if player.id === mp.myId}<span class="lp-you">You</span>{/if}
-            </div>
-          {/each}
+        <div class="setup-section">
+          <label>Players ({mp.players.length}/8)</label>
+          <div class="player-list">
+            {#each mp.players as player}
+              <div
+                class="lobby-player"
+                class:host={player.id === mp.hostId}
+                class:me={player.id === mp.myId}
+              >
+                <span class="lp-name">{player.name}</span>
+                {#if player.id === mp.hostId}<span class="lp-badge">Host</span>{/if}
+                {#if player.id === mp.myId}<span class="lp-you">You</span>{/if}
+              </div>
+            {/each}
+          </div>
         </div>
-      </div>
 
-      <!-- Settings (host editable, others read-only) -->
-      <div class="setup-section">
-        <label>Category</label>
-        {#if mp.isHost}
-          {#if previewCategory}
-            <div class="category-preview">
-              <div class="preview-header">
-                <button
-                  class="back-btn"
-                  onclick={() => {
-                    previewCategory = null;
-                    previewSearch = "";
-                  }}>&larr; Back</button
-                >
-                <div class="preview-title">
-                  <h3>{previewCategory.name}</h3>
-                  <p>{previewCategory.description}</p>
-                </div>
-                <button
-                  class="select-btn"
-                  onclick={() => selectCategory(previewCategory!)}
-                  >Select</button
-                >
-              </div>
-              <div class="preview-tags">
-                {#each previewCategory.tags as tag}
-                  <span class="tag">{tag}</span>
-                {/each}
-              </div>
-              <input
-                type="text"
-                bind:value={previewSearch}
-                placeholder="Search items..."
-                class="preview-search"
-              />
-              <div class="preview-list">
-                {#each filteredPreviewItems as { item, rank }}
-                  <div class="preview-item">
-                    <span class="preview-rank">#{rank}</span>
-                    <span class="preview-name">{item}</span>
-                    <span class="preview-points">{rank} pts</span>
-                  </div>
-                {/each}
-                {#if filteredPreviewItems.length === 0}
-                  <div class="preview-empty">
-                    No items match "{previewSearch}"
-                  </div>
-                {/if}
-              </div>
-            </div>
-          {:else}
-            <input
-              type="text"
-              bind:value={categorySearch}
-              placeholder="Search categories..."
-            />
-            <div class="tag-bar">
+        <div class="setup-section">
+          <label>Game Mode</label>
+          {#if mp.isHost}
+            <div class="mode-toggle">
               <button
-                class="tag-btn"
-                class:active={activeTag === "__featured__"}
-                onclick={() => (activeTag = "__featured__")}>Featured</button
+                class="mode-btn"
+                class:active={mp.mode === "strikes"}
+                onclick={() => mp.updateSettings({ mode: "strikes" })}
               >
+                <span class="mode-icon">&#10060;</span> Strikes
+              </button>
               <button
-                class="tag-btn"
-                class:active={activeTag === null}
-                onclick={() => (activeTag = null)}>All</button
+                class="mode-btn"
+                class:active={mp.mode === "turns"}
+                onclick={() => mp.updateSettings({ mode: "turns" })}
               >
-              {#each allTags as tag}
-                <button
-                  class="tag-btn"
-                  class:active={activeTag === tag}
-                  onclick={() => (activeTag = activeTag === tag ? null : tag)}
-                  >{tag}</button
-                >
-              {/each}
+                <span class="mode-icon">&#128260;</span> Turns
+              </button>
             </div>
-            <div class="category-grid">
-              {#each filteredCategories as cat}
-                <div
-                  class="category-card"
-                  class:selected={mp.categoryId === cat.id}
-                  role="button"
-                  tabindex="0"
-                  onclick={() => mp.updateSettings({ categoryId: cat.id })}
-                  onkeydown={(e: KeyboardEvent) => {
-                    if (e.key === "Enter" || e.key === " ")
-                      mp.updateSettings({ categoryId: cat.id });
-                  }}
-                >
-                  <div class="card-top">
-                    <span class="card-name">{cat.name}</span>
-                    {#if mp.categoryId === cat.id}<span class="card-check"
-                        >&#10003;</span
-                      >{/if}
-                  </div>
-                  <span class="card-desc">{cat.description}</span>
-                  <div class="card-tags">
-                    {#each cat.tags as tag}
-                      <span class="card-tag">{tag}</span>
-                    {/each}
-                  </div>
+            {#if mp.mode === "strikes"}
+              <div class="mode-config">
+                <label for="maxStrikes">Strikes to eliminate</label>
+                <div class="player-count-row">
                   <button
-                    class="browse-items-btn"
-                    onclick={(e: MouseEvent) => {
-                      e.stopPropagation();
-                      previewCategory = cat;
-                      previewSearch = "";
-                    }}>Browse items</button
+                    class="count-btn"
+                    disabled={mp.maxStrikes <= 1}
+                    onclick={() => mp.updateSettings({ maxStrikes: mp.maxStrikes - 1 })}
+                    >-</button
+                  >
+                  <span class="count-display">{mp.maxStrikes}</span>
+                  <button
+                    class="count-btn"
+                    disabled={mp.maxStrikes >= 10}
+                    onclick={() => mp.updateSettings({ maxStrikes: mp.maxStrikes + 1 })}
+                    >+</button
                   >
                 </div>
-              {/each}
-            </div>
-          {/if}
-        {:else}
-          <div class="readonly-setting">
-            <span class="setting-value">{mp.category.name}</span>
-            <span class="setting-desc">{mp.category.description}</span>
-          </div>
-        {/if}
-      </div>
-
-      <div class="setup-section">
-        <label>Game Mode</label>
-        {#if mp.isHost}
-          <div class="mode-toggle">
-            <button
-              class="mode-btn"
-              class:active={mp.mode === "strikes"}
-              onclick={() => mp.updateSettings({ mode: "strikes" })}
-            >
-              <span class="mode-icon">&#10060;</span> Strikes
-            </button>
-            <button
-              class="mode-btn"
-              class:active={mp.mode === "turns"}
-              onclick={() => mp.updateSettings({ mode: "turns" })}
-            >
-              <span class="mode-icon">&#128260;</span> Turns
-            </button>
-          </div>
-          {#if mp.mode === "strikes"}
-            <div class="mode-config">
-              <label for="maxStrikes">Strikes to eliminate</label>
-              <div class="player-count-row">
-                <button
-                  class="count-btn"
-                  disabled={mp.maxStrikes <= 1}
-                  onclick={() =>
-                    mp.updateSettings({ maxStrikes: mp.maxStrikes - 1 })}
-                  >-</button
-                >
-                <span class="count-display">{mp.maxStrikes}</span>
-                <button
-                  class="count-btn"
-                  disabled={mp.maxStrikes >= 10}
-                  onclick={() =>
-                    mp.updateSettings({ maxStrikes: mp.maxStrikes + 1 })}
-                  >+</button
-                >
               </div>
-            </div>
+            {:else}
+              <div class="mode-config">
+                <label for="maxTurns">Turns per player</label>
+                <div class="player-count-row">
+                  <button
+                    class="count-btn"
+                    disabled={mp.maxTurns <= 1}
+                    onclick={() => mp.updateSettings({ maxTurns: mp.maxTurns - 1 })}>-</button
+                  >
+                  <span class="count-display">{mp.maxTurns}</span>
+                  <button
+                    class="count-btn"
+                    disabled={mp.maxTurns >= 50}
+                    onclick={() => mp.updateSettings({ maxTurns: mp.maxTurns + 1 })}>+</button
+                  >
+                </div>
+              </div>
+            {/if}
           {:else}
-            <div class="mode-config">
-              <label for="maxTurns">Turns per player</label>
-              <div class="player-count-row">
-                <button
-                  class="count-btn"
-                  disabled={mp.maxTurns <= 1}
-                  onclick={() =>
-                    mp.updateSettings({ maxTurns: mp.maxTurns - 1 })}>-</button
-                >
-                <span class="count-display">{mp.maxTurns}</span>
-                <button
-                  class="count-btn"
-                  disabled={mp.maxTurns >= 50}
-                  onclick={() =>
-                    mp.updateSettings({ maxTurns: mp.maxTurns + 1 })}>+</button
-                >
-              </div>
+            <div class="readonly-setting">
+              <span class="setting-value">
+                {mp.mode === "strikes"
+                  ? `Strikes (${mp.maxStrikes} to eliminate)`
+                  : `Turns (${mp.maxTurns} per player)`}
+              </span>
             </div>
           {/if}
-        {:else}
-          <div class="readonly-setting">
-            <span class="setting-value">
-              {mp.mode === "strikes"
-                ? `Strikes (${mp.maxStrikes} to eliminate)`
-                : `Turns (${mp.maxTurns} per player)`}
-            </span>
-          </div>
-        {/if}
+        </div>
       </div>
 
+      <!-- Column 2: Category -->
+      <div class="lobby-col lobby-col-category">
+        <div class="setup-section">
+          <label>Category</label>
+          {#if mp.isHost}
+            {#if previewCategory}
+              <div class="category-preview">
+                <div class="preview-header">
+                  <button
+                    class="back-btn"
+                    onclick={() => { previewCategory = null; previewSearch = ""; }}
+                    >&larr; Back</button
+                  >
+                  <div class="preview-title">
+                    <h3>{previewCategory.name}</h3>
+                    <p>{previewCategory.description}</p>
+                  </div>
+                  <button
+                    class="select-btn"
+                    onclick={() => selectCategory(previewCategory!)}
+                    >Select</button
+                  >
+                </div>
+                <div class="preview-tags">
+                  {#each previewCategory.tags as tag}
+                    <span class="tag">{tag}</span>
+                  {/each}
+                </div>
+                <input
+                  type="text"
+                  bind:value={previewSearch}
+                  placeholder="Search items..."
+                  class="preview-search"
+                />
+                <div class="preview-list">
+                  {#each filteredPreviewItems as { item, rank }}
+                    <div class="preview-item">
+                      <span class="preview-rank">#{rank}</span>
+                      <span class="preview-name">{item}</span>
+                      <span class="preview-points">{rank} pts</span>
+                    </div>
+                  {/each}
+                  {#if filteredPreviewItems.length === 0}
+                    <div class="preview-empty">No items match "{previewSearch}"</div>
+                  {/if}
+                </div>
+              </div>
+            {:else}
+              <input
+                type="text"
+                bind:value={categorySearch}
+                placeholder="Search categories..."
+              />
+              <div class="tag-bar">
+                <button
+                  class="tag-btn"
+                  class:active={activeTag === "__featured__"}
+                  onclick={() => (activeTag = "__featured__")}>Featured</button
+                >
+                <button
+                  class="tag-btn"
+                  class:active={activeTag === null}
+                  onclick={() => (activeTag = null)}>All</button
+                >
+                {#each allTags as tag}
+                  <button
+                    class="tag-btn"
+                    class:active={activeTag === tag}
+                    onclick={() => (activeTag = activeTag === tag ? null : tag)}
+                    >{tag}</button
+                  >
+                {/each}
+              </div>
+              <div class="category-grid">
+                {#each filteredCategories as cat}
+                  <div
+                    class="category-card"
+                    class:selected={mp.categoryId === cat.id}
+                    role="button"
+                    tabindex="0"
+                    onclick={() => mp.updateSettings({ categoryId: cat.id })}
+                    onkeydown={(e: KeyboardEvent) => {
+                      if (e.key === "Enter" || e.key === " ")
+                        mp.updateSettings({ categoryId: cat.id });
+                    }}
+                  >
+                    <div class="card-top">
+                      <span class="card-name">{cat.name}</span>
+                      {#if mp.categoryId === cat.id}<span class="card-check">&#10003;</span>{/if}
+                    </div>
+                    <span class="card-desc">{cat.description}</span>
+                    <div class="card-tags">
+                      {#each cat.tags as tag}
+                        <span class="card-tag">{tag}</span>
+                      {/each}
+                    </div>
+                    <button
+                      class="browse-items-btn"
+                      onclick={(e: MouseEvent) => {
+                        e.stopPropagation();
+                        previewCategory = cat;
+                        previewSearch = "";
+                      }}>Browse items</button
+                    >
+                  </div>
+                {/each}
+              </div>
+            {/if}
+          {:else}
+            <div class="readonly-setting">
+              <span class="setting-value">{mp.category.name}</span>
+              <span class="setting-desc">{mp.category.description}</span>
+            </div>
+          {/if}
+        </div>
+      </div>
+
+      <!-- Actions bar spanning full width -->
       <div class="lobby-actions">
         {#if mp.isHost}
           <button
-            class="start-btn"
+            class="start-btn lobby-start-btn"
             disabled={mp.players.length < 2}
             onclick={() => mp.startGame()}
           >
@@ -997,10 +990,109 @@
     padding: 1.5rem;
   }
 
+  /* ─── LOBBY ─── */
+  .lobby {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .category-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
   @media (min-width: 900px) {
     .app:has(.game) {
       max-width: 1400px;
       padding: 1.5rem 2rem;
+    }
+
+    .app:has(.lobby) {
+      height: 100dvh;
+      box-sizing: border-box;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      max-width: 1200px;
+      padding: 1.5rem 2rem;
+    }
+
+    .lobby {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      grid-template-rows: 1fr auto;
+      gap: 1.25rem;
+    }
+
+    .lobby-col-info {
+      grid-column: 1;
+      grid-row: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .lobby-col-category {
+      grid-column: 2;
+      grid-row: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    /* Category setup-section fills the right column */
+    .lobby-col-category .setup-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .lobby-actions {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid #d4c5a0;
+    }
+
+    .lobby-start-btn { flex: 1; margin-top: 0; }
+    .lobby-actions .leave-btn { flex-shrink: 0; }
+    .lobby-actions .waiting-msg { flex: 1; }
+
+    /* Category grid: 3 columns, fills space, scrolls on overflow */
+    .category-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.75rem;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      align-content: start;
+    }
+
+    /* Category preview also fills and scrolls */
+    .category-preview {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .preview-list {
+      flex: 1;
+      overflow-y: auto;
+      min-height: 0;
     }
   }
 
@@ -1012,15 +1104,76 @@
   }
 
   .title-row {
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    gap: 0.5rem;
+  }
+
+  .title-row-left {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .title-row-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
   }
 
   .title-link {
     text-decoration: none;
     color: inherit;
+    text-align: center;
+  }
+
+  .header-code-block {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: rgba(139, 0, 0, 0.05);
+    border: 1px solid rgba(139, 0, 0, 0.2);
+  }
+
+  .header-code-block .code-text {
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    font-family: "Courier New", Courier, monospace;
+    color: #8b0000;
+    padding: 0.3rem 0.75rem;
+  }
+
+  .header-code-block .copy-btn {
+    font-size: 0.72rem;
+    padding: 0.3rem 0.6rem;
+    border: none;
+    border-left: 1px solid rgba(139, 0, 0, 0.2);
+    background: rgba(139, 0, 0, 0.08);
+    color: #8b0000;
+    font-family: "Source Serif 4", Georgia, serif;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    height: 100%;
+  }
+
+  .header-code-block .copy-btn:hover {
+    background: rgba(139, 0, 0, 0.15);
+  }
+
+  .header-code-block .copy-btn.copied {
+    color: #2d7a2d;
+    border-left-color: rgba(45, 122, 45, 0.3);
+    background: rgba(45, 122, 45, 0.08);
+  }
+
+  .visibility-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
   }
 
   header h1 {
@@ -1364,13 +1517,6 @@
     font-style: italic;
   }
 
-  /* ─── LOBBY ─── */
-  .lobby {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
   .party-code-section {
     text-align: center;
     background: #fffef2;
@@ -1391,13 +1537,13 @@
 
   .code-display {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
 
   .code-text {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: 800;
     letter-spacing: 0.1em;
     font-family: "Courier New", Courier, monospace;
@@ -1418,6 +1564,11 @@
   .copy-btn:hover {
     border-color: #1a1a1a;
     color: #1a1a1a;
+  }
+
+  .copy-btn.copied {
+    border-color: #2d7a2d;
+    color: #2d7a2d;
   }
 
   .public-toggle {
@@ -1580,17 +1731,11 @@
     color: #f5e6c8;
   }
 
-  .category-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
   .category-card {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
-    padding: 0.85rem 1rem;
+    gap: 0.25rem;
+    padding: 0.6rem 0.75rem;
     border: 1px solid #d4c5a0;
     background: #fffef2;
     cursor: pointer;
@@ -1611,11 +1756,19 @@
   .card-name {
     font-family: "Playfair Display", Georgia, serif;
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: 0.88rem;
   }
   .card-check { color: #8b0000; font-weight: 700; }
-  .card-desc { font-size: 0.8rem; color: #888; font-style: italic; }
-  .card-tags { display: flex; gap: 0.35rem; margin-top: 0.15rem; }
+  .card-desc {
+    font-size: 0.75rem;
+    color: #888;
+    font-style: italic;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-tags { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-top: 0.1rem; }
   .card-tag {
     font-size: 0.7rem;
     padding: 0.15rem 0.45rem;
