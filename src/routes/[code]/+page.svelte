@@ -3469,7 +3469,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     color: #555;
-    white-space: nowrap;
   }
 
   .dt-guess-area {
