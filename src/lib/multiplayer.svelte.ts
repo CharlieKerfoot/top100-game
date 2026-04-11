@@ -281,41 +281,33 @@ export function createMultiplayerState() {
     valueLabel = undefined;
   }
 
-  function createParty(playerName: string, pub: boolean) {
-    connect();
-    // Wait for connection then emit
+  function waitForConnection(fn: () => void) {
+    let attempts = 0;
     const tryEmit = () => {
       if (socket?.connected) {
-        socket.emit('create-party', { playerName, isPublic: pub });
+        fn();
+      } else if (++attempts > 50) {
+        error = 'Could not connect to the server. Please try again.';
       } else {
         setTimeout(tryEmit, 100);
       }
     };
     tryEmit();
+  }
+
+  function createParty(playerName: string, pub: boolean) {
+    connect();
+    waitForConnection(() => socket!.emit('create-party', { playerName, isPublic: pub }));
   }
 
   function joinParty(code: string, playerName: string) {
     connect();
-    const tryEmit = () => {
-      if (socket?.connected) {
-        socket.emit('join-party', { code: code.toUpperCase(), playerName });
-      } else {
-        setTimeout(tryEmit, 100);
-      }
-    };
-    tryEmit();
+    waitForConnection(() => socket!.emit('join-party', { code: code.toUpperCase(), playerName }));
   }
 
   function browseParties() {
     connect();
-    const tryEmit = () => {
-      if (socket?.connected) {
-        socket.emit('browse-parties');
-      } else {
-        setTimeout(tryEmit, 100);
-      }
-    };
-    tryEmit();
+    waitForConnection(() => socket!.emit('browse-parties'));
   }
 
   function updateSettings(update: Record<string, unknown>) {
