@@ -29,6 +29,13 @@ export interface GuessResult {
   playerName: string;
 }
 
+export interface GuessHistoryEntry {
+  guess: string;
+  playerName: string;
+  isStrike: boolean;
+  rank: number | null;
+}
+
 export interface PublicParty {
   code: string;
   hostName: string;
@@ -74,6 +81,7 @@ export function createMultiplayerState() {
   let currentPlayerIndex = $state(0);
   let playerOrder = $state<string[]>([]);
   let guessedItems = $state<GuessedItem[]>([]);
+  let guessHistory = $state<GuessHistoryEntry[]>([]);
   let lastResult = $state<GuessResult | null>(null);
   let showResult = $state(false);
 
@@ -239,6 +247,7 @@ export function createMultiplayerState() {
     if (game.maxStrikes) maxStrikes = game.maxStrikes;
     if (game.maxTurns) maxTurns = game.maxTurns;
     if (game.hints !== undefined) hints = game.hints;
+    if (game.guessHistory) guessHistory = game.guessHistory;
   }
 
   function resetState() {
@@ -246,6 +255,7 @@ export function createMultiplayerState() {
     hostId = '';
     players = [];
     guessedItems = [];
+    guessHistory = [];
     lastResult = null;
     showResult = false;
     currentPlayerIndex = 0;
@@ -352,6 +362,7 @@ export function createMultiplayerState() {
     get currentPlayerIndex() { return currentPlayerIndex; },
     get playerOrder() { return playerOrder; },
     get guessedItems() { return guessedItems; },
+    get guessHistory() { return guessHistory; },
     get lastResult() { return lastResult; },
     get showResult() { return showResult; },
     get publicParties() { return publicParties; },

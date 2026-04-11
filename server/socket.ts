@@ -22,10 +22,18 @@ interface GameSettings {
   hints: boolean;
 }
 
+interface GuessHistoryEntry {
+  guess: string;
+  playerName: string;
+  isStrike: boolean;
+  rank: number | null;
+}
+
 interface GameState {
   currentPlayerIndex: number;
   playerOrder: string[];
   guessedItems: Map<number, string>;
+  guessHistory: GuessHistoryEntry[];
   lastResult: GuessResult | null;
   showResult: boolean;
 }
@@ -98,6 +106,7 @@ function serializeGameState(party: Party) {
       name: cat?.items[idx] ?? '???',
       playerName: name,
     })),
+    guessHistory: party.game.guessHistory,
     lastResult: party.game.lastResult,
     showResult: party.game.showResult,
     players: [...party.players.values()],
@@ -377,6 +386,7 @@ export function setupSocketServer(io: Server) {
         currentPlayerIndex: 0,
         playerOrder: [...party.players.keys()],
         guessedItems: new Map(),
+        guessHistory: [],
         lastResult: null,
         showResult: false,
       };
@@ -429,6 +439,7 @@ export function setupSocketServer(io: Server) {
         game.guessedItems.set(foundIndex, player.name);
       }
 
+      game.guessHistory.push({ guess, playerName: player.name, isStrike: result.isStrike, rank: result.rank });
       game.lastResult = result;
       game.showResult = true;
 

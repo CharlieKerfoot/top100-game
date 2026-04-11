@@ -59,6 +59,7 @@
   // Game state
   let guessInput = $state("");
   let showRules = $state(false);
+  let showHistory = $state(false);
 
   const sortedGuessed = $derived(
     [...mp.guessedItems].sort((a, b) => a.index - b.index),
@@ -900,6 +901,36 @@
         </div>
       </div>
 
+      <!-- Desktop game action bar -->
+      <div class="game-action-bar">
+        <button class="game-action-btn" onclick={() => (showHistory = !showHistory)}>
+          {showHistory ? "Hide" : "Show"} All Guesses ({mp.guessHistory.length})
+        </button>
+        {#if mp.isHost}
+          <button class="game-action-btn" onclick={() => mp.backToLobby()}>End Game</button>
+        {/if}
+        <button class="game-action-btn danger" onclick={() => mp.leaveParty()}>Leave Game</button>
+      </div>
+
+      {#if showHistory}
+        <div class="history-panel">
+          <div class="history-list">
+            {#each [...mp.guessHistory].reverse() as entry}
+              <div class="history-entry" class:history-hit={!entry.isStrike} class:history-miss={entry.isStrike}>
+                <span class="history-player">{entry.playerName}</span>
+                <span class="history-guess">{entry.guess}</span>
+                <span class="history-result">
+                  {#if entry.isStrike}✗{:else}#{entry.rank}{/if}
+                </span>
+              </div>
+            {/each}
+            {#if mp.guessHistory.length === 0}
+              <p class="history-empty">No guesses yet</p>
+            {/if}
+          </div>
+        </div>
+      {/if}
+
       <!-- Mobile: compact vertical layout -->
       <div class="game-mobile">
         <div class="game-header">
@@ -1018,6 +1049,32 @@
             {/each}
           </div>
         </div>
+
+        <div class="mobile-game-actions">
+          <button class="game-action-btn" onclick={() => (showHistory = !showHistory)}>
+            {showHistory ? "Hide" : "Show"} All Guesses ({mp.guessHistory.length})
+          </button>
+          {#if mp.isHost}
+            <button class="game-action-btn" onclick={() => mp.backToLobby()}>End Game</button>
+          {/if}
+          <button class="game-action-btn danger" onclick={() => mp.leaveParty()}>Leave Game</button>
+        </div>
+
+        {#if showHistory}
+          <div class="history-panel">
+            <div class="history-list">
+              {#each [...mp.guessHistory].reverse() as entry}
+                <div class="history-entry" class:history-hit={!entry.isStrike} class:history-miss={entry.isStrike}>
+                  <span class="history-player">{entry.playerName}</span>
+                  <span class="history-guess">{entry.guess}</span>
+                  <span class="history-result">
+                    {#if entry.isStrike}✗{:else}#{entry.rank}{/if}
+                  </span>
+                </div>
+              {/each}
+            </div>
+          </div>
+        {/if}
       </div>
     </div>
 
@@ -1061,13 +1118,15 @@
       </div>
 
       <div class="guessed-list">
-        <h3>All Guessed Items ({mp.guessedItems.length}/100)</h3>
-        <div class="guessed-grid">
-          {#each sortedGuessed as item}
-            <div class="guessed-item">
-              <span class="guessed-rank">#{item.index + 1}</span>
-              <span class="guessed-name">{item.name}</span>
-              <span class="guessed-by">{item.playerName}</span>
+        <h3>All Guesses ({mp.guessHistory.length})</h3>
+        <div class="history-list">
+          {#each [...mp.guessHistory].reverse() as entry}
+            <div class="history-entry" class:history-hit={!entry.isStrike} class:history-miss={entry.isStrike}>
+              <span class="history-player">{entry.playerName}</span>
+              <span class="history-guess">{entry.guess}</span>
+              <span class="history-result">
+                {#if entry.isStrike}✗ Miss{:else}✓ #{entry.rank}{/if}
+              </span>
             </div>
           {/each}
         </div>
@@ -2488,6 +2547,114 @@
 
   .next-btn:hover {
     background: #333;
+  }
+
+  /* Game action bar */
+  .game-action-bar {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    border-top: 1px solid #d4c5a0;
+    flex-wrap: wrap;
+  }
+
+  .mobile-game-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+  }
+
+  .game-action-btn {
+    padding: 0.35rem 0.8rem;
+    border: 1px solid #c4b48a;
+    background: transparent;
+    color: #555;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .game-action-btn:hover {
+    border-color: #1a1a1a;
+    color: #1a1a1a;
+  }
+
+  .game-action-btn.danger {
+    border-color: rgba(139, 0, 0, 0.3);
+    color: #8b0000;
+  }
+
+  .game-action-btn.danger:hover {
+    border-color: #8b0000;
+    background: rgba(139, 0, 0, 0.05);
+  }
+
+  /* History panel */
+  .history-panel {
+    background: #fffef2;
+    border: 1px solid #d4c5a0;
+    margin-bottom: 1rem;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+
+  .history-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .history-entry {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    border-bottom: 1px solid #ede0c4;
+    font-size: 0.82rem;
+  }
+
+  .history-entry:last-child {
+    border-bottom: none;
+  }
+
+  .history-entry.history-miss {
+    opacity: 0.6;
+  }
+
+  .history-player {
+    font-weight: 600;
+    min-width: 70px;
+    color: #555;
+    font-size: 0.75rem;
+  }
+
+  .history-guess {
+    flex: 1;
+    font-style: italic;
+  }
+
+  .history-result {
+    font-size: 0.75rem;
+    font-weight: 600;
+    min-width: 40px;
+    text-align: right;
+  }
+
+  .history-entry.history-hit .history-result {
+    color: #2d7a2d;
+  }
+
+  .history-entry.history-miss .history-result {
+    color: #8b0000;
+  }
+
+  .history-empty {
+    text-align: center;
+    color: #888;
+    font-style: italic;
+    padding: 1rem;
+    font-size: 0.85rem;
   }
 
   /* Guessed list */
