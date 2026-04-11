@@ -1,10 +1,12 @@
 import type { Category } from './types';
+import { nbaCareerPointsHints } from './hints';
 
 export const nbaCareerPoints: Category = {
   id: 'nba-career-points',
   name: 'NBA All-Time Points Leaders',
   description: 'NBA players ranked by all-time career regular season points',
   tags: ['sports', 'basketball'],
+  hints: nbaCareerPointsHints,
   items: [
     "LeBron James", "Kareem Abdul-Jabbar", "Karl Malone", "Kobe Bryant", "Kevin Durant",
     "Michael Jordan", "Dirk Nowitzki", "Wilt Chamberlain", "Julius Erving", "Moses Malone",

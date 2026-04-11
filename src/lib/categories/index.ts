@@ -28,6 +28,11 @@ import { mostStreamedSpotifyArtists } from './most-streamed-spotify-artists';
 import { bestSellingBooks } from './best-selling-books';
 import { forbesBillionaires } from './forbes-billionaires';
 import { mostVisitedCountries } from './most-visited-countries';
+import { sportsTeamsByRevenue } from './sports-teams-by-revenue';
+import { nbaCareerPoints } from './nba-career-points';
+import { mlbCareerWar } from './mlb-career-war';
+import { nflCareerPpr } from './nfl-career-ppr';
+import { highestGrossingTvShows } from './highest-grossing-tv-shows';
 
 import type { Category } from './types';
 
@@ -44,6 +49,11 @@ export const categories: Category[] = [
   bestSellingBooks,
   forbesBillionaires,
   mostVisitedCountries,
+  sportsTeamsByRevenue,
+  nbaCareerPoints,
+  mlbCareerWar,
+  nflCareerPpr,
+  highestGrossingTvShows,
 ];
 
 export function getAllTags(): string[] {

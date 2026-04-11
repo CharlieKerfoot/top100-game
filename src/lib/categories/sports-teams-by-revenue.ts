@@ -1,10 +1,12 @@
 import type { Category } from './types';
+import { sportsTeamsByRevenueHints } from './hints';
 
 export const sportsTeamsByRevenue: Category = {
   id: 'sports-teams-by-revenue',
   name: 'Most Valuable Sports Franchises',
   description: 'Sports franchises ranked by total value (Sportico 2025)',
   tags: ['sports', 'business'],
+  hints: sportsTeamsByRevenueHints,
   items: [
     "Dallas Cowboys", "Los Angeles Rams", "New York Giants", "Golden State Warriors", "New England Patriots",
     "San Francisco 49ers", "Philadelphia Eagles", "New York Yankees", "New York Knicks", "Miami Dolphins",

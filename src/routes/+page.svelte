@@ -105,7 +105,7 @@
           disabled={!playerName.trim()}
           onclick={handleCreate}
           >{!playerName.trim()
-            ? "Enter your name above first"
+            ? "Enter your name first"
             : "Create Party"}</button
         >
       </div>

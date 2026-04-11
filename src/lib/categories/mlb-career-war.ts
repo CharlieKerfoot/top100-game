@@ -1,10 +1,12 @@
 import type { Category } from './types';
+import { mlbCareerWarHints } from './hints';
 
 export const mlbCareerWar: Category = {
   id: 'mlb-career-war',
   name: 'MLB All-Time Career WAR Leaders',
   description: 'MLB players ranked by all-time career Wins Above Replacement (WAR)',
   tags: ['sports', 'baseball'],
+  hints: mlbCareerWarHints,
   items: [
     "Babe Ruth", "Walter Johnson", "Cy Young", "Barry Bonds", "Willie Mays",
     "Ty Cobb", "Henry Aaron", "Roger Clemens", "Tris Speaker", "Honus Wagner",

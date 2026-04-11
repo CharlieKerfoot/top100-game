@@ -10,3 +10,8 @@ export { mostStreamedSpotifyArtistsHints } from './most-streamed-spotify-artists
 export { bestSellingBooksHints } from './best-selling-books';
 export { forbesBillionairesHints } from './forbes-billionaires';
 export { mostVisitedCountriesHints } from './most-visited-countries';
+export { sportsTeamsByRevenueHints } from './sports-teams-by-revenue';
+export { nbaCareerPointsHints } from './nba-career-points';
+export { mlbCareerWarHints } from './mlb-career-war';
+export { nflCareerPprHints } from './nfl-career-ppr';
+export { highestGrossingTvShowsHints } from './highest-grossing-tv-shows';
