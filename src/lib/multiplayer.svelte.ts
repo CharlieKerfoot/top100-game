@@ -1,7 +1,9 @@
 import { io, type Socket } from 'socket.io-client';
+import { goto } from '$app/navigation';
+import { getContext } from 'svelte';
 import { categories } from './categories/index';
 
-export type AppPhase = 'home' | 'lobby' | 'playing' | 'results';
+export type AppPhase = 'home' | 'lobby' | 'playing' | 'results' | 'sitting-out';
 
 export interface PlayerInfo {
   id: string;
@@ -10,6 +12,7 @@ export interface PlayerInfo {
   strikes: number;
   eliminated: boolean;
   guesses: number;
+  sittingOut: boolean;
 }
 
 export interface GuessedItem {
@@ -111,8 +114,15 @@ export function createMultiplayerState() {
     s.on('rejoin', ({ phase: p, party, game }: { phase: string; party: any; game: any }) => {
       applyPartyState(party);
       if (game) applyGameState(game);
-      phase = p as AppPhase;
+      // Check if this player is sitting out
+      const me = party.players?.find((pl: any) => pl.id === playerId);
+      if (me?.sittingOut && (p === 'playing' || p === 'results')) {
+        phase = 'sitting-out';
+      } else {
+        phase = p as AppPhase;
+      }
       error = '';
+      if (party.code) goto(`/${party.code}`);
     });
 
     s.on('disconnect', () => {
@@ -129,15 +139,29 @@ export function createMultiplayerState() {
       applyPartyState(party);
       phase = 'lobby';
       error = '';
+      goto(`/${party.code}`);
     });
 
     s.on('party-updated', ({ party, game }: { party: any; game: any }) => {
       applyPartyState(party);
       if (game) applyGameState(game);
+      // If we joined the party via URL, navigate to the party route
+      if (phase === 'home' && partyCode) {
+        phase = 'lobby';
+        goto(`/${partyCode}`);
+      }
     });
 
     s.on('public-parties', ({ parties: list }: { parties: PublicParty[] }) => {
       publicParties = list;
+    });
+
+    s.on('joined-mid-game', ({ party, game }: { party: any; game: any }) => {
+      applyPartyState(party);
+      if (game) applyGameState(game);
+      phase = 'sitting-out';
+      error = '';
+      goto(`/${party.code}`);
     });
 
     s.on('game-started', ({ party, game }: { party: any; game: any }) => {
@@ -172,11 +196,13 @@ export function createMultiplayerState() {
       showResult = false;
       guessedItems = [];
       phase = 'lobby';
+      goto(`/${party.code}`);
     });
 
     s.on('left-party', () => {
       resetState();
       phase = 'home';
+      goto('/');
     });
   }
 
@@ -277,6 +303,25 @@ export function createMultiplayerState() {
     socket?.emit('leave-party');
   }
 
+  function checkParty(code: string): Promise<{ exists: boolean; code: string; phase?: string; hostName?: string; playerCount?: number; categoryName?: string }> {
+    connect();
+    return new Promise((resolve) => {
+      const tryEmit = () => {
+        if (socket?.connected) {
+          socket.once('party-check', (data: any) => resolve(data));
+          socket.emit('check-party', { code });
+        } else {
+          setTimeout(tryEmit, 100);
+        }
+      };
+      tryEmit();
+    });
+  }
+
+  function setPhase(p: AppPhase) {
+    phase = p;
+  }
+
   // Auto-connect on creation to enable reconnect on page refresh
   connect();
 
@@ -316,5 +361,13 @@ export function createMultiplayerState() {
     nextTurn,
     backToLobby,
     leaveParty,
+    checkParty,
+    setPhase,
   };
+}
+
+export type MultiplayerState = ReturnType<typeof createMultiplayerState>;
+
+export function getMultiplayerState(): MultiplayerState {
+  return getContext<MultiplayerState>('mp');
 }
