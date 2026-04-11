@@ -62,6 +62,13 @@
   let showHistory = $state(false);
   let confirmAction = $state<"leave" | "end" | null>(null);
 
+  $effect(() => {
+    if (mp.phase === "playing") {
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = ""; };
+    }
+  });
+
   const sortedGuessed = $derived(
     [...mp.guessedItems].sort((a, b) => a.index - b.index),
   );
@@ -1214,25 +1221,8 @@
 
   @media (min-width: 900px) {
     .app:has(.game) {
-      height: 100dvh;
-      box-sizing: border-box;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
       max-width: 1400px;
       padding: 1.5rem 2rem;
-    }
-
-    .game {
-      flex: 1;
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .game-desktop {
-      flex: 1;
-      min-height: 0;
     }
 
     .app:has(.lobby) {
@@ -3030,14 +3020,6 @@
     grid-template-columns: 240px 1fr;
     gap: 1.5rem;
     align-items: start;
-    flex: 1;
-    min-height: 0;
-  }
-
-  .dt-board {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
   }
 
   /* ─── DESKTOP PLAYERS SIDEBAR ─── */
@@ -3142,7 +3124,7 @@
   .dt-board-body {
     flex: 1;
     overflow-y: auto;
-    min-height: 0;
+    max-height: calc(100vh - 280px);
   }
 
   /* 100-slot list */
