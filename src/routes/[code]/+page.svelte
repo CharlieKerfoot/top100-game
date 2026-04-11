@@ -128,15 +128,29 @@
   <header>
     <div class="title-row">
       <div class="title-row-left">
-        {#if mp.phase !== "lobby"}
+        {#if mp.phase === "lobby"}
           <button
-            class="info-btn"
-            onclick={() => (showRules = true)}
-            title="How to play">i</button
+            class="visibility-toggle"
+            class:is-public={mp.isPublic}
+            onclick={() => mp.isHost && mp.updateSettings({ isPublic: !mp.isPublic })}
+            class:readonly={!mp.isHost}
+            title={mp.isHost ? (mp.isPublic ? "Switch to Private" : "Switch to Public") : ""}
           >
+            <span class="visibility-label-text">{mp.isPublic ? "Public" : "Private"}</span>
+            <span class="visibility-slider">
+              <span class="visibility-knob"></span>
+            </span>
+          </button>
         {/if}
       </div>
-      <a href="/" class="title-link"><h1>Common Cents</h1></a>
+      <div class="title-center">
+        <a href="/" class="title-link"><h1>Common Cents</h1></a>
+        <button
+          class="info-btn"
+          onclick={() => (showRules = true)}
+          title="How to play">i</button
+        >
+      </div>
       <div class="title-row-right">
         {#if mp.phase === "lobby"}
           <div class="header-code-block">
@@ -503,26 +517,6 @@
     <div class="lobby">
       <!-- Column 1: Players + Game Mode -->
       <div class="lobby-col lobby-col-info">
-        {#if mp.isHost}
-          <div class="visibility-row">
-            <button
-              class="toggle-btn small"
-              class:active={mp.isPublic}
-              onclick={() => mp.updateSettings({ isPublic: true })}
-              >Public</button
-            >
-            <button
-              class="toggle-btn small"
-              class:active={!mp.isPublic}
-              onclick={() => mp.updateSettings({ isPublic: false })}
-              >Private</button
-            >
-          </div>
-        {:else}
-          <span class="visibility-label"
-            >{mp.isPublic ? "Public" : "Private"} party</span
-          >
-        {/if}
 
         <div class="setup-section">
           <label>Players ({mp.players.length}/8)</label>
@@ -754,14 +748,6 @@
                         <span class="card-tag">{tag}</span>
                       {/each}
                     </div>
-                    <button
-                      class="browse-items-btn"
-                      onclick={(e: MouseEvent) => {
-                        e.stopPropagation();
-                        previewCategory = cat;
-                        previewSearch = "";
-                      }}>Browse items</button
-                    >
                   </div>
                 {/each}
               </div>
@@ -1289,10 +1275,72 @@
     justify-content: flex-end;
   }
 
+  .title-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
   .title-link {
     text-decoration: none;
     color: inherit;
     text-align: center;
+  }
+
+  .visibility-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(139, 0, 0, 0.05);
+    border: 1px solid rgba(139, 0, 0, 0.2);
+    padding: 0.3rem 0.5rem 0.3rem 0.75rem;
+    cursor: pointer;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8b0000;
+    transition: background 0.2s;
+  }
+
+  .visibility-toggle.readonly {
+    cursor: default;
+  }
+
+  .visibility-toggle:not(.readonly):hover {
+    background: rgba(139, 0, 0, 0.1);
+  }
+
+  .visibility-slider {
+    width: 28px;
+    height: 16px;
+    background: rgba(139, 0, 0, 0.2);
+    border-radius: 8px;
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .visibility-toggle.is-public .visibility-slider {
+    background: #8b0000;
+  }
+
+  .visibility-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fffef2;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+
+  .visibility-toggle.is-public .visibility-knob {
+    transform: translateX(12px);
   }
 
   .header-code-block {
@@ -1336,12 +1384,6 @@
     color: #2d7a2d;
     border-left-color: rgba(45, 122, 45, 0.3);
     background: rgba(45, 122, 45, 0.08);
-  }
-
-  .visibility-row {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
   }
 
   header h1 {
@@ -1847,13 +1889,6 @@
     color: #f5e6c8;
   }
 
-  .visibility-label {
-    display: block;
-    font-size: 0.8rem;
-    color: #888;
-    margin-top: 0.5rem;
-    font-style: italic;
-  }
 
   .player-list {
     display: flex;
@@ -2027,24 +2062,6 @@
     background: rgba(139, 0, 0, 0.06);
     color: #8b0000;
     text-transform: capitalize;
-  }
-
-  .browse-items-btn {
-    align-self: flex-start;
-    margin-top: 0.25rem;
-    padding: 0.25rem 0.6rem;
-    border: 1px solid #c4b48a;
-    background: transparent;
-    color: #777;
-    font-size: 0.75rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: "Source Serif 4", Georgia, serif;
-  }
-
-  .browse-items-btn:hover {
-    border-color: #1a1a1a;
-    color: #1a1a1a;
   }
 
   /* Category preview */

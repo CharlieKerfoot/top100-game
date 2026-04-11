@@ -63,6 +63,10 @@ const featuredIds = [
   'most-streamed-songs',        // music
   'forbes-billionaires',        // business
   'best-selling-video-games',   // gaming
+  'most-followed-instagram',    // social media
+  'best-selling-books',         // literature
+  'most-visited-countries',     // travel
+  'most-subscribed-youtube',    // tech/social
 ];
 
 export function getFeaturedCategories(): Category[] {
