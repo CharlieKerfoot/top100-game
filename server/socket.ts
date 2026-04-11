@@ -498,6 +498,8 @@ export function setupSocketServer(io: Server) {
       if (!party || !party.game || party.phase !== 'playing') return;
 
       const game = party.game;
+      if (!game.showResult) return; // only advance when a result is showing
+
       game.lastResult = null;
       game.showResult = false;
 
