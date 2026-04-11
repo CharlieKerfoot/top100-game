@@ -524,7 +524,7 @@ export function setupSocketServer(io: Server) {
       const code = playerParty.get(playerId);
       if (!code) return;
       const party = parties.get(code);
-      if (!party) return;
+      if (!party || party.hostId !== playerId) return;
 
       party.game = null;
       party.phase = 'lobby';
