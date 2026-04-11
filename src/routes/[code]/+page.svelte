@@ -1228,7 +1228,7 @@
             </div>
             <div class="guess-form">
               <Autocomplete
-                hints={availableHints}
+                hints={mp.hints ? availableHints : []}
                 bind:value={guessInput}
                 placeholder="Enter your guess..."
                 onsubmit={handleSubmitGuess}
