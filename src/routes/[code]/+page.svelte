@@ -43,12 +43,12 @@
       partyInfo = info;
       checking = false;
     });
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   });
 
-  const needsJoin = $derived(
-    mp.partyCode !== routeCode || mp.phase === "home",
-  );
+  const needsJoin = $derived(mp.partyCode !== routeCode || mp.phase === "home");
 
   // Lobby category browser state
   let categorySearch = $state("");
@@ -118,9 +118,10 @@
   function copyCode() {
     navigator.clipboard.writeText(mp.partyCode);
     copied = true;
-    setTimeout(() => { copied = false; }, 1500);
+    setTimeout(() => {
+      copied = false;
+    }, 1500);
   }
-
 </script>
 
 <div class="app">
@@ -128,7 +129,11 @@
     <div class="title-row">
       <div class="title-row-left">
         {#if mp.phase !== "lobby"}
-          <button class="info-btn" onclick={() => (showRules = true)} title="How to play">i</button>
+          <button
+            class="info-btn"
+            onclick={() => (showRules = true)}
+            title="How to play">i</button
+          >
         {/if}
       </div>
       <a href="/" class="title-link"><h1>Common Cents</h1></a>
@@ -236,7 +241,8 @@
           </div>
           {#if partyInfo.phase !== "lobby"}
             <div class="midgame-notice">
-              This game is already in progress. You'll join as a spectator and can play in the next round.
+              This game is already in progress. You'll join as a spectator and
+              can play in the next round.
             </div>
           {/if}
           <div class="setup-section">
@@ -246,10 +252,13 @@
               type="text"
               bind:value={playerName}
               placeholder="Enter your name..."
-              onkeydown={(e) => { if (e.key === "Enter") handleJoin(); }}
+              onkeydown={(e) => {
+                if (e.key === "Enter") handleJoin();
+              }}
             />
             <button
               class="start-btn"
+              style="margin-top: 0.75rem;"
               disabled={!playerName.trim() || (partyInfo.playerCount ?? 0) >= 8}
               onclick={handleJoin}
             >
@@ -268,13 +277,16 @@
       {/if}
     </div>
 
-  <!-- ─── SITTING OUT SCREEN ─── -->
+    <!-- ─── SITTING OUT SCREEN ─── -->
   {:else if mp.phase === "sitting-out"}
     <div class="sitting-out">
       <div class="sitting-out-banner">
         <div class="sitting-out-icon">&#128064;</div>
         <h2>Sitting This One Out</h2>
-        <p>You joined while a game was in progress. Watch the action below and you'll be able to play in the next round!</p>
+        <p>
+          You joined while a game was in progress. Watch the action below and
+          you'll be able to play in the next round!
+        </p>
       </div>
 
       <div class="game">
@@ -289,9 +301,17 @@
                   class:miss={mp.lastResult.isStrike}
                 >
                   {#if mp.lastResult.isStrike}
-                    <span><strong>{mp.lastResult.playerName}</strong> guessed "<strong>{mp.lastResult.guess}</strong>" &mdash; Strike!</span>
+                    <span
+                      ><strong>{mp.lastResult.playerName}</strong> guessed "<strong
+                        >{mp.lastResult.guess}</strong
+                      >" &mdash; Strike!</span
+                    >
                   {:else}
-                    <span><strong>{mp.lastResult.playerName}</strong> guessed "<strong>{mp.lastResult.guess}</strong>" &mdash; #{mp.lastResult.rank}! +{mp.lastResult.points} pts</span>
+                    <span
+                      ><strong>{mp.lastResult.playerName}</strong> guessed "<strong
+                        >{mp.lastResult.guess}</strong
+                      >" &mdash; #{mp.lastResult.rank}! +{mp.lastResult.points} pts</span
+                    >
                   {/if}
                 </div>
               {:else}
@@ -315,7 +335,8 @@
                   <div class="dt-player-top">
                     <span class="dt-player-name">
                       {player.name}
-                      {#if player.id === mp.myId}<span class="you-tag">you</span>{/if}
+                      {#if player.id === mp.myId}<span class="you-tag">you</span
+                        >{/if}
                     </span>
                     {#if player.sittingOut}
                       <span class="dt-player-spectating">Watching</span>
@@ -330,7 +351,10 @@
                     <div class="dt-player-meta">
                       {#if mp.mode === "strikes"}
                         {#each Array(mp.maxStrikes) as _, s}
-                          <span class="strike-dot" class:hit={s < player.strikes}>&#10060;</span>
+                          <span
+                            class="strike-dot"
+                            class:hit={s < player.strikes}>&#10060;</span
+                          >
                         {/each}
                       {:else}
                         {mp.maxTurns - player.guesses} turns left
@@ -344,7 +368,9 @@
             <div class="dt-board">
               <div class="dt-board-header">
                 <span class="dt-board-title">{mp.category.name}</span>
-                <span class="dt-board-count">{mp.guessedItems.length} of 100 identified</span>
+                <span class="dt-board-count"
+                  >{mp.guessedItems.length} of 100 identified</span
+                >
               </div>
               <div class="dt-board-body">
                 <div class="dt-slots">
@@ -368,7 +394,9 @@
         <div class="game-mobile">
           <div class="game-header">
             <div class="category-badge">{mp.category.name}</div>
-            <div class="mode-badge">{mp.mode === "strikes" ? "Strikes" : "Turns"} Mode</div>
+            <div class="mode-badge">
+              {mp.mode === "strikes" ? "Strikes" : "Turns"} Mode
+            </div>
             <div class="code-badge">{mp.partyCode}</div>
           </div>
 
@@ -383,7 +411,8 @@
               >
                 <div class="player-name">
                   {player.name}
-                  {#if player.id === mp.myId}<span class="you-tag">you</span>{/if}
+                  {#if player.id === mp.myId}<span class="you-tag">you</span
+                    >{/if}
                 </div>
                 <div class="player-score">{player.score} pts</div>
                 {#if player.sittingOut}
@@ -393,11 +422,16 @@
                     {#if mp.mode === "strikes"}
                       <span class="strikes">
                         {#each Array(mp.maxStrikes) as _, s}
-                          <span class="strike-dot" class:hit={s < player.strikes}>&#10060;</span>
+                          <span
+                            class="strike-dot"
+                            class:hit={s < player.strikes}>&#10060;</span
+                          >
                         {/each}
                       </span>
                     {:else}
-                      <span class="turns-left">{mp.maxTurns - player.guesses} left</span>
+                      <span class="turns-left"
+                        >{mp.maxTurns - player.guesses} left</span
+                      >
                     {/if}
                   </div>
                 {/if}
@@ -417,13 +451,17 @@
               {#if mp.lastResult.isStrike}
                 <div class="result-icon">&#10060;</div>
                 <div class="result-text">
-                  <strong>{mp.lastResult.playerName}</strong> guessed "<strong>{mp.lastResult.guess}</strong>" &mdash; not in the top 100!
+                  <strong>{mp.lastResult.playerName}</strong> guessed "<strong
+                    >{mp.lastResult.guess}</strong
+                  >" &mdash; not in the top 100!
                 </div>
                 <div class="result-points">Strike!</div>
               {:else}
                 <div class="result-icon">&#127942;</div>
                 <div class="result-text">
-                  <strong>{mp.lastResult.playerName}</strong> guessed "<strong>{mp.lastResult.guess}</strong>" &mdash; ranked <strong>#{mp.lastResult.rank}</strong>!
+                  <strong>{mp.lastResult.playerName}</strong> guessed "<strong
+                    >{mp.lastResult.guess}</strong
+                  >" &mdash; ranked <strong>#{mp.lastResult.rank}</strong>!
                 </div>
                 <div class="result-points">+{mp.lastResult.points} points</div>
               {/if}
@@ -431,7 +469,9 @@
           {:else}
             <div class="guess-area waiting">
               <div class="current-turn">
-                <span class="turn-label">Waiting for {mp.currentPlayer?.name ?? "..."}...</span>
+                <span class="turn-label"
+                  >Waiting for {mp.currentPlayer?.name ?? "..."}...</span
+                >
               </div>
             </div>
           {/if}
@@ -452,23 +492,36 @@
       </div>
 
       <div class="lobby-actions">
-        <button class="leave-btn" onclick={() => mp.leaveParty()}>Leave Party</button>
+        <button class="leave-btn" onclick={() => mp.leaveParty()}
+          >Leave Party</button
+        >
       </div>
     </div>
 
-  <!-- ─── LOBBY SCREEN ─── -->
+    <!-- ─── LOBBY SCREEN ─── -->
   {:else if mp.phase === "lobby"}
     <div class="lobby">
-
       <!-- Column 1: Players + Game Mode -->
       <div class="lobby-col lobby-col-info">
         {#if mp.isHost}
           <div class="visibility-row">
-            <button class="toggle-btn small" class:active={mp.isPublic} onclick={() => mp.updateSettings({ isPublic: true })}>Public</button>
-            <button class="toggle-btn small" class:active={!mp.isPublic} onclick={() => mp.updateSettings({ isPublic: false })}>Private</button>
+            <button
+              class="toggle-btn small"
+              class:active={mp.isPublic}
+              onclick={() => mp.updateSettings({ isPublic: true })}
+              >Public</button
+            >
+            <button
+              class="toggle-btn small"
+              class:active={!mp.isPublic}
+              onclick={() => mp.updateSettings({ isPublic: false })}
+              >Private</button
+            >
           </div>
         {:else}
-          <span class="visibility-label">{mp.isPublic ? "Public" : "Private"} party</span>
+          <span class="visibility-label"
+            >{mp.isPublic ? "Public" : "Private"} party</span
+          >
         {/if}
 
         <div class="setup-section">
@@ -481,7 +534,8 @@
                 class:me={player.id === mp.myId}
               >
                 <span class="lp-name">{player.name}</span>
-                {#if player.id === mp.hostId}<span class="lp-badge">Host</span>{/if}
+                {#if player.id === mp.hostId}<span class="lp-badge">Host</span
+                  >{/if}
                 {#if player.id === mp.myId}<span class="lp-you">You</span>{/if}
               </div>
             {/each}
@@ -514,14 +568,16 @@
                   <button
                     class="count-btn"
                     disabled={mp.maxStrikes <= 1}
-                    onclick={() => mp.updateSettings({ maxStrikes: mp.maxStrikes - 1 })}
+                    onclick={() =>
+                      mp.updateSettings({ maxStrikes: mp.maxStrikes - 1 })}
                     >-</button
                   >
                   <span class="count-display">{mp.maxStrikes}</span>
                   <button
                     class="count-btn"
                     disabled={mp.maxStrikes >= 10}
-                    onclick={() => mp.updateSettings({ maxStrikes: mp.maxStrikes + 1 })}
+                    onclick={() =>
+                      mp.updateSettings({ maxStrikes: mp.maxStrikes + 1 })}
                     >+</button
                   >
                 </div>
@@ -533,13 +589,17 @@
                   <button
                     class="count-btn"
                     disabled={mp.maxTurns <= 1}
-                    onclick={() => mp.updateSettings({ maxTurns: mp.maxTurns - 1 })}>-</button
+                    onclick={() =>
+                      mp.updateSettings({ maxTurns: mp.maxTurns - 1 })}
+                    >-</button
                   >
                   <span class="count-display">{mp.maxTurns}</span>
                   <button
                     class="count-btn"
                     disabled={mp.maxTurns >= 50}
-                    onclick={() => mp.updateSettings({ maxTurns: mp.maxTurns + 1 })}>+</button
+                    onclick={() =>
+                      mp.updateSettings({ maxTurns: mp.maxTurns + 1 })}
+                    >+</button
                   >
                 </div>
               </div>
@@ -551,6 +611,42 @@
                   ? `Strikes (${mp.maxStrikes} to eliminate)`
                   : `Turns (${mp.maxTurns} per player)`}
               </span>
+            </div>
+          {/if}
+        </div>
+
+        <div class="setup-section">
+          <label>
+            Hints
+            <span
+              class="hint-info"
+              aria-label="Show autocomplete suggestions as you type"
+              >i
+              <span class="hint-tooltip"
+                >Show autocomplete suggestions while typing your guess</span
+              >
+            </span>
+          </label>
+          {#if mp.isHost}
+            <div class="mode-toggle">
+              <button
+                class="mode-btn"
+                class:active={mp.hints}
+                onclick={() => mp.updateSettings({ hints: true })}
+              >
+                On
+              </button>
+              <button
+                class="mode-btn"
+                class:active={!mp.hints}
+                onclick={() => mp.updateSettings({ hints: false })}
+              >
+                Off
+              </button>
+            </div>
+          {:else}
+            <div class="readonly-setting">
+              <span class="setting-value">{mp.hints ? "On" : "Off"}</span>
             </div>
           {/if}
         </div>
@@ -566,8 +662,10 @@
                 <div class="preview-header">
                   <button
                     class="back-btn"
-                    onclick={() => { previewCategory = null; previewSearch = ""; }}
-                    >&larr; Back</button
+                    onclick={() => {
+                      previewCategory = null;
+                      previewSearch = "";
+                    }}>&larr; Back</button
                   >
                   <div class="preview-title">
                     <h3>{previewCategory.name}</h3>
@@ -599,7 +697,9 @@
                     </div>
                   {/each}
                   {#if filteredPreviewItems.length === 0}
-                    <div class="preview-empty">No items match "{previewSearch}"</div>
+                    <div class="preview-empty">
+                      No items match "{previewSearch}"
+                    </div>
                   {/if}
                 </div>
               </div>
@@ -644,7 +744,9 @@
                   >
                     <div class="card-top">
                       <span class="card-name">{cat.name}</span>
-                      {#if mp.categoryId === cat.id}<span class="card-check">&#10003;</span>{/if}
+                      {#if mp.categoryId === cat.id}<span class="card-check"
+                          >&#10003;</span
+                        >{/if}
                     </div>
                     <span class="card-desc">{cat.description}</span>
                     <div class="card-tags">
@@ -686,11 +788,13 @@
         {:else}
           <div class="waiting-msg">Waiting for host to start...</div>
         {/if}
-        <button class="leave-btn" onclick={() => mp.leaveParty()}>Leave Party</button>
+        <button class="leave-btn" onclick={() => mp.leaveParty()}
+          >Leave Party</button
+        >
       </div>
     </div>
 
-  <!-- ─── GAME SCREEN ─── -->
+    <!-- ─── GAME SCREEN ─── -->
   {:else if mp.phase === "playing"}
     <div class="game">
       <!-- Desktop: full-width layout -->
@@ -717,12 +821,14 @@
                     >" &mdash; #{mp.lastResult.rank}! +{mp.lastResult.points} pts</span
                   >
                 {/if}
-                <button class="dt-next-btn" onclick={() => mp.nextTurn()}>Next Turn</button>
+                <button class="dt-next-btn" onclick={() => mp.nextTurn()}
+                  >Next Turn</button
+                >
               </div>
             {:else if mp.isMyTurn}
               <div class="dt-input-row">
                 <Autocomplete
-                  hints={availableHints}
+                  hints={mp.hints ? availableHints : []}
                   bind:value={guessInput}
                   placeholder="Name something in the top 100..."
                   onsubmit={handleSubmitGuess}
@@ -754,7 +860,8 @@
                 <div class="dt-player-top">
                   <span class="dt-player-name">
                     {player.name}
-                    {#if player.id === mp.myId}<span class="you-tag">you</span>{/if}
+                    {#if player.id === mp.myId}<span class="you-tag">you</span
+                      >{/if}
                   </span>
                   {#if player.sittingOut}
                     <span class="dt-player-spectating">Watching</span>
@@ -769,7 +876,9 @@
                   <div class="dt-player-meta">
                     {#if mp.mode === "strikes"}
                       {#each Array(mp.maxStrikes) as _, s}
-                        <span class="strike-dot" class:hit={s < player.strikes}>&#10060;</span>
+                        <span class="strike-dot" class:hit={s < player.strikes}
+                          >&#10060;</span
+                        >
                       {/each}
                     {:else}
                       {mp.maxTurns - player.guesses} turns left
@@ -783,7 +892,9 @@
           <div class="dt-board">
             <div class="dt-board-header">
               <span class="dt-board-title">{mp.category.name}</span>
-              <span class="dt-board-count">{mp.guessedItems.length} of 100 identified</span>
+              <span class="dt-board-count"
+                >{mp.guessedItems.length} of 100 identified</span
+              >
             </div>
             <div class="dt-board-body">
               <div class="dt-slots">
@@ -807,7 +918,9 @@
       <div class="game-mobile">
         <div class="game-header">
           <div class="category-badge">{mp.category.name}</div>
-          <div class="mode-badge">{mp.mode === "strikes" ? "Strikes" : "Turns"} Mode</div>
+          <div class="mode-badge">
+            {mp.mode === "strikes" ? "Strikes" : "Turns"} Mode
+          </div>
           <div class="code-badge">{mp.partyCode}</div>
         </div>
 
@@ -832,11 +945,15 @@
                   {#if mp.mode === "strikes"}
                     <span class="strikes">
                       {#each Array(mp.maxStrikes) as _, s}
-                        <span class="strike-dot" class:hit={s < player.strikes}>&#10060;</span>
+                        <span class="strike-dot" class:hit={s < player.strikes}
+                          >&#10060;</span
+                        >
                       {/each}
                     </span>
                   {:else}
-                    <span class="turns-left">{mp.maxTurns - player.guesses} left</span>
+                    <span class="turns-left"
+                      >{mp.maxTurns - player.guesses} left</span
+                    >
                   {/if}
                 </div>
               {/if}
@@ -856,17 +973,23 @@
             {#if mp.lastResult.isStrike}
               <div class="result-icon">&#10060;</div>
               <div class="result-text">
-                <strong>{mp.lastResult.playerName}</strong> guessed "<strong>{mp.lastResult.guess}</strong>" &mdash; not in the top 100!
+                <strong>{mp.lastResult.playerName}</strong> guessed "<strong
+                  >{mp.lastResult.guess}</strong
+                >" &mdash; not in the top 100!
               </div>
               <div class="result-points">Strike!</div>
             {:else}
               <div class="result-icon">&#127942;</div>
               <div class="result-text">
-                <strong>{mp.lastResult.playerName}</strong> guessed "<strong>{mp.lastResult.guess}</strong>" &mdash; ranked <strong>#{mp.lastResult.rank}</strong>!
+                <strong>{mp.lastResult.playerName}</strong> guessed "<strong
+                  >{mp.lastResult.guess}</strong
+                >" &mdash; ranked <strong>#{mp.lastResult.rank}</strong>!
               </div>
               <div class="result-points">+{mp.lastResult.points} points</div>
             {/if}
-            <button class="next-btn" onclick={() => mp.nextTurn()}>Next Turn</button>
+            <button class="next-btn" onclick={() => mp.nextTurn()}
+              >Next Turn</button
+            >
           </div>
         {:else if mp.isMyTurn}
           <div class="guess-area">
@@ -890,7 +1013,9 @@
         {:else}
           <div class="guess-area waiting">
             <div class="current-turn">
-              <span class="turn-label">Waiting for {mp.currentPlayer?.name ?? "..."}...</span>
+              <span class="turn-label"
+                >Waiting for {mp.currentPlayer?.name ?? "..."}...</span
+              >
             </div>
           </div>
         {/if}
@@ -910,7 +1035,7 @@
       </div>
     </div>
 
-  <!-- ─── RESULTS SCREEN ─── -->
+    <!-- ─── RESULTS SCREEN ─── -->
   {:else if mp.phase === "results"}
     <div class="results">
       <h2>Game Over!</h2>
@@ -933,7 +1058,8 @@
         {#each mp.rankings as player, i}
           <div class="ranking-row" class:first={i === 0}>
             <span class="ranking-position">
-              {#if i === 0}&#129351;{:else if i === 1}&#129352;{:else if i === 2}&#129353;{:else}{i + 1}{/if}
+              {#if i === 0}&#129351;{:else if i === 1}&#129352;{:else if i === 2}&#129353;{:else}{i +
+                  1}{/if}
             </span>
             <span class="ranking-name">
               {player.name}
@@ -963,11 +1089,15 @@
 
       <div class="lobby-actions">
         {#if mp.isHost}
-          <button class="start-btn" onclick={() => mp.backToLobby()}>Back to Lobby</button>
+          <button class="start-btn" onclick={() => mp.backToLobby()}
+            >Back to Lobby</button
+          >
         {:else}
           <div class="waiting-msg">Waiting for host...</div>
         {/if}
-        <button class="leave-btn" onclick={() => mp.leaveParty()}>Leave Party</button>
+        <button class="leave-btn" onclick={() => mp.leaveParty()}
+          >Leave Party</button
+        >
       </div>
     </div>
   {/if}
@@ -1003,6 +1133,13 @@
     gap: 0.5rem;
   }
 
+  .lobby-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
   @media (min-width: 900px) {
     .app:has(.game) {
       max-width: 1400px;
@@ -1034,6 +1171,8 @@
       display: flex;
       flex-direction: column;
       gap: 0;
+      overflow-y: auto;
+      min-height: 0;
     }
 
     .lobby-col-category {
@@ -1059,15 +1198,44 @@
       grid-row: 2;
       display: flex;
       flex-direction: row;
-      align-items: center;
-      gap: 1rem;
+      align-items: stretch;
+      gap: 0;
       padding-top: 0.75rem;
       border-top: 1px solid #d4c5a0;
     }
 
-    .lobby-start-btn { flex: 1; margin-top: 0; }
-    .lobby-actions .leave-btn { flex-shrink: 0; }
-    .lobby-actions .waiting-msg { flex: 1; }
+    .lobby-actions {
+      gap: 0.5rem;
+    }
+    .lobby-start-btn {
+      flex: 3;
+      margin-top: 0;
+      width: auto;
+      padding: 0.85rem 1rem;
+    }
+    .lobby-actions > .leave-btn {
+      flex: 1;
+      border: 2px solid #1a1a1a;
+      background: transparent;
+      color: #1a1a1a;
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.85rem 0.5rem;
+      cursor: pointer;
+      transition:
+        background 0.2s,
+        color 0.2s;
+    }
+    .lobby-actions > .leave-btn:hover {
+      background: #1a1a1a;
+      color: #f5e6c8;
+    }
+    .lobby-actions .waiting-msg {
+      flex: 3;
+    }
 
     /* Category grid: 3 columns, fills space, scrolls on overflow */
     .category-grid {
@@ -1211,6 +1379,63 @@
     color: #1a1a1a;
   }
 
+  .hint-info {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid #bbb;
+    color: #bbb;
+    font-family: Georgia, serif;
+    font-size: 0.55rem;
+    font-style: italic;
+    font-weight: 400;
+    cursor: default;
+    position: relative;
+    margin-left: 4px;
+    flex-shrink: 0;
+  }
+
+  .hint-info:hover {
+    border-color: #888;
+    color: #888;
+  }
+
+  .hint-tooltip {
+    display: none;
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + 5px);
+    background: #333;
+    color: #fffef2;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 0.72rem;
+    font-style: normal;
+    font-weight: 400;
+    white-space: normal;
+    width: 160px;
+    padding: 0.3rem 0.5rem;
+    border-radius: 3px;
+    pointer-events: none;
+    z-index: 200;
+    opacity: 0.92;
+  }
+
+  .hint-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 6px;
+    border: 4px solid transparent;
+    border-top-color: #333;
+  }
+
+  .hint-info:hover .hint-tooltip {
+    display: block;
+  }
+
   .header-meta {
     display: flex;
     justify-content: center;
@@ -1251,8 +1476,12 @@
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   .modal {
@@ -1279,7 +1508,9 @@
     line-height: 1;
   }
 
-  .modal-close:hover { color: #1a1a1a; }
+  .modal-close:hover {
+    color: #1a1a1a;
+  }
 
   .modal h2 {
     font-family: "Playfair Display", Georgia, serif;
@@ -1318,8 +1549,14 @@
   }
 
   @keyframes slideIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   /* Shared */
@@ -1331,7 +1568,8 @@
   }
 
   .setup-section > label {
-    display: block;
+    display: flex;
+    align-items: center;
     font-family: "Playfair Display", Georgia, serif;
     font-weight: 700;
     font-size: 0.85rem;
@@ -1356,7 +1594,9 @@
     font-family: "Source Serif 4", Georgia, serif;
   }
 
-  input[type="text"]:focus { border-color: #8b0000; }
+  input[type="text"]:focus {
+    border-color: #8b0000;
+  }
 
   .start-btn {
     width: 100%;
@@ -1368,8 +1608,9 @@
     font-size: 1.1rem;
     font-weight: 700;
     cursor: pointer;
-    transition: background 0.2s, color 0.2s;
-    margin-top: 1rem;
+    transition:
+      background 0.2s,
+      color 0.2s;
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
@@ -1635,7 +1876,10 @@
     background: #fff8e8;
   }
 
-  .lp-name { flex: 1; font-weight: 500; }
+  .lp-name {
+    flex: 1;
+    font-weight: 500;
+  }
 
   .lp-badge {
     font-size: 0.7rem;
@@ -1656,9 +1900,14 @@
     font-style: italic;
   }
 
-  .readonly-setting { padding: 0.5rem 0; }
+  .readonly-setting {
+    padding: 0.5rem 0;
+  }
 
-  .setting-value { font-weight: 600; font-size: 1rem; }
+  .setting-value {
+    font-weight: 600;
+    font-size: 1rem;
+  }
 
   .setting-desc {
     display: block;
@@ -1666,13 +1915,6 @@
     color: #888;
     margin-top: 0.15rem;
     font-style: italic;
-  }
-
-  .lobby-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-top: 0.5rem;
   }
 
   .waiting-msg {
@@ -1742,7 +1984,9 @@
     transition: all 0.2s;
   }
 
-  .category-card:hover { border-color: #1a1a1a; }
+  .category-card:hover {
+    border-color: #1a1a1a;
+  }
   .category-card.selected {
     border-color: #8b0000;
     background: rgba(139, 0, 0, 0.03);
@@ -1758,7 +2002,10 @@
     font-weight: 700;
     font-size: 0.88rem;
   }
-  .card-check { color: #8b0000; font-weight: 700; }
+  .card-check {
+    color: #8b0000;
+    font-weight: 700;
+  }
   .card-desc {
     font-size: 0.75rem;
     color: #888;
@@ -1768,7 +2015,12 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  .card-tags { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-top: 0.1rem; }
+  .card-tags {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    margin-top: 0.1rem;
+  }
   .card-tag {
     font-size: 0.7rem;
     padding: 0.15rem 0.45rem;
@@ -1823,7 +2075,9 @@
     color: #1a1a1a;
   }
 
-  .preview-title { flex: 1; }
+  .preview-title {
+    flex: 1;
+  }
   .preview-title h3 {
     margin: 0;
     font-family: "Playfair Display", Georgia, serif;
@@ -1848,9 +2102,14 @@
     white-space: nowrap;
   }
 
-  .select-btn:hover { background: #333; }
+  .select-btn:hover {
+    background: #333;
+  }
 
-  .preview-tags { display: flex; gap: 0.35rem; }
+  .preview-tags {
+    display: flex;
+    gap: 0.35rem;
+  }
   .tag {
     font-size: 0.7rem;
     padding: 0.15rem 0.5rem;
@@ -1867,7 +2126,9 @@
     overflow-y: auto;
   }
 
-  .preview-search { border: 1px solid #c4b48a; }
+  .preview-search {
+    border: 1px solid #c4b48a;
+  }
 
   .preview-item {
     display: flex;
@@ -1879,9 +2140,19 @@
     border-bottom: 1px solid #e8d9b8;
   }
 
-  .preview-rank { color: #8b0000; font-weight: 700; min-width: 2.2rem; }
-  .preview-name { flex: 1; }
-  .preview-points { color: #888; font-size: 0.75rem; font-weight: 600; }
+  .preview-rank {
+    color: #8b0000;
+    font-weight: 700;
+    min-width: 2.2rem;
+  }
+  .preview-name {
+    flex: 1;
+  }
+  .preview-points {
+    color: #888;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
   .preview-empty {
     text-align: center;
     color: #888;
@@ -1913,13 +2184,17 @@
     gap: 0.5rem;
   }
 
-  .mode-btn:hover { border-color: #1a1a1a; }
+  .mode-btn:hover {
+    border-color: #1a1a1a;
+  }
   .mode-btn.active {
     border-color: #1a1a1a;
     background: #1a1a1a;
     color: #f5e6c8;
   }
-  .mode-icon { font-size: 1.5rem; }
+  .mode-icon {
+    font-size: 1.5rem;
+  }
 
   .mode-config {
     margin-top: 1rem;
@@ -1961,7 +2236,10 @@
     border-color: #1a1a1a;
     background: #f5e6c8;
   }
-  .count-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .count-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
   .count-display {
     font-family: "Playfair Display", Georgia, serif;
     font-size: 1.5rem;
@@ -2028,7 +2306,9 @@
     background: rgba(139, 0, 0, 0.03);
     box-shadow: 0 0 12px rgba(139, 0, 0, 0.08);
   }
-  .player-card.eliminated { opacity: 0.4; }
+  .player-card.eliminated {
+    opacity: 0.4;
+  }
   .player-card.me {
     border-color: #c4b48a;
     border-width: 2px;
@@ -2046,14 +2326,21 @@
     font-weight: 700;
     color: #8b0000;
   }
-  .player-meta { margin-top: 0.2rem; }
+  .player-meta {
+    margin-top: 0.2rem;
+  }
   .strike-dot {
     font-size: 0.65rem;
     opacity: 0.2;
     margin: 0 1px;
   }
-  .strike-dot.hit { opacity: 1; }
-  .turns-left { font-size: 0.75rem; color: #888; }
+  .strike-dot.hit {
+    opacity: 1;
+  }
+  .turns-left {
+    font-size: 0.75rem;
+    color: #888;
+  }
 
   .you-tag {
     font-size: 0.6rem;
@@ -2125,8 +2412,13 @@
     white-space: nowrap;
   }
 
-  .guess-btn:hover:not(:disabled) { background: #333; }
-  .guess-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .guess-btn:hover:not(:disabled) {
+    background: #333;
+  }
+  .guess-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
 
   /* Result */
   .result {
@@ -2145,16 +2437,26 @@
     border: 2px solid #8b0000;
   }
 
-  .result-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
-  .result-text { font-size: 1rem; margin-bottom: 0.25rem; }
+  .result-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .result-text {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
   .result-points {
     font-family: "Playfair Display", Georgia, serif;
     font-size: 1.3rem;
     font-weight: 700;
     margin-bottom: 1rem;
   }
-  .hit .result-points { color: #2d5016; }
-  .miss .result-points { color: #8b0000; }
+  .hit .result-points {
+    color: #2d5016;
+  }
+  .miss .result-points {
+    color: #8b0000;
+  }
 
   .next-btn {
     padding: 0.6rem 1.5rem;
@@ -2167,7 +2469,9 @@
     cursor: pointer;
   }
 
-  .next-btn:hover { background: #333; }
+  .next-btn:hover {
+    background: #333;
+  }
 
   /* Guessed list */
   .guessed-list {
@@ -2205,12 +2509,24 @@
     font-size: 0.85rem;
   }
 
-  .guessed-rank { color: #8b0000; font-weight: 700; min-width: 2.5rem; }
-  .guessed-name { flex: 1; }
-  .guessed-by { color: #999; font-size: 0.8rem; font-style: italic; }
+  .guessed-rank {
+    color: #8b0000;
+    font-weight: 700;
+    min-width: 2.5rem;
+  }
+  .guessed-name {
+    flex: 1;
+  }
+  .guessed-by {
+    color: #999;
+    font-size: 0.8rem;
+    font-style: italic;
+  }
 
   /* Results */
-  .results { text-align: center; }
+  .results {
+    text-align: center;
+  }
   .results h2 {
     font-family: "Playfair Display", Georgia, serif;
     font-size: 2rem;
@@ -2225,9 +2541,14 @@
     animation: slideIn 0.5s ease-out;
   }
 
-  .winner-banner.tie { border-color: #8b6914; }
+  .winner-banner.tie {
+    border-color: #8b6914;
+  }
 
-  .winner-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+  .winner-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+  }
   .winner-name {
     font-family: "Playfair Display", Georgia, serif;
     font-size: 1.5rem;
@@ -2265,22 +2586,44 @@
     border-bottom: 1px solid #ede0c4;
   }
 
-  .ranking-row.first { background: rgba(139, 0, 0, 0.04); }
-  .ranking-position { font-size: 1.2rem; min-width: 2rem; text-align: center; }
-  .ranking-name { flex: 1; font-weight: 600; }
-  .ranking-score { font-weight: 700; color: #8b0000; }
-  .ranking-details { font-size: 0.8rem; color: #888; font-style: italic; }
+  .ranking-row.first {
+    background: rgba(139, 0, 0, 0.04);
+  }
+  .ranking-position {
+    font-size: 1.2rem;
+    min-width: 2rem;
+    text-align: center;
+  }
+  .ranking-name {
+    flex: 1;
+    font-weight: 600;
+  }
+  .ranking-score {
+    font-weight: 700;
+    color: #8b0000;
+  }
+  .ranking-details {
+    font-size: 0.8rem;
+    color: #888;
+    font-style: italic;
+  }
 
   /* ─── DESKTOP / MOBILE GAME TOGGLE ─── */
-  .game-desktop { display: none; }
-  .game-mobile { display: block; }
+  .game-desktop {
+    display: none;
+  }
+  .game-mobile {
+    display: block;
+  }
 
   @media (min-width: 900px) {
     .game-desktop {
       display: flex;
       flex-direction: column;
     }
-    .game-mobile { display: none; }
+    .game-mobile {
+      display: none;
+    }
   }
 
   /* ─── DESKTOP TOP BAR ─── */
@@ -2301,7 +2644,9 @@
     white-space: nowrap;
   }
 
-  .dt-guess-area { flex: 1; }
+  .dt-guess-area {
+    flex: 1;
+  }
 
   .dt-input-row {
     display: flex;
@@ -2323,8 +2668,13 @@
     transition: background 0.2s;
   }
 
-  .dt-submit-btn:hover:not(:disabled) { background: #6b0000; }
-  .dt-submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .dt-submit-btn:hover:not(:disabled) {
+    background: #6b0000;
+  }
+  .dt-submit-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
 
   .dt-waiting {
     text-align: center;
@@ -2344,8 +2694,12 @@
     animation: slideIn 0.3s ease-out;
   }
 
-  .dt-result.hit { color: #2d5016; }
-  .dt-result.miss { color: #8b0000; }
+  .dt-result.hit {
+    color: #2d5016;
+  }
+  .dt-result.miss {
+    color: #8b0000;
+  }
 
   .dt-next-btn {
     padding: 0.4rem 1.2rem;
@@ -2359,7 +2713,9 @@
     transition: background 0.2s;
   }
 
-  .dt-next-btn:hover { background: #333; }
+  .dt-next-btn:hover {
+    background: #333;
+  }
 
   /* ─── DESKTOP BODY ─── */
   .dt-body {
@@ -2388,8 +2744,12 @@
     border-left: 4px solid #8b0000;
   }
 
-  .dt-player.eliminated { opacity: 0.35; }
-  .dt-player.me { background: #fff8e8; }
+  .dt-player.eliminated {
+    opacity: 0.35;
+  }
+  .dt-player.me {
+    background: #fff8e8;
+  }
 
   .dt-player-top {
     display: flex;
@@ -2497,7 +2857,9 @@
     border-bottom: none;
   }
 
-  .dt-slot.filled { background: rgba(139, 0, 0, 0.04); }
+  .dt-slot.filled {
+    background: rgba(139, 0, 0, 0.04);
+  }
 
   .dt-slot-rank {
     font-weight: 700;
@@ -2506,7 +2868,9 @@
     color: #c4b48a;
   }
 
-  .dt-slot.filled .dt-slot-rank { color: #8b0000; }
+  .dt-slot.filled .dt-slot-rank {
+    color: #8b0000;
+  }
 
   .dt-slot-name {
     flex: 1;

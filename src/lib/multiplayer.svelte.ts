@@ -67,6 +67,7 @@ export function createMultiplayerState() {
   let mode = $state<'strikes' | 'turns'>('strikes');
   let maxStrikes = $state(3);
   let maxTurns = $state(10);
+  let hints = $state(true);
 
   // Game state
   let currentPlayerIndex = $state(0);
@@ -221,6 +222,7 @@ export function createMultiplayerState() {
     mode = party.settings.mode;
     maxStrikes = party.settings.maxStrikes;
     maxTurns = party.settings.maxTurns;
+    hints = party.settings.hints ?? true;
     if (party.phase === 'lobby') phase = 'lobby';
   }
 
@@ -235,6 +237,7 @@ export function createMultiplayerState() {
     if (game.mode) mode = game.mode;
     if (game.maxStrikes) maxStrikes = game.maxStrikes;
     if (game.maxTurns) maxTurns = game.maxTurns;
+    if (game.hints !== undefined) hints = game.hints;
   }
 
   function resetState() {
@@ -344,6 +347,7 @@ export function createMultiplayerState() {
     get mode() { return mode; },
     get maxStrikes() { return maxStrikes; },
     get maxTurns() { return maxTurns; },
+    get hints() { return hints; },
     get currentPlayerIndex() { return currentPlayerIndex; },
     get playerOrder() { return playerOrder; },
     get guessedItems() { return guessedItems; },

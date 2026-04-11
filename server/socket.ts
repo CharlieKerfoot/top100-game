@@ -19,6 +19,7 @@ interface GameSettings {
   mode: 'strikes' | 'turns';
   maxStrikes: number;
   maxTurns: number;
+  hints: boolean;
 }
 
 interface GameState {
@@ -104,6 +105,7 @@ function serializeGameState(party: Party) {
     mode: party.settings.mode,
     maxStrikes: party.settings.maxStrikes,
     maxTurns: party.settings.maxTurns,
+    hints: party.settings.hints,
   };
 }
 
@@ -269,7 +271,7 @@ export function setupSocketServer(io: Server) {
       const party: Party = {
         code, hostId: playerId, isPublic,
         players: new Map([[playerId, player]]),
-        settings: { categoryId: categories[0].id, mode: 'strikes', maxStrikes: 3, maxTurns: 10 },
+        settings: { categoryId: categories[0].id, mode: 'strikes', maxStrikes: 3, maxTurns: 10, hints: true },
         game: null, phase: 'lobby',
       };
 
@@ -352,6 +354,7 @@ export function setupSocketServer(io: Server) {
       if (settings.mode !== undefined) party.settings.mode = settings.mode;
       if (settings.maxStrikes !== undefined) party.settings.maxStrikes = settings.maxStrikes;
       if (settings.maxTurns !== undefined) party.settings.maxTurns = settings.maxTurns;
+      if (settings.hints !== undefined) party.settings.hints = settings.hints;
       if (settings.isPublic !== undefined) party.isPublic = settings.isPublic;
 
       io.to(code).emit('party-updated', { party: serializeParty(party), game: null });
