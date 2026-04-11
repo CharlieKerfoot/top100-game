@@ -228,19 +228,29 @@ function removePlayerFromParty(playerId: string, io: Server) {
   if (party.game) {
     const orderIdx = party.game.playerOrder.indexOf(playerId);
     if (orderIdx !== -1) {
+      const wasCurrentPlayer = orderIdx === party.game.currentPlayerIndex;
       if (orderIdx < party.game.currentPlayerIndex) {
         party.game.currentPlayerIndex--;
-      } else if (orderIdx === party.game.currentPlayerIndex) {
-        party.game.currentPlayerIndex = Math.min(
-          party.game.currentPlayerIndex,
-          party.game.playerOrder.length - 2
-        );
-        if (party.game.currentPlayerIndex < 0) party.game.currentPlayerIndex = 0;
       }
       party.game.playerOrder.splice(orderIdx, 1);
+
+      // Wrap the index if it's now past the end of the array
+      if (party.game.playerOrder.length > 0) {
+        party.game.currentPlayerIndex = party.game.currentPlayerIndex % party.game.playerOrder.length;
+      }
+
+      // If the removed player was the current player, find the next valid one
+      if (wasCurrentPlayer && party.game.playerOrder.length > 0) {
+        // Temporarily step back so findNextActivePlayer advances to the right slot
+        party.game.currentPlayerIndex = (party.game.currentPlayerIndex - 1 + party.game.playerOrder.length) % party.game.playerOrder.length;
+        const next = findNextActivePlayer(party);
+        if (next !== -1) {
+          party.game.currentPlayerIndex = next;
+        }
+      }
     }
 
-    if (isGameOver(party)) {
+    if (isGameOver(party) || party.game.playerOrder.length === 0) {
       party.phase = 'results';
       io.to(code).emit('game-over', {
         party: serializeParty(party),
