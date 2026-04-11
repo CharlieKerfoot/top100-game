@@ -60,11 +60,11 @@ const SOCKET_URL = import.meta.env.VITE_SOCKET_URL
   || (import.meta.env.DEV ? 'http://localhost:3001' : undefined);
 
 function getOrCreatePlayerId(): string {
-  if (typeof sessionStorage === 'undefined') return '';
-  let id = sessionStorage.getItem('top100_player_id');
+  if (typeof localStorage === 'undefined') return '';
+  let id = localStorage.getItem('top100_player_id');
   if (!id) {
     id = crypto.randomUUID();
-    sessionStorage.setItem('top100_player_id', id);
+    localStorage.setItem('top100_player_id', id);
   }
   return id;
 }
