@@ -33,6 +33,26 @@ import { nbaCareerPoints } from './nba-career-points';
 import { mlbCareerWar } from './mlb-career-war';
 import { nflCareerPpr } from './nfl-career-ppr';
 import { highestGrossingTvShows } from './highest-grossing-tv-shows';
+import { companyValuation } from './company-valuation';
+import { usnewsCollegeRankings } from './usnews-college-rankings';
+import { largestCollegePopulations } from './largest-college-populations';
+import { popularMaleNames } from './popular-male-names';
+import { popularFemaleNames } from './popular-female-names';
+import { mostPopulousCitiesUsa } from './most-populous-cities-usa';
+import { mostUsedEnglishWords } from './most-used-english-words';
+import { countriesOlympicMedals } from './countries-olympic-medals';
+import { countriesByGdp } from './countries-by-gdp';
+import { countriesByLiteracyRate } from './countries-by-literacy-rate';
+import { countriesByPovertyRate } from './countries-by-poverty-rate';
+import { countriesColdest } from './countries-coldest';
+import { countriesHottest } from './countries-hottest';
+import { mostVisitedWebsites } from './most-visited-websites';
+import { oscarNominations } from './oscar-nominations';
+import { highestBudgetMovies } from './highest-budget-movies';
+import { actorsBoxOffice } from './actors-box-office';
+import { directorsBoxOffice } from './directors-box-office';
+import { grammyAwards } from './grammy-awards';
+import { usCitiesCostOfLiving } from './us-cities-cost-of-living';
 
 import type { Category } from './types';
 
@@ -54,6 +74,26 @@ export const categories: Category[] = [
   mlbCareerWar,
   nflCareerPpr,
   highestGrossingTvShows,
+  companyValuation,
+  usnewsCollegeRankings,
+  largestCollegePopulations,
+  popularMaleNames,
+  popularFemaleNames,
+  mostPopulousCitiesUsa,
+  mostUsedEnglishWords,
+  countriesOlympicMedals,
+  countriesByGdp,
+  countriesByLiteracyRate,
+  countriesByPovertyRate,
+  countriesColdest,
+  countriesHottest,
+  mostVisitedWebsites,
+  oscarNominations,
+  highestBudgetMovies,
+  actorsBoxOffice,
+  directorsBoxOffice,
+  grammyAwards,
+  usCitiesCostOfLiving,
 ];
 
 export function getAllTags(): string[] {

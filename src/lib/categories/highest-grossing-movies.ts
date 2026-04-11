@@ -7,6 +7,7 @@ export const highestGrossingMovies: Category = {
   description: 'All-time worldwide box office',
   tags: ['entertainment', 'movies'],
   hints: highestGrossingMoviesHints,
+  valueLabel: 'Box Office',
   items: [
     "Avatar", "Avengers: Endgame", "Avatar: The Way of Water", "Titanic", "Star Wars: The Force Awakens",
     "Avengers: Infinity War", "Spider-Man: No Way Home", "Inside Out 2", "Jurassic World", "The Lion King",
@@ -28,5 +29,27 @@ export const highestGrossingMovies: Category = {
     "Inception", "Harry Potter and the Prisoner of Azkaban", "Ice Age: Dawn of the Dinosaurs", "Coco", "Kung Fu Panda 2",
     "Batman v Superman: Dawn of Justice", "Puss in Boots: The Last Wish", "Fast & Furious 6", "Madagascar 3", "Shrek Forever After",
     "X-Men: Days of Future Past", "The Chronicles of Narnia: The Lion the Witch and the Wardrobe", "Gravity", "Maleficent", "The Matrix Reloaded"
-  ]
+  ],
+  values: [
+    "$2.92B", "$2.80B", "$2.32B", "$2.26B", "$2.07B",
+    "$2.05B", "$1.92B", "$1.70B", "$1.67B", "$1.66B",
+    "$1.52B", "$1.52B", "$1.45B", "$1.49B", "$1.44B",
+    "$1.40B", "$1.36B", "$1.35B", "$1.34B", "$1.33B",
+    "$1.31B", "$1.28B", "$1.26B", "$1.24B", "$1.24B",
+    "$1.21B", "$1.16B", "$1.15B", "$1.15B", "$1.15B",
+    "$1.13B", "$1.13B", "$1.12B", "$1.11B", "$1.10B",
+    "$1.08B", "$1.07B", "$1.07B", "$1.07B", "$1.07B",
+    "$1.07B", "$1.06B", "$1.05B", "$1.05B", "$1.03B",
+    "$1.03B", "$1.03B", "$1.02B", "$1.02B", "$1.01B",
+    "$1.00B", "$971M", "$967M", "$960M", "$956M",
+    "$940M", "$937M", "$934M", "$921M", "$900M",
+    "$871M", "$869M", "$868M", "$865M", "$863M",
+    "$862M", "$860M", "$859M", "$858M", "$854M",
+    "$822M", "$821M", "$819M", "$816M", "$812M",
+    "$810M", "$809M", "$803M", "$799M", "$794M",
+    "$783M", "$774M", "$773M", "$773M", "$771M",
+    "$756M", "$748M", "$746M", "$741M", "$736M",
+    "$748M", "$745M", "$723M", "$714M", "$742M",
+    "$748M", "$745M", "$723M", "$758M", "$742M",
+  ],
 };

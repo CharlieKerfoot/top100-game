@@ -7,6 +7,7 @@ export const mostStreamedSongs: Category = {
   description: 'All-time most streamed tracks',
   tags: ['entertainment', 'music'],
   hints: mostStreamedSongsHints,
+  valueLabel: 'Streams',
   items: [
     "Blinding Lights", "Shape of You", "Someone You Loved", "As It Was", "Sunflower",
     "Dance Monkey", "Starboy", "Closer", "One Dance", "Believer",
@@ -28,5 +29,27 @@ export const mostStreamedSongs: Category = {
     "Can't Hold Us", "River Flows in You", "Die with a Smile", "Golden Hour", "Thinkin Bout You",
     "Memories", "Before You Go", "Until I Found You", "Snowman", "Physical",
     "Unstoppable", "Gym Class Heroes: Stereo Hearts", "I Wanna Be Yours", "Put Your Records On", "Tongue Tied"
-  ]
+  ],
+  values: [
+    "4.8B", "4.2B", "3.7B", "3.6B", "3.5B",
+    "3.4B", "3.4B", "3.3B", "3.2B", "3.1B",
+    "3.1B", "3.0B", "2.9B", "2.9B", "2.9B",
+    "2.8B", "2.8B", "2.8B", "2.8B", "2.7B",
+    "2.7B", "2.7B", "2.7B", "2.6B", "2.6B",
+    "2.6B", "2.6B", "2.5B", "2.5B", "2.5B",
+    "2.5B", "2.4B", "2.4B", "2.4B", "2.4B",
+    "2.4B", "2.3B", "2.3B", "2.3B", "2.3B",
+    "2.3B", "2.2B", "2.2B", "2.2B", "2.2B",
+    "2.2B", "2.2B", "2.1B", "2.1B", "2.1B",
+    "2.1B", "2.1B", "2.0B", "2.0B", "2.0B",
+    "2.0B", "2.0B", "2.0B", "1.9B", "1.9B",
+    "1.9B", "1.9B", "1.9B", "1.9B", "1.9B",
+    "1.8B", "1.8B", "1.8B", "1.8B", "1.8B",
+    "1.8B", "1.8B", "1.8B", "1.7B", "1.7B",
+    "1.7B", "1.7B", "1.7B", "1.7B", "1.7B",
+    "1.7B", "1.6B", "1.6B", "1.6B", "1.6B",
+    "1.6B", "1.6B", "1.6B", "1.6B", "1.6B",
+    "1.5B", "1.5B", "1.5B", "1.5B", "1.5B",
+    "1.5B", "1.5B", "1.5B", "1.5B", "1.5B",
+  ],
 };

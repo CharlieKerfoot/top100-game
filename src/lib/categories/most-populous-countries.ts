@@ -7,6 +7,7 @@ export const mostPopulousCountries: Category = {
   description: 'Countries by population (2024)',
   tags: ['geography', 'world'],
   hints: mostPopulousCountriesHints,
+  valueLabel: 'Population',
   items: [
     "India", "China", "United States", "Indonesia", "Pakistan",
     "Nigeria", "Brazil", "Bangladesh", "Russia", "Ethiopia",
@@ -28,5 +29,27 @@ export const mostPopulousCountries: Category = {
     "Czech Republic", "Jordan", "Sweden", "Portugal", "Azerbaijan",
     "Greece", "Hungary", "Honduras", "Tajikistan", "United Arab Emirates",
     "Belarus", "Papua New Guinea", "Israel", "Austria", "Switzerland"
+  ],
+  values: [
+    "1.44B", "1.43B", "340M", "279M", "240M",
+    "230M", "217M", "174M", "144M", "130M",
+    "130M", "124M", "118M", "113M", "105M",
+    "100M", "90M", "86M", "84M", "72M",
+    "69M", "68M", "67M", "62M", "59M",
+    "56M", "55M", "52M", "52M", "50M",
+    "49M", "48M", "46M", "46M", "45M",
+    "42M", "41M", "40M", "38M", "37M",
+    "37M", "36M", "36M", "35M", "34M",
+    "34M", "34M", "34M", "31M", "29M",
+    "30M", "29M", "29M", "27M", "27M",
+    "26M", "24M", "23M", "23M", "23M",
+    "21M", "23M", "20M", "20M", "20M",
+    "19M", "18M", "18M", "18M", "18M",
+    "18M", "18M", "17M", "17M", "14M",
+    "14M", "14M", "13M", "13M", "12M",
+    "12M", "11M", "11M", "12M", "11M",
+    "11M", "11M", "11M", "11M", "10M",
+    "10M", "10M", "10M", "10M", "10M",
+    "9.1M", "10M", "9.4M", "9.2M", "8.9M"
   ]
 };

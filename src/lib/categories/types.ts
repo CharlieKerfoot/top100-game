@@ -5,4 +5,6 @@ export interface Category {
   tags: string[];
   items: string[];
   hints?: string[];
+  values?: string[];
+  valueLabel?: string;
 }

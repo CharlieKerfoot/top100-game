@@ -27,6 +27,7 @@ interface GuessHistoryEntry {
   playerName: string;
   isStrike: boolean;
   rank: number | null;
+  value?: string;
 }
 
 interface GameState {
@@ -44,6 +45,8 @@ interface GuessResult {
   points: number;
   isStrike: boolean;
   playerName: string;
+  value?: string;
+  valueLabel?: string;
 }
 
 interface CategorySuggestion {
@@ -122,7 +125,9 @@ function serializeGameState(party: Party) {
       index: idx,
       name: cat?.items[idx] ?? '???',
       playerName: name,
+      value: cat?.values?.[idx],
     })),
+    valueLabel: cat?.valueLabel,
     guessHistory: party.game.guessHistory,
     lastResult: party.game.lastResult,
     showResult: party.game.showResult,
@@ -452,13 +457,15 @@ export function setupSocketServer(io: Server) {
       } else {
         const rank = foundIndex + 1;
         const points = rank;
-        result = { guess, rank, points, isStrike: false, playerName: player.name };
+        const value = cat.values?.[foundIndex];
+        const valueLabel = cat.valueLabel;
+        result = { guess, rank, points, isStrike: false, playerName: player.name, value, valueLabel };
         player.score += points;
         player.guesses++;
         game.guessedItems.set(foundIndex, player.name);
       }
 
-      game.guessHistory.push({ guess, playerName: player.name, isStrike: result.isStrike, rank: result.rank });
+      game.guessHistory.push({ guess, playerName: player.name, isStrike: result.isStrike, rank: result.rank, value: result.value });
       game.lastResult = result;
       game.showResult = true;
 

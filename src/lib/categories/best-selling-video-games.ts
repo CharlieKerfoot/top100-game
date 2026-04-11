@@ -7,6 +7,7 @@ export const bestSellingVideoGames: Category = {
   description: 'All-time best sellers',
   tags: ['entertainment', 'gaming'],
   hints: bestSellingVideoGamesHints,
+  valueLabel: 'Copies Sold',
   items: [
     "Minecraft", "Grand Theft Auto V", "Tetris", "Wii Sports", "PUBG: Battlegrounds",
     "Mario Kart 8", "Super Smash Bros. Ultimate", "Red Dead Redemption 2", "Overwatch", "The Witcher 3",
@@ -28,5 +29,27 @@ export const bestSellingVideoGames: Category = {
     "Pokémon Let's Go Pikachu/Eevee", "The Sims 3", "Destiny", "Gran Turismo", "Metal Gear Solid",
     "Tomb Raider II", "Mortal Kombat 11", "Super Mario Galaxy", "Gran Turismo 4", "Forza Horizon 5",
     "Tom Clancy's The Division", "Halo Reach", "FIFA 15", "Just Dance 3", "Resident Evil 2"
-  ]
+  ],
+  values: [
+    "300M", "205M", "202M", "83M", "75M",
+    "72M", "35M", "65M", "50M", "50M",
+    "43M", "40M", "40M", "47M", "37M",
+    "35M", "34M", "44M", "30M", "33M",
+    "30M", "30M", "30M", "30M", "29M",
+    "28M", "28M", "28M", "28M", "28M",
+    "27M", "27M", "27M", "24M", "24M",
+    "28M", "26M", "24M", "25M", "24M",
+    "27M", "24M", "23M", "18M", "26M",
+    "23M", "22M", "22M", "20M", "22M",
+    "20M", "19M", "17M", "20M", "18M",
+    "16M", "19M", "16M", "16M", "16M",
+    "16M", "16M", "15M", "15M", "15M",
+    "14M", "15M", "14M", "14M", "14M",
+    "14M", "14M", "13M", "13M", "13M",
+    "13M", "13M", "13M", "13M", "12M",
+    "13M", "12M", "12M", "12M", "12M",
+    "12M", "12M", "12M", "12M", "11M",
+    "11M", "11M", "11M", "11M", "11M",
+    "10M", "10M", "10M", "10M", "10M",
+  ],
 };

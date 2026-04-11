@@ -7,6 +7,7 @@ export const largestCities: Category = {
   description: "World's largest urban areas",
   tags: ['geography', 'world'],
   hints: largestCitiesHints,
+  valueLabel: 'Metro Population',
   items: [
     "Tokyo", "Delhi", "Shanghai", "Dhaka", "Cairo",
     "Beijing", "Mumbai", "Mexico City", "Osaka", "São Paulo",
@@ -28,5 +29,27 @@ export const largestCities: Category = {
     "Taipei", "Los Angeles", "Chicago", "Abidjan", "Monterrey",
     "Casablanca", "Wuhan", "Jaipur", "Berlin", "Cape Town",
     "Kabul", "Kunming", "Changchun", "Medellín", "Brasília"
-  ]
+  ],
+  values: [
+    "37.4M", "32.9M", "29.2M", "23.9M", "22.6M",
+    "21.5M", "21.3M", "21.8M", "19.1M", "22.4M",
+    "18.4M", "18.3M", "17.4M", "17.1M", "15.9M",
+    "15.5M", "15.1M", "14.9M", "14.5M", "14.0M",
+    "13.5M", "13.2M", "13.0M", "12.8M", "12.7M",
+    "12.4M", "12.0M", "11.9M", "11.8M", "11.5M",
+    "11.2M", "10.8M", "10.0M", "10.0M", "9.5M",
+    "9.3M", "9.3M", "9.1M", "9.0M", "8.9M",
+    "8.6M", "8.5M", "8.5M", "8.4M", "8.3M",
+    "8.2M", "8.2M", "8.1M", "8.0M", "7.9M",
+    "7.6M", "7.5M", "7.2M", "7.1M", "7.0M",
+    "6.9M", "6.8M", "6.8M", "6.7M", "6.6M",
+    "6.5M", "6.4M", "6.3M", "6.3M", "6.2M",
+    "6.1M", "6.1M", "6.0M", "5.9M", "5.9M",
+    "5.8M", "5.8M", "5.7M", "5.7M", "5.6M",
+    "5.6M", "5.5M", "5.5M", "5.5M", "5.4M",
+    "5.3M", "5.2M", "5.2M", "5.2M", "5.1M",
+    "5.0M", "5.0M", "4.9M", "4.8M", "4.8M",
+    "4.7M", "4.7M", "4.6M", "4.6M", "4.5M",
+    "4.5M", "4.4M", "4.4M", "4.3M", "4.3M",
+  ],
 };

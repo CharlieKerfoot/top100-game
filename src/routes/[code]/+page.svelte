@@ -359,7 +359,7 @@
                     <span
                       ><strong>{mp.lastResult.playerName}</strong> guessed "<strong
                         >{mp.lastResult.guess}</strong
-                      >" &mdash; #{mp.lastResult.rank}! +{mp.lastResult.points} pts</span
+                      >" &mdash; #{mp.lastResult.rank}{#if mp.lastResult.value}&nbsp;({mp.lastResult.value}){/if}! +{mp.lastResult.points} pts</span
                     >
                   {/if}
                 </div>
@@ -429,6 +429,7 @@
                       <span class="dt-slot-rank">{i + 1}.</span>
                       {#if item}
                         <span class="dt-slot-name">{item.name}</span>
+                        {#if item.value}<span class="dt-slot-value">{item.value}</span>{/if}
                         <span class="dt-slot-by">{item.playerName}</span>
                       {/if}
                     </div>
@@ -510,7 +511,7 @@
                 <div class="result-text">
                   <strong>{mp.lastResult.playerName}</strong> guessed "<strong
                     >{mp.lastResult.guess}</strong
-                  >" &mdash; ranked <strong>#{mp.lastResult.rank}</strong>!
+                  >" &mdash; ranked <strong>#{mp.lastResult.rank}</strong>{#if mp.lastResult.value}&nbsp;({mp.lastResult.value}){/if}!
                 </div>
                 <div class="result-points">+{mp.lastResult.points} points</div>
               {/if}
@@ -532,6 +533,7 @@
                 <div class="guessed-item">
                   <span class="guessed-rank">#{item.index + 1}</span>
                   <span class="guessed-name">{item.name}</span>
+                  {#if item.value}<span class="guessed-value">{item.value}</span>{/if}
                   <span class="guessed-by">{item.playerName}</span>
                 </div>
               {/each}
@@ -990,7 +992,7 @@
                   <span
                     ><strong>{mp.lastResult.playerName}</strong> guessed "<strong
                       >{mp.lastResult.guess}</strong
-                    >" &mdash; #{mp.lastResult.rank}! +{mp.lastResult.points} pts</span
+                    >" &mdash; #{mp.lastResult.rank}{#if mp.lastResult.value}&nbsp;({mp.lastResult.value}){/if}! +{mp.lastResult.points} pts</span
                   >
                 {/if}
                 <button class="dt-next-btn" onclick={() => mp.nextTurn()}
@@ -1076,6 +1078,7 @@
                     <span class="dt-slot-rank">{i + 1}.</span>
                     {#if item}
                       <span class="dt-slot-name">{item.name}</span>
+                      {#if item.value}<span class="dt-slot-value">{item.value}</span>{/if}
                       <span class="dt-slot-by">{item.playerName}</span>
                     {/if}
                   </div>
@@ -1100,7 +1103,7 @@
                   <span class="history-player">{entry.playerName}</span>
                   <span class="history-guess">{entry.guess}</span>
                   <span class="history-result">
-                    {#if entry.isStrike}✗{:else}#{entry.rank}{/if}
+                    {#if entry.isStrike}✗{:else}#{entry.rank}{#if entry.value}&nbsp;({entry.value}){/if}{/if}
                   </span>
                 </div>
               {/each}
@@ -1197,7 +1200,7 @@
               <div class="result-text">
                 <strong>{mp.lastResult.playerName}</strong> guessed "<strong
                   >{mp.lastResult.guess}</strong
-                >" &mdash; ranked <strong>#{mp.lastResult.rank}</strong>!
+                >" &mdash; ranked <strong>#{mp.lastResult.rank}</strong>{#if mp.lastResult.value}&nbsp;({mp.lastResult.value}){/if}!
               </div>
               <div class="result-points">+{mp.lastResult.points} points</div>
             {/if}
@@ -1241,6 +1244,7 @@
               <div class="guessed-item">
                 <span class="guessed-rank">#{item.index + 1}</span>
                 <span class="guessed-name">{item.name}</span>
+                {#if item.value}<span class="guessed-value">{item.value}</span>{/if}
                 <span class="guessed-by">{item.playerName}</span>
               </div>
             {/each}
@@ -1260,7 +1264,7 @@
                     <span class="history-player">{entry.playerName}</span>
                     <span class="history-guess">{entry.guess}</span>
                     <span class="history-result">
-                      {#if entry.isStrike}✗{:else}#{entry.rank}{/if}
+                      {#if entry.isStrike}✗{:else}#{entry.rank}{#if entry.value}&nbsp;({entry.value}){/if}{/if}
                     </span>
                   </div>
                 {/each}
@@ -1370,7 +1374,7 @@
               <span class="history-player">{entry.playerName}</span>
               <span class="history-guess">{entry.guess}</span>
               <span class="history-result">
-                {#if entry.isStrike}✗ Miss{:else}✓ #{entry.rank}{/if}
+                {#if entry.isStrike}✗ Miss{:else}✓ #{entry.rank}{#if entry.value}&nbsp;({entry.value}){/if}{/if}
               </span>
             </div>
           {/each}
@@ -3328,6 +3332,12 @@
   .guessed-name {
     flex: 1;
   }
+  .guessed-value {
+    color: #996633;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
   .guessed-by {
     color: #999;
     font-size: 0.8rem;
@@ -3690,6 +3700,13 @@
     font-weight: 500;
     color: #1a1a1a;
     animation: slideIn 0.2s ease-out;
+  }
+
+  .dt-slot-value {
+    color: #996633;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
   }
 
   .dt-slot-by {

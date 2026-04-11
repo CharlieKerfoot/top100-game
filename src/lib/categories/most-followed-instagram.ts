@@ -7,6 +7,7 @@ export const mostFollowedInstagram: Category = {
   description: 'By follower count (2024)',
   tags: ['entertainment', 'social media'],
   hints: mostFollowedInstagramHints,
+  valueLabel: 'Followers',
   items: [
     "Instagram", "Cristiano Ronaldo", "Lionel Messi", "Selena Gomez", "Kylie Jenner",
     "Dwayne Johnson", "Ariana Grande", "Kim Kardashian", "Beyoncé", "Khloé Kardashian",
@@ -28,5 +29,27 @@ export const mostFollowedInstagram: Category = {
     "Juventus", "Marvel", "Salman Khan", "Akshay Kumar", "James Rodriguez",
     "Bayern Munich", "WWE", "Marcelo", "Ozil", "Gerard Piqué",
     "Lewis Hamilton", "Mohamed Salah", "Chelsea FC", "Gareth Bale", "Netflix"
-  ]
+  ],
+  values: [
+    "676M", "650M", "504M", "425M", "400M",
+    "397M", "380M", "364M", "320M", "312M",
+    "306M", "294M", "294M", "284M", "275M",
+    "253M", "228M", "284M", "228M", "218M",
+    "206M", "228M", "185M", "181M", "175M",
+    "170M", "157M", "156M", "153M", "151M",
+    "119M", "149M", "147M", "143M", "134M",
+    "104M", "101M", "96M", "95M", "91M",
+    "90M", "89M", "87M", "86M", "86M",
+    "85M", "83M", "82M", "81M", "79M",
+    "88M", "78M", "72M", "71M", "69M",
+    "68M", "66M", "65M", "65M", "64M",
+    "63M", "62M", "61M", "60M", "59M",
+    "58M", "57M", "56M", "56M", "55M",
+    "54M", "54M", "53M", "53M", "52M",
+    "52M", "51M", "50M", "50M", "49M",
+    "48M", "48M", "47M", "47M", "46M",
+    "46M", "45M", "45M", "44M", "44M",
+    "43M", "43M", "42M", "42M", "41M",
+    "41M", "41M", "40M", "40M", "39M",
+  ],
 };
