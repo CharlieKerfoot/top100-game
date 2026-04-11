@@ -390,7 +390,7 @@
 
             <div class="dt-board">
               <div class="dt-board-header">
-                <span class="dt-board-title">{mp.category.name}</span>
+                <span class="dt-board-title">{mp.category.description}</span>
                 <span class="dt-board-count"
                   >{mp.guessedItems.length} of 100 identified</span
                 >
@@ -886,7 +886,7 @@
 
           <div class="dt-board">
             <div class="dt-board-header">
-              <span class="dt-board-title">{mp.category.name}</span>
+              <span class="dt-board-title">{mp.category.description}</span>
               <span class="dt-board-count"
                 >{mp.guessedItems.length} of 100 identified</span
               >
@@ -2587,7 +2587,7 @@
   .game-action-bar {
     display: flex;
     gap: 0.5rem;
-    padding: 0.5rem 0;
+    padding: 0.5rem 0 1.25rem;
     border-top: 1px solid #d4c5a0;
     flex-wrap: wrap;
     position: relative;
@@ -2933,10 +2933,12 @@
 
   .dt-category-label {
     font-family: "Playfair Display", Georgia, serif;
-    font-weight: 700;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    font-weight: 900;
+    font-size: 1.3rem;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     color: #555;
     white-space: nowrap;
   }
@@ -3108,11 +3110,10 @@
   }
 
   .dt-board-title {
-    font-family: "Playfair Display", Georgia, serif;
-    font-weight: 700;
-    font-size: 0.95rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 0.8rem;
+    font-style: italic;
+    color: #666;
   }
 
   .dt-board-count {
