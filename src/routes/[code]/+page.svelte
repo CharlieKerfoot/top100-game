@@ -179,7 +179,7 @@
         {/if}
       </div>
       <div class="title-center">
-        <a href="/" class="title-link"><h1>Common Cents</h1></a>
+        <h1>Common Cents</h1>
         <button
           class="info-btn"
           onclick={() => (showRules = true)}
@@ -359,7 +359,9 @@
                     <span
                       ><strong>{mp.lastResult.playerName}</strong> guessed "<strong
                         >{mp.lastResult.guess}</strong
-                      >" &mdash; #{mp.lastResult.rank}{#if mp.lastResult.value}&nbsp;({mp.lastResult.value}){/if}! +{mp.lastResult.points} pts</span
+                      >" &mdash; #{mp.lastResult
+                        .rank}{#if mp.lastResult.value}&nbsp;({mp.lastResult
+                          .value}){/if}! +{mp.lastResult.points} pts</span
                     >
                   {/if}
                 </div>
@@ -429,7 +431,9 @@
                       <span class="dt-slot-rank">{i + 1}.</span>
                       {#if item}
                         <span class="dt-slot-name">{item.name}</span>
-                        {#if item.value}<span class="dt-slot-value">{item.value}</span>{/if}
+                        {#if item.value}<span class="dt-slot-value"
+                            >{item.value}</span
+                          >{/if}
                         <span class="dt-slot-by">{item.playerName}</span>
                       {/if}
                     </div>
@@ -511,7 +515,9 @@
                 <div class="result-text">
                   <strong>{mp.lastResult.playerName}</strong> guessed "<strong
                     >{mp.lastResult.guess}</strong
-                  >" &mdash; ranked <strong>#{mp.lastResult.rank}</strong>{#if mp.lastResult.value}&nbsp;({mp.lastResult.value}){/if}!
+                  >" &mdash; ranked
+                  <strong>#{mp.lastResult.rank}</strong
+                  >{#if mp.lastResult.value}&nbsp;({mp.lastResult.value}){/if}!
                 </div>
                 <div class="result-points">+{mp.lastResult.points} points</div>
               {/if}
@@ -533,7 +539,8 @@
                 <div class="guessed-item">
                   <span class="guessed-rank">#{item.index + 1}</span>
                   <span class="guessed-name">{item.name}</span>
-                  {#if item.value}<span class="guessed-value">{item.value}</span>{/if}
+                  {#if item.value}<span class="guessed-value">{item.value}</span
+                    >{/if}
                   <span class="guessed-by">{item.playerName}</span>
                 </div>
               {/each}
@@ -992,7 +999,9 @@
                   <span
                     ><strong>{mp.lastResult.playerName}</strong> guessed "<strong
                       >{mp.lastResult.guess}</strong
-                    >" &mdash; #{mp.lastResult.rank}{#if mp.lastResult.value}&nbsp;({mp.lastResult.value}){/if}! +{mp.lastResult.points} pts</span
+                    >" &mdash; #{mp.lastResult
+                      .rank}{#if mp.lastResult.value}&nbsp;({mp.lastResult
+                        .value}){/if}! +{mp.lastResult.points} pts</span
                   >
                 {/if}
                 <button class="dt-next-btn" onclick={() => mp.nextTurn()}
@@ -1078,7 +1087,9 @@
                     <span class="dt-slot-rank">{i + 1}.</span>
                     {#if item}
                       <span class="dt-slot-name">{item.name}</span>
-                      {#if item.value}<span class="dt-slot-value">{item.value}</span>{/if}
+                      {#if item.value}<span class="dt-slot-value"
+                          >{item.value}</span
+                        >{/if}
                       <span class="dt-slot-by">{item.playerName}</span>
                     {/if}
                   </div>
@@ -1200,7 +1211,9 @@
               <div class="result-text">
                 <strong>{mp.lastResult.playerName}</strong> guessed "<strong
                   >{mp.lastResult.guess}</strong
-                >" &mdash; ranked <strong>#{mp.lastResult.rank}</strong>{#if mp.lastResult.value}&nbsp;({mp.lastResult.value}){/if}!
+                >" &mdash; ranked
+                <strong>#{mp.lastResult.rank}</strong
+                >{#if mp.lastResult.value}&nbsp;({mp.lastResult.value}){/if}!
               </div>
               <div class="result-points">+{mp.lastResult.points} points</div>
             {/if}
@@ -1244,7 +1257,8 @@
               <div class="guessed-item">
                 <span class="guessed-rank">#{item.index + 1}</span>
                 <span class="guessed-name">{item.name}</span>
-                {#if item.value}<span class="guessed-value">{item.value}</span>{/if}
+                {#if item.value}<span class="guessed-value">{item.value}</span
+                  >{/if}
                 <span class="guessed-by">{item.playerName}</span>
               </div>
             {/each}
@@ -1597,12 +1611,6 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-  }
-
-  .title-link {
-    text-decoration: none;
-    color: inherit;
-    text-align: center;
   }
 
   .visibility-toggle {
