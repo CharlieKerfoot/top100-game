@@ -291,8 +291,9 @@
     font-family: "Source Serif 4", Georgia, serif;
   }
 
-  input[type="text"]:focus {
+  input[type="text"]:focus-visible {
     border-color: #8b0000;
+    box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.2);
   }
 
   .hint {
@@ -325,6 +326,11 @@
   .start-btn:hover:not(:disabled) {
     background: #fffef2;
     color: #1a1a1a;
+  }
+
+  .start-btn:focus-visible {
+    outline: 2px solid #8b0000;
+    outline-offset: 2px;
   }
 
   .start-btn:disabled {
@@ -364,6 +370,11 @@
     color: #f5e6c8;
   }
 
+  .tab-btn:focus-visible {
+    outline: 2px solid #8b0000;
+    outline-offset: -2px;
+  }
+
   .public-toggle {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -387,6 +398,11 @@
     border-color: #1a1a1a;
     background: #1a1a1a;
     color: #f5e6c8;
+  }
+
+  .toggle-btn:focus-visible {
+    outline: 2px solid #8b0000;
+    outline-offset: 2px;
   }
 
   .code-input {
