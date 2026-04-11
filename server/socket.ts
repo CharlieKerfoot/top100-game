@@ -157,7 +157,7 @@ function isGameOver(party: Party): boolean {
 
   if (settings.mode === 'strikes') {
     const active = players.filter(p => !p.eliminated);
-    return active.length <= 1;
+    return active.length === 0;
   } else {
     return players.every(p => p.guesses >= settings.maxTurns);
   }
