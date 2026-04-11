@@ -187,7 +187,6 @@
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     max-width: 720px;
     margin: 0 auto;
     padding: 1.5rem;
@@ -335,8 +334,13 @@
 
   /* ─── HOME ─── */
   .home {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     max-width: 380px;
     margin: 0 auto;
+    width: 100%;
   }
 
   .tab-bar {
