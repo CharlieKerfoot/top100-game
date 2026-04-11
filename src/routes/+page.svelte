@@ -45,8 +45,9 @@
   <header>
     <div class="header-rule"></div>
     <h1>Common Cents</h1>
-    <p class="subtitle">The Top&nbsp;100 Game</p>
+    <p class="subtitle">The Top&nbsp;100 Ranking Game</p>
     <div class="header-rule"></div>
+    <p class="tagline">Name things from a hidden Top&nbsp;100 list. Harder answers score more. Last one standing wins.</p>
   </header>
 
   {#if mp.error}
@@ -184,13 +185,9 @@
   }
 
   .app {
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
     max-width: 720px;
     margin: 0 auto;
     padding: 1.5rem;
-    box-sizing: border-box;
   }
 
   /* ─── MASTHEAD ─── */
@@ -247,14 +244,8 @@
   }
 
   @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   /* Shared */
@@ -291,9 +282,7 @@
     font-family: "Source Serif 4", Georgia, serif;
   }
 
-  input[type="text"]:focus {
-    border-color: #8b0000;
-  }
+  input[type="text"]:focus { border-color: #8b0000; }
 
   .hint {
     color: #777;
@@ -313,9 +302,7 @@
     font-size: 1.1rem;
     font-weight: 700;
     cursor: pointer;
-    transition:
-      background 0.2s,
-      color 0.2s;
+    transition: background 0.2s, color 0.2s;
     margin-top: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -334,13 +321,8 @@
 
   /* ─── HOME ─── */
   .home {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
     max-width: 380px;
     margin: 0 auto;
-    width: 100%;
   }
 
   .tab-bar {
@@ -443,14 +425,8 @@
     gap: 0.15rem;
   }
 
-  .pp-host {
-    font-weight: 600;
-    font-size: 0.9rem;
-  }
-  .pp-details {
-    font-size: 0.8rem;
-    color: #888;
-  }
+  .pp-host { font-weight: 600; font-size: 0.9rem; }
+  .pp-details { font-size: 0.8rem; color: #888; }
 
   .pp-actions {
     display: flex;
