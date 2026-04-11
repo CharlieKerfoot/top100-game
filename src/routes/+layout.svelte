@@ -25,4 +25,12 @@
     color: #1a1a1a;
     min-height: 100vh;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(*) {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 </style>
