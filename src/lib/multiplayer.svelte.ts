@@ -345,7 +345,12 @@ export function createMultiplayerState() {
   function checkParty(code: string): Promise<{ exists: boolean; code: string; phase?: string; hostName?: string; playerCount?: number; categoryName?: string }> {
     connect();
     return new Promise((resolve) => {
+      let attempts = 0;
       const tryEmit = () => {
+        if (++attempts > 50) {
+          resolve({ exists: false, code: code.toUpperCase() });
+          return;
+        }
         if (socket?.connected) {
           socket.once('party-check', (data: any) => resolve(data));
           socket.emit('check-party', { code });
