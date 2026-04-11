@@ -56,6 +56,11 @@
   let previewCategory = $state<Category | null>(null);
   let previewSearch = $state("");
 
+  // Non-host suggest browser state
+  let showSuggestBrowser = $state(false);
+  let suggestSearch = $state("");
+  let suggestTag = $state<string | null>("__featured__");
+
   // Game state
   let guessInput = $state("");
   let showRules = $state(false);
@@ -65,7 +70,9 @@
   $effect(() => {
     if (mp.phase === "playing") {
       document.body.style.overflow = "hidden";
-      return () => { document.body.style.overflow = ""; };
+      return () => {
+        document.body.style.overflow = "";
+      };
     }
   });
 
@@ -78,6 +85,18 @@
   );
 
   const allTags = getAllTags();
+  const mySuggestion = $derived(
+    mp.categorySuggestions.find((s) => s.playerId === mp.myId) ?? null,
+  );
+  const filteredSuggestCategories = $derived.by(() => {
+    if (suggestTag === "__featured__" && !suggestSearch.trim()) {
+      return getFeaturedCategories();
+    }
+    return searchCategories(
+      suggestSearch,
+      suggestTag === "__featured__" ? null : suggestTag,
+    );
+  });
   const filteredCategories = $derived.by(() => {
     if (activeTag === "__featured__" && !categorySearch.trim()) {
       return getFeaturedCategories();
@@ -141,11 +160,18 @@
           <button
             class="visibility-toggle"
             class:is-public={mp.isPublic}
-            onclick={() => mp.isHost && mp.updateSettings({ isPublic: !mp.isPublic })}
+            onclick={() =>
+              mp.isHost && mp.updateSettings({ isPublic: !mp.isPublic })}
             class:readonly={!mp.isHost}
-            title={mp.isHost ? (mp.isPublic ? "Switch to Private" : "Switch to Public") : ""}
+            title={mp.isHost
+              ? mp.isPublic
+                ? "Switch to Private"
+                : "Switch to Public"
+              : ""}
           >
-            <span class="visibility-label-text">{mp.isPublic ? "Public" : "Private"}</span>
+            <span class="visibility-label-text"
+              >{mp.isPublic ? "Public" : "Private"}</span
+            >
             <span class="visibility-slider">
               <span class="visibility-knob"></span>
             </span>
@@ -526,7 +552,6 @@
     <div class="lobby">
       <!-- Column 1: Players + Game Mode -->
       <div class="lobby-col lobby-col-info">
-
         <div class="setup-section">
           <label>Players ({mp.players.length}/8)</label>
           <div class="player-list">
@@ -707,6 +732,41 @@
                 </div>
               </div>
             {:else}
+              {#if mp.categorySuggestions.length > 0}
+                <div class="suggestions-panel">
+                  <div class="suggestions-panel-header">Player suggestions</div>
+                  {#each mp.categorySuggestions as suggestion}
+                    <div class="suggestion-row">
+                      <div class="suggestion-row-info">
+                        <span class="suggestion-row-player"
+                          >{suggestion.playerName}</span
+                        >
+                        <span class="suggestion-row-arrow">suggested</span>
+                        <span class="suggestion-row-category"
+                          >{suggestion.categoryName}</span
+                        >
+                      </div>
+                      <div class="suggestion-row-actions">
+                        <button
+                          class="suggestion-accept-btn"
+                          onclick={() => {
+                            mp.updateSettings({
+                              categoryId: suggestion.categoryId,
+                            });
+                            mp.dismissSuggestion(suggestion.playerId);
+                          }}>Accept</button
+                        >
+                        <button
+                          class="suggestion-dismiss-btn"
+                          onclick={() =>
+                            mp.dismissSuggestion(suggestion.playerId)}
+                          >&times;</button
+                        >
+                      </div>
+                    </div>
+                  {/each}
+                </div>
+              {/if}
               <input
                 type="text"
                 bind:value={categorySearch}
@@ -761,10 +821,127 @@
                 {/each}
               </div>
             {/if}
+          {:else if showSuggestBrowser}
+            <div class="suggest-browser">
+              <div class="suggest-browser-header">
+                <button
+                  class="back-btn"
+                  onclick={() => {
+                    showSuggestBrowser = false;
+                    suggestSearch = "";
+                    suggestTag = "__featured__";
+                  }}>&larr; Back</button
+                >
+                <span class="suggest-browser-title">Suggest a category</span>
+              </div>
+              <input
+                type="text"
+                bind:value={suggestSearch}
+                placeholder="Search categories..."
+              />
+              <div class="tag-bar">
+                <button
+                  class="tag-btn"
+                  class:active={suggestTag === "__featured__"}
+                  onclick={() => (suggestTag = "__featured__")}>Featured</button
+                >
+                <button
+                  class="tag-btn"
+                  class:active={suggestTag === null}
+                  onclick={() => (suggestTag = null)}>All</button
+                >
+                {#each allTags as tag}
+                  <button
+                    class="tag-btn"
+                    class:active={suggestTag === tag}
+                    onclick={() =>
+                      (suggestTag = suggestTag === tag ? null : tag)}
+                    >{tag}</button
+                  >
+                {/each}
+              </div>
+              <div class="category-grid">
+                {#each filteredSuggestCategories as cat}
+                  <div
+                    class="category-card"
+                    class:selected={mySuggestion?.categoryId === cat.id}
+                    role="button"
+                    tabindex="0"
+                    onclick={() => {
+                      mp.suggestCategory(cat.id);
+                      showSuggestBrowser = false;
+                      suggestSearch = "";
+                      suggestTag = "__featured__";
+                    }}
+                    onkeydown={(e: KeyboardEvent) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        mp.suggestCategory(cat.id);
+                        showSuggestBrowser = false;
+                        suggestSearch = "";
+                        suggestTag = "__featured__";
+                      }
+                    }}
+                  >
+                    <div class="card-top">
+                      <span class="card-name">{cat.name}</span>
+                      {#if mySuggestion?.categoryId === cat.id}<span
+                          class="card-check">&#10003;</span
+                        >{/if}
+                    </div>
+                    <span class="card-desc">{cat.description}</span>
+                    <div class="card-tags">
+                      {#each cat.tags as tag}
+                        <span class="card-tag">{tag}</span>
+                      {/each}
+                    </div>
+                  </div>
+                {/each}
+              </div>
+            </div>
           {:else}
-            <div class="readonly-setting">
-              <span class="setting-value">{mp.category.name}</span>
-              <span class="setting-desc">{mp.category.description}</span>
+            <div class="category-readonly">
+              <div class="category-readonly-inner">
+                <div class="category-readonly-eyebrow">Category</div>
+                <div class="category-readonly-name">{mp.category.name}</div>
+                <div class="category-readonly-desc">
+                  {mp.category.description}
+                </div>
+                {#if mp.category.tags?.length}
+                  <div class="category-readonly-tags">
+                    {#each mp.category.tags as tag}
+                      <span class="card-tag">{tag}</span>
+                    {/each}
+                  </div>
+                {/if}
+                {#if mySuggestion}
+                  <div class="my-suggestion">
+                    <div class="my-suggestion-check">&#10003;</div>
+                    <div class="my-suggestion-label">Your suggestion</div>
+                    <div class="my-suggestion-name">
+                      {mySuggestion.categoryName}
+                    </div>
+                    <div class="my-suggestion-footer">
+                      <button
+                        class="my-suggestion-change"
+                        onclick={() => (showSuggestBrowser = true)}
+                        >Change</button
+                      >
+                      <span class="my-suggestion-sep">&middot;</span>
+                      <button
+                        class="my-suggestion-retract"
+                        onclick={() => mp.dismissSuggestion(mp.myId)}
+                        >Retract</button
+                      >
+                    </div>
+                  </div>
+                {:else}
+                  <button
+                    class="suggest-open-btn"
+                    onclick={() => (showSuggestBrowser = true)}
+                    >Suggest a category</button
+                  >
+                {/if}
+              </div>
             </div>
           {/if}
         </div>
@@ -915,7 +1092,11 @@
           <div class="history-panel">
             <div class="history-list">
               {#each [...mp.guessHistory].reverse() as entry}
-                <div class="history-entry" class:history-hit={!entry.isStrike} class:history-miss={entry.isStrike}>
+                <div
+                  class="history-entry"
+                  class:history-hit={!entry.isStrike}
+                  class:history-miss={entry.isStrike}
+                >
                   <span class="history-player">{entry.playerName}</span>
                   <span class="history-guess">{entry.guess}</span>
                   <span class="history-result">
@@ -929,13 +1110,22 @@
             </div>
           </div>
         {/if}
-        <button class="game-action-btn" onclick={() => (showHistory = !showHistory)}>
+        <button
+          class="game-action-btn"
+          onclick={() => (showHistory = !showHistory)}
+        >
           {showHistory ? "Hide" : "Show"} All Guesses ({mp.guessHistory.length})
         </button>
         {#if mp.isHost}
-          <button class="game-action-btn" onclick={() => (confirmAction = "end")}>End Game</button>
+          <button
+            class="game-action-btn"
+            onclick={() => (confirmAction = "end")}>End Game</button
+          >
         {/if}
-        <button class="game-action-btn danger" onclick={() => (confirmAction = "leave")}>Leave Game</button>
+        <button
+          class="game-action-btn danger"
+          onclick={() => (confirmAction = "leave")}>Leave Game</button
+        >
       </div>
 
       <!-- Mobile: compact vertical layout -->
@@ -1062,7 +1252,11 @@
             <div class="history-panel">
               <div class="history-list">
                 {#each [...mp.guessHistory].reverse() as entry}
-                  <div class="history-entry" class:history-hit={!entry.isStrike} class:history-miss={entry.isStrike}>
+                  <div
+                    class="history-entry"
+                    class:history-hit={!entry.isStrike}
+                    class:history-miss={entry.isStrike}
+                  >
                     <span class="history-player">{entry.playerName}</span>
                     <span class="history-guess">{entry.guess}</span>
                     <span class="history-result">
@@ -1073,13 +1267,23 @@
               </div>
             </div>
           {/if}
-          <button class="game-action-btn" onclick={() => (showHistory = !showHistory)}>
-            {showHistory ? "Hide" : "Show"} All Guesses ({mp.guessHistory.length})
+          <button
+            class="game-action-btn"
+            onclick={() => (showHistory = !showHistory)}
+          >
+            {showHistory ? "Hide" : "Show"} All Guesses ({mp.guessHistory
+              .length})
           </button>
           {#if mp.isHost}
-            <button class="game-action-btn" onclick={() => (confirmAction = "end")}>End Game</button>
+            <button
+              class="game-action-btn"
+              onclick={() => (confirmAction = "end")}>End Game</button
+            >
           {/if}
-          <button class="game-action-btn danger" onclick={() => (confirmAction = "leave")}>Leave Game</button>
+          <button
+            class="game-action-btn danger"
+            onclick={() => (confirmAction = "leave")}>Leave Game</button
+          >
         </div>
       </div>
 
@@ -1094,7 +1298,10 @@
               {/if}
             </p>
             <div class="confirm-btns">
-              <button class="confirm-cancel" onclick={() => (confirmAction = null)}>Cancel</button>
+              <button
+                class="confirm-cancel"
+                onclick={() => (confirmAction = null)}>Cancel</button
+              >
               <button
                 class="confirm-ok"
                 class:danger={confirmAction === "leave"}
@@ -1155,7 +1362,11 @@
         <h3>All Guesses ({mp.guessHistory.length})</h3>
         <div class="history-list">
           {#each [...mp.guessHistory].reverse() as entry}
-            <div class="history-entry" class:history-hit={!entry.isStrike} class:history-miss={entry.isStrike}>
+            <div
+              class="history-entry"
+              class:history-hit={!entry.isStrike}
+              class:history-miss={entry.isStrike}
+            >
               <span class="history-player">{entry.playerName}</span>
               <span class="history-guess">{entry.guess}</span>
               <span class="history-result">
@@ -1270,6 +1481,15 @@
       flex-direction: column;
       min-height: 0;
       overflow: hidden;
+    }
+
+    /* Suggest browser fills the column the same way the host browser does */
+    .suggest-browser {
+      overflow: hidden;
+    }
+
+    .suggest-browser .category-grid {
+      overflow-y: auto;
     }
 
     .lobby-actions {
@@ -1429,7 +1649,7 @@
     border-radius: 50%;
     background: #fffef2;
     transition: transform 0.2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   }
 
   .visibility-toggle.is-public .visibility-knob {
@@ -1982,7 +2202,6 @@
     color: #f5e6c8;
   }
 
-
   .player-list {
     display: flex;
     flex-direction: column;
@@ -2043,6 +2262,301 @@
     color: #888;
     margin-top: 0.15rem;
     font-style: italic;
+  }
+
+  .category-readonly {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+
+  .category-readonly-inner {
+    text-align: center;
+    max-width: 420px;
+    padding: 2.5rem 2rem;
+    border: 2px solid #d4c5a0;
+    border-radius: 8px;
+    background: #fffef7;
+  }
+
+  .category-readonly-eyebrow {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #b89a5a;
+    margin-bottom: 0.75rem;
+  }
+
+  .category-readonly-name {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1.2;
+    margin-bottom: 0.6rem;
+  }
+
+  .category-readonly-desc {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 1rem;
+    font-style: italic;
+  }
+
+  .category-readonly-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+  }
+
+  .category-readonly-note {
+    font-size: 0.75rem;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 1.25rem;
+  }
+
+  .suggest-open-btn {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: transparent;
+    border: 2px solid #1a1a1a;
+    color: #1a1a1a;
+    padding: 0.55rem 1.25rem;
+    cursor: pointer;
+    transition:
+      background 0.15s,
+      color 0.15s;
+  }
+
+  .suggest-open-btn:hover {
+    background: #1a1a1a;
+    color: #f5e6c8;
+  }
+
+  .my-suggestion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 1.25rem 1.5rem 1rem;
+    background: #fffef7;
+    border: 2px solid #b89a5a;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+  }
+
+  .my-suggestion-check {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: #1a1a1a;
+    color: #f5e6c8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+
+  .my-suggestion-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #b89a5a;
+  }
+
+  .my-suggestion-name {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    text-align: center;
+    line-height: 1.2;
+    margin-top: 0.1rem;
+  }
+
+  .my-suggestion-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.6rem;
+  }
+
+  .my-suggestion-sep {
+    color: #ccc;
+    font-size: 0.8rem;
+  }
+
+  .my-suggestion-change,
+  .my-suggestion-retract {
+    background: transparent;
+    border: none;
+    font-size: 0.78rem;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.15s;
+  }
+
+  .my-suggestion-change {
+    color: #555;
+    text-decoration: underline;
+  }
+
+  .my-suggestion-change:hover {
+    color: #1a1a1a;
+  }
+
+  .my-suggestion-retract {
+    color: #aaa;
+    text-decoration: underline;
+  }
+
+  .my-suggestion-retract:hover {
+    color: #666;
+  }
+
+  /* Suggest browser (non-host) */
+  .suggest-browser {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    gap: 0.5rem;
+  }
+
+  .suggest-browser-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .suggest-browser-title {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  /* Host suggestions panel */
+  .suggestions-panel {
+    border: 2px solid #b89a5a;
+    border-radius: 6px;
+    background: #fffbf0;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+  }
+
+  .suggestions-panel-header {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #b89a5a;
+    padding: 0.4rem 0.75rem;
+    background: #fdf5e0;
+    border-bottom: 1px solid #d4c5a0;
+  }
+
+  .suggestion-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #ede5cc;
+  }
+
+  .suggestion-row:last-child {
+    border-bottom: none;
+  }
+
+  .suggestion-row-info {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex: 1;
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+
+  .suggestion-row-player {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #1a1a1a;
+  }
+
+  .suggestion-row-arrow {
+    font-size: 0.75rem;
+    color: #999;
+    font-style: italic;
+  }
+
+  .suggestion-row-category {
+    font-size: 0.85rem;
+    color: #444;
+  }
+
+  .suggestion-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+  }
+
+  .suggestion-accept-btn {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: #1a1a1a;
+    color: #f5e6c8;
+    border: none;
+    padding: 0.3rem 0.65rem;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: background 0.15s;
+  }
+
+  .suggestion-accept-btn:hover {
+    background: #333;
+  }
+
+  .suggestion-dismiss-btn {
+    background: transparent;
+    border: 1px solid #ccc;
+    color: #888;
+    font-size: 1rem;
+    line-height: 1;
+    width: 1.6rem;
+    height: 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 3px;
+    transition:
+      border-color 0.15s,
+      color 0.15s;
+  }
+
+  .suggestion-dismiss-btn:hover {
+    border-color: #888;
+    color: #333;
   }
 
   .waiting-msg {
@@ -2587,7 +3101,7 @@
   .game-action-bar {
     display: flex;
     gap: 0.5rem;
-    padding: 0.5rem 0 1.25rem;
+    padding: 0.25rem 0 2.5rem;
     border-top: 1px solid #d4c5a0;
     flex-wrap: wrap;
     position: relative;
@@ -2929,6 +3443,7 @@
     align-items: center;
     gap: 1rem;
     margin-bottom: 1.5rem;
+    height: 2.5rem;
   }
 
   .dt-category-label {

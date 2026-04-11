@@ -44,6 +44,13 @@ export interface PublicParty {
   phase: string;
 }
 
+export interface CategorySuggestion {
+  playerId: string;
+  playerName: string;
+  categoryId: string;
+  categoryName: string;
+}
+
 // In production, Socket.IO runs on the same origin. In dev, separate port.
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL
   || (import.meta.env.DEV ? 'http://localhost:3001' : undefined);
@@ -87,6 +94,9 @@ export function createMultiplayerState() {
 
   // Browse
   let publicParties = $state<PublicParty[]>([]);
+
+  // Category suggestions (lobby)
+  let categorySuggestions = $state<CategorySuggestion[]>([]);
 
   const playerId = getOrCreatePlayerId();
 
@@ -232,6 +242,7 @@ export function createMultiplayerState() {
     maxStrikes = party.settings.maxStrikes;
     maxTurns = party.settings.maxTurns;
     hints = party.settings.hints ?? true;
+    categorySuggestions = party.suggestions ?? [];
     if (party.phase === 'lobby') phase = 'lobby';
   }
 
@@ -260,6 +271,7 @@ export function createMultiplayerState() {
     showResult = false;
     currentPlayerIndex = 0;
     playerOrder = [];
+    categorySuggestions = [];
   }
 
   function createParty(playerName: string, pub: boolean) {
@@ -338,6 +350,14 @@ export function createMultiplayerState() {
     });
   }
 
+  function suggestCategory(categoryId: string) {
+    socket?.emit('suggest-category', { categoryId });
+  }
+
+  function dismissSuggestion(targetPlayerId: string) {
+    socket?.emit('dismiss-suggestion', { playerId: targetPlayerId });
+  }
+
   function setPhase(p: AppPhase) {
     phase = p;
   }
@@ -366,6 +386,7 @@ export function createMultiplayerState() {
     get lastResult() { return lastResult; },
     get showResult() { return showResult; },
     get publicParties() { return publicParties; },
+    get categorySuggestions() { return categorySuggestions; },
     get myId() { return myId; },
     get isHost() { return isHost; },
     get category() { return category; },
@@ -385,6 +406,8 @@ export function createMultiplayerState() {
     backToLobby,
     leaveParty,
     checkParty,
+    suggestCategory,
+    dismissSuggestion,
     setPhase,
   };
 }

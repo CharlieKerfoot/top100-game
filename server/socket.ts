@@ -46,6 +46,13 @@ interface GuessResult {
   playerName: string;
 }
 
+interface CategorySuggestion {
+  playerId: string;
+  playerName: string;
+  categoryId: string;
+  categoryName: string;
+}
+
 interface Party {
   code: string;
   hostId: string;
@@ -54,6 +61,7 @@ interface Party {
   settings: GameSettings;
   game: GameState | null;
   phase: 'lobby' | 'playing' | 'results';
+  suggestions: Map<string, string>; // playerId -> categoryId
 }
 
 // ── State ──────────────────────────────────────────────────
@@ -85,6 +93,14 @@ function normalizeGuess(text: string): string {
 }
 
 function serializeParty(party: Party) {
+  const suggestions: CategorySuggestion[] = [];
+  for (const [playerId, categoryId] of party.suggestions) {
+    const player = party.players.get(playerId);
+    const cat = categories.find(c => c.id === categoryId);
+    if (player && cat) {
+      suggestions.push({ playerId, playerName: player.name, categoryId, categoryName: cat.name });
+    }
+  }
   return {
     code: party.code,
     hostId: party.hostId,
@@ -92,6 +108,7 @@ function serializeParty(party: Party) {
     players: [...party.players.values()],
     settings: party.settings,
     phase: party.phase,
+    suggestions,
   };
 }
 
@@ -183,6 +200,7 @@ function removePlayerFromParty(playerId: string, io: Server) {
   }
 
   party.players.delete(playerId);
+  party.suggestions.delete(playerId);
   playerParty.delete(playerId);
   playerToSocket.delete(playerId);
 
@@ -282,6 +300,7 @@ export function setupSocketServer(io: Server) {
         players: new Map([[playerId, player]]),
         settings: { categoryId: categories[0].id, mode: 'strikes', maxStrikes: 3, maxTurns: 10, hints: true },
         game: null, phase: 'lobby',
+        suggestions: new Map(),
       };
 
       parties.set(code, party);
@@ -489,10 +508,38 @@ export function setupSocketServer(io: Server) {
 
       party.game = null;
       party.phase = 'lobby';
+      party.suggestions.clear();
       for (const player of party.players.values()) {
         player.score = 0; player.strikes = 0; player.eliminated = false; player.guesses = 0; player.sittingOut = false;
       }
       io.to(code).emit('returned-to-lobby', { party: serializeParty(party) });
+    });
+
+    socket.on('suggest-category', ({ categoryId }: { categoryId: string }) => {
+      const playerId = getPlayerId(socket.id);
+      if (!playerId) return;
+      const code = playerParty.get(playerId);
+      if (!code) return;
+      const party = parties.get(code);
+      if (!party || party.phase !== 'lobby' || party.hostId === playerId) return;
+      if (!categories.find(c => c.id === categoryId)) return;
+
+      party.suggestions.set(playerId, categoryId);
+      io.to(code).emit('party-updated', { party: serializeParty(party), game: null });
+    });
+
+    socket.on('dismiss-suggestion', ({ playerId: targetId }: { playerId: string }) => {
+      const playerId = getPlayerId(socket.id);
+      if (!playerId) return;
+      const code = playerParty.get(playerId);
+      if (!code) return;
+      const party = parties.get(code);
+      if (!party) return;
+      // Host can dismiss any suggestion; non-host can only retract their own
+      if (party.hostId !== playerId && targetId !== playerId) return;
+
+      party.suggestions.delete(targetId);
+      io.to(code).emit('party-updated', { party: serializeParty(party), game: null });
     });
 
     socket.on('leave-party', () => {
