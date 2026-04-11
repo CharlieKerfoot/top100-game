@@ -98,7 +98,11 @@ function generateCode(): string {
 }
 
 function normalizeGuess(text: string): string {
-  return text.toLowerCase().replace(/[^a-z0-9]/g, '');
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // strip diacritics
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
 }
 
 function serializeParty(party: Party) {
