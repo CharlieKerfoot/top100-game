@@ -60,6 +60,7 @@
   let guessInput = $state("");
   let showRules = $state(false);
   let showHistory = $state(false);
+  let confirmAction = $state<"leave" | "end" | null>(null);
 
   const sortedGuessed = $derived(
     [...mp.guessedItems].sort((a, b) => a.index - b.index),
@@ -925,9 +926,9 @@
           {showHistory ? "Hide" : "Show"} All Guesses ({mp.guessHistory.length})
         </button>
         {#if mp.isHost}
-          <button class="game-action-btn" onclick={() => mp.backToLobby()}>End Game</button>
+          <button class="game-action-btn" onclick={() => (confirmAction = "end")}>End Game</button>
         {/if}
-        <button class="game-action-btn danger" onclick={() => mp.leaveParty()}>Leave Game</button>
+        <button class="game-action-btn danger" onclick={() => (confirmAction = "leave")}>Leave Game</button>
       </div>
 
       <!-- Mobile: compact vertical layout -->
@@ -1069,11 +1070,39 @@
             {showHistory ? "Hide" : "Show"} All Guesses ({mp.guessHistory.length})
           </button>
           {#if mp.isHost}
-            <button class="game-action-btn" onclick={() => mp.backToLobby()}>End Game</button>
+            <button class="game-action-btn" onclick={() => (confirmAction = "end")}>End Game</button>
           {/if}
-          <button class="game-action-btn danger" onclick={() => mp.leaveParty()}>Leave Game</button>
+          <button class="game-action-btn danger" onclick={() => (confirmAction = "leave")}>Leave Game</button>
         </div>
       </div>
+
+      {#if confirmAction}
+        <div class="confirm-overlay" onclick={() => (confirmAction = null)}>
+          <div class="confirm-modal" onclick={(e) => e.stopPropagation()}>
+            <p class="confirm-msg">
+              {#if confirmAction === "leave"}
+                Leave the game? You'll be taken back to the home screen.
+              {:else}
+                End the game for everyone? The party will return to the lobby.
+              {/if}
+            </p>
+            <div class="confirm-btns">
+              <button class="confirm-cancel" onclick={() => (confirmAction = null)}>Cancel</button>
+              <button
+                class="confirm-ok"
+                class:danger={confirmAction === "leave"}
+                onclick={() => {
+                  if (confirmAction === "leave") mp.leaveParty();
+                  else mp.backToLobby();
+                  confirmAction = null;
+                }}
+              >
+                {confirmAction === "leave" ? "Leave Game" : "End Game"}
+              </button>
+            </div>
+          </div>
+        </div>
+      {/if}
     </div>
 
     <!-- ─── RESULTS SCREEN ─── -->
@@ -1185,8 +1214,25 @@
 
   @media (min-width: 900px) {
     .app:has(.game) {
+      height: 100dvh;
+      box-sizing: border-box;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
       max-width: 1400px;
       padding: 1.5rem 2rem;
+    }
+
+    .game {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .game-desktop {
+      flex: 1;
+      min-height: 0;
     }
 
     .app:has(.lobby) {
@@ -2596,7 +2642,7 @@
     position: absolute;
     bottom: 100%;
     left: 0;
-    right: 0;
+    width: 240px;
     background: #fffef2;
     border: 1px solid #d4c5a0;
     max-height: 260px;
@@ -2604,6 +2650,77 @@
     z-index: 50;
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
     margin-bottom: 2px;
+  }
+
+  /* Confirmation modal */
+  .confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+  }
+
+  .confirm-modal {
+    background: #fffef2;
+    border: 1px solid #d4c5a0;
+    padding: 1.5rem;
+    max-width: 320px;
+    width: 90%;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  }
+
+  .confirm-msg {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 0.95rem;
+    color: #1a1a1a;
+    margin: 0 0 1.25rem;
+    line-height: 1.5;
+  }
+
+  .confirm-btns {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+
+  .confirm-cancel {
+    padding: 0.5rem 1rem;
+    border: 1px solid #c4b48a;
+    background: transparent;
+    color: #555;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+
+  .confirm-cancel:hover {
+    border-color: #1a1a1a;
+    color: #1a1a1a;
+  }
+
+  .confirm-ok {
+    padding: 0.5rem 1rem;
+    border: 2px solid #1a1a1a;
+    background: #1a1a1a;
+    color: #f5e6c8;
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .confirm-ok.danger {
+    border-color: #8b0000;
+    background: #8b0000;
+  }
+
+  .confirm-ok:hover {
+    opacity: 0.85;
   }
 
   .history-list {
@@ -2913,6 +3030,14 @@
     grid-template-columns: 240px 1fr;
     gap: 1.5rem;
     align-items: start;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .dt-board {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
   }
 
   /* ─── DESKTOP PLAYERS SIDEBAR ─── */
@@ -3017,7 +3142,7 @@
   .dt-board-body {
     flex: 1;
     overflow-y: auto;
-    max-height: calc(100vh - 280px);
+    min-height: 0;
   }
 
   /* 100-slot list */
