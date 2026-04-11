@@ -903,6 +903,24 @@
 
       <!-- Desktop game action bar -->
       <div class="game-action-bar">
+        {#if showHistory}
+          <div class="history-panel">
+            <div class="history-list">
+              {#each [...mp.guessHistory].reverse() as entry}
+                <div class="history-entry" class:history-hit={!entry.isStrike} class:history-miss={entry.isStrike}>
+                  <span class="history-player">{entry.playerName}</span>
+                  <span class="history-guess">{entry.guess}</span>
+                  <span class="history-result">
+                    {#if entry.isStrike}✗{:else}#{entry.rank}{/if}
+                  </span>
+                </div>
+              {/each}
+              {#if mp.guessHistory.length === 0}
+                <p class="history-empty">No guesses yet</p>
+              {/if}
+            </div>
+          </div>
+        {/if}
         <button class="game-action-btn" onclick={() => (showHistory = !showHistory)}>
           {showHistory ? "Hide" : "Show"} All Guesses ({mp.guessHistory.length})
         </button>
@@ -911,25 +929,6 @@
         {/if}
         <button class="game-action-btn danger" onclick={() => mp.leaveParty()}>Leave Game</button>
       </div>
-
-      {#if showHistory}
-        <div class="history-panel">
-          <div class="history-list">
-            {#each [...mp.guessHistory].reverse() as entry}
-              <div class="history-entry" class:history-hit={!entry.isStrike} class:history-miss={entry.isStrike}>
-                <span class="history-player">{entry.playerName}</span>
-                <span class="history-guess">{entry.guess}</span>
-                <span class="history-result">
-                  {#if entry.isStrike}✗{:else}#{entry.rank}{/if}
-                </span>
-              </div>
-            {/each}
-            {#if mp.guessHistory.length === 0}
-              <p class="history-empty">No guesses yet</p>
-            {/if}
-          </div>
-        </div>
-      {/if}
 
       <!-- Mobile: compact vertical layout -->
       <div class="game-mobile">
@@ -1051,6 +1050,21 @@
         </div>
 
         <div class="mobile-game-actions">
+          {#if showHistory}
+            <div class="history-panel">
+              <div class="history-list">
+                {#each [...mp.guessHistory].reverse() as entry}
+                  <div class="history-entry" class:history-hit={!entry.isStrike} class:history-miss={entry.isStrike}>
+                    <span class="history-player">{entry.playerName}</span>
+                    <span class="history-guess">{entry.guess}</span>
+                    <span class="history-result">
+                      {#if entry.isStrike}✗{:else}#{entry.rank}{/if}
+                    </span>
+                  </div>
+                {/each}
+              </div>
+            </div>
+          {/if}
           <button class="game-action-btn" onclick={() => (showHistory = !showHistory)}>
             {showHistory ? "Hide" : "Show"} All Guesses ({mp.guessHistory.length})
           </button>
@@ -1059,22 +1073,6 @@
           {/if}
           <button class="game-action-btn danger" onclick={() => mp.leaveParty()}>Leave Game</button>
         </div>
-
-        {#if showHistory}
-          <div class="history-panel">
-            <div class="history-list">
-              {#each [...mp.guessHistory].reverse() as entry}
-                <div class="history-entry" class:history-hit={!entry.isStrike} class:history-miss={entry.isStrike}>
-                  <span class="history-player">{entry.playerName}</span>
-                  <span class="history-guess">{entry.guess}</span>
-                  <span class="history-result">
-                    {#if entry.isStrike}✗{:else}#{entry.rank}{/if}
-                  </span>
-                </div>
-              {/each}
-            </div>
-          </div>
-        {/if}
       </div>
     </div>
 
@@ -2556,6 +2554,7 @@
     padding: 0.5rem 0;
     border-top: 1px solid #d4c5a0;
     flex-wrap: wrap;
+    position: relative;
   }
 
   .mobile-game-actions {
@@ -2563,6 +2562,7 @@
     gap: 0.5rem;
     flex-wrap: wrap;
     margin-top: 0.75rem;
+    position: relative;
   }
 
   .game-action-btn {
@@ -2593,11 +2593,17 @@
 
   /* History panel */
   .history-panel {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
     background: #fffef2;
     border: 1px solid #d4c5a0;
-    margin-bottom: 1rem;
     max-height: 260px;
     overflow-y: auto;
+    z-index: 50;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2px;
   }
 
   .history-list {
