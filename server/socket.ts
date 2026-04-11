@@ -77,6 +77,12 @@ const disconnectTimers = new Map<string, ReturnType<typeof setTimeout>>(); // pl
 
 // ── Helpers ────────────────────────────────────────────────
 
+function sanitizeString(s: unknown, maxLen: number): string | null {
+  if (typeof s !== 'string') return null;
+  const trimmed = s.trim().slice(0, maxLen);
+  return trimmed || null;
+}
+
 function getPlayerId(socketId: string): string | undefined {
   return socketToPlayer.get(socketId);
 }
@@ -258,6 +264,7 @@ export function setupSocketServer(io: Server) {
 
     // Register maps the client's stable playerId to this socket
     socket.on('register', ({ playerId }: { playerId: string }) => {
+      if (typeof playerId !== 'string' || !playerId || playerId.length > 100) return;
       socketToPlayer.set(socket.id, playerId);
       playerToSocket.set(playerId, socket.id);
 
@@ -290,12 +297,14 @@ export function setupSocketServer(io: Server) {
     socket.on('create-party', ({ playerName, isPublic }: { playerName: string; isPublic: boolean }) => {
       const playerId = getPlayerId(socket.id);
       if (!playerId) return;
+      const name = sanitizeString(playerName, 30);
+      if (!name) return;
 
       removePlayerFromParty(playerId, io);
 
       const code = generateCode();
       const player: Player = {
-        id: playerId, name: playerName,
+        id: playerId, name,
         score: 0, strikes: 0, eliminated: false, guesses: 0,
         sittingOut: false,
       };
@@ -318,6 +327,8 @@ export function setupSocketServer(io: Server) {
     socket.on('join-party', ({ code, playerName }: { code: string; playerName: string }) => {
       const playerId = getPlayerId(socket.id);
       if (!playerId) return;
+      const name = sanitizeString(playerName, 30);
+      if (!name) return;
 
       const party = parties.get(code.toUpperCase());
       if (!party) { socket.emit('error-msg', { message: 'Party not found' }); return; }
@@ -327,7 +338,7 @@ export function setupSocketServer(io: Server) {
 
       const isMidGame = party.phase !== 'lobby';
       const player: Player = {
-        id: playerId, name: playerName,
+        id: playerId, name,
         score: 0, strikes: 0, eliminated: false, guesses: 0,
         sittingOut: isMidGame,
       };
@@ -426,6 +437,8 @@ export function setupSocketServer(io: Server) {
     socket.on('submit-guess', ({ guess }: { guess: string }) => {
       const playerId = getPlayerId(socket.id);
       if (!playerId) return;
+      const safeGuess = sanitizeString(guess, 200);
+      if (!safeGuess) return;
       const code = playerParty.get(playerId);
       if (!code) return;
       const party = parties.get(code);
@@ -437,7 +450,7 @@ export function setupSocketServer(io: Server) {
       const cat = categories.find(c => c.id === party.settings.categoryId);
       if (!cat) return;
 
-      const normalized = normalizeGuess(guess);
+      const normalized = normalizeGuess(safeGuess);
       let foundIndex = -1;
       for (let i = 0; i < cat.items.length; i++) {
         if (normalizeGuess(cat.items[i]) === normalized) { foundIndex = i; break; }
@@ -448,7 +461,7 @@ export function setupSocketServer(io: Server) {
       let result: GuessResult;
 
       if (alreadyGuessed || foundIndex < 0) {
-        result = { guess, rank: null, points: 0, isStrike: true, playerName: player.name };
+        result = { guess: safeGuess, rank: null, points: 0, isStrike: true, playerName: player.name };
         player.strikes++;
         player.guesses++;
         if (party.settings.mode === 'strikes' && player.strikes >= party.settings.maxStrikes) {
@@ -459,13 +472,13 @@ export function setupSocketServer(io: Server) {
         const points = rank;
         const value = cat.values?.[foundIndex];
         const valueLabel = cat.valueLabel;
-        result = { guess, rank, points, isStrike: false, playerName: player.name, value, valueLabel };
+        result = { guess: safeGuess, rank, points, isStrike: false, playerName: player.name, value, valueLabel };
         player.score += points;
         player.guesses++;
         game.guessedItems.set(foundIndex, player.name);
       }
 
-      game.guessHistory.push({ guess, playerName: player.name, isStrike: result.isStrike, rank: result.rank, value: result.value });
+      game.guessHistory.push({ guess: safeGuess, playerName: player.name, isStrike: result.isStrike, rank: result.rank, value: result.value });
       game.lastResult = result;
       game.showResult = true;
 
