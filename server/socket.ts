@@ -11,6 +11,7 @@ interface Player {
   strikes: number;
   eliminated: boolean;
   guesses: number;
+  sittingOut: boolean;
 }
 
 interface GameSettings {
@@ -262,6 +263,7 @@ export function setupSocketServer(io: Server) {
       const player: Player = {
         id: playerId, name: playerName,
         score: 0, strikes: 0, eliminated: false, guesses: 0,
+        sittingOut: false,
       };
 
       const party: Party = {
@@ -284,25 +286,58 @@ export function setupSocketServer(io: Server) {
 
       const party = parties.get(code.toUpperCase());
       if (!party) { socket.emit('error-msg', { message: 'Party not found' }); return; }
-      if (party.phase !== 'lobby') { socket.emit('error-msg', { message: 'Game already in progress' }); return; }
       if (party.players.size >= 8) { socket.emit('error-msg', { message: 'Party is full (max 8 players)' }); return; }
 
       removePlayerFromParty(playerId, io);
 
+      const isMidGame = party.phase !== 'lobby';
       const player: Player = {
         id: playerId, name: playerName,
         score: 0, strikes: 0, eliminated: false, guesses: 0,
+        sittingOut: isMidGame,
       };
 
       party.players.set(playerId, player);
       playerParty.set(playerId, party.code);
       socket.join(party.code);
-      io.to(party.code).emit('party-updated', { party: serializeParty(party), game: null });
-      console.log(`[party] ${playerName} joined ${party.code}`);
+
+      if (isMidGame) {
+        // Tell the joining player they're sitting out
+        socket.emit('joined-mid-game', {
+          party: serializeParty(party),
+          game: serializeGameState(party),
+        });
+        // Tell everyone else about the new spectator
+        socket.to(party.code).emit('party-updated', {
+          party: serializeParty(party),
+          game: serializeGameState(party),
+        });
+      } else {
+        io.to(party.code).emit('party-updated', { party: serializeParty(party), game: null });
+      }
+      console.log(`[party] ${playerName} joined ${party.code}${isMidGame ? ' (sitting out)' : ''}`);
     });
 
     socket.on('browse-parties', () => {
       socket.emit('public-parties', { parties: getPublicParties() });
+    });
+
+    socket.on('check-party', ({ code }: { code: string }) => {
+      const party = parties.get(code.toUpperCase());
+      if (!party) {
+        socket.emit('party-check', { exists: false, code: code.toUpperCase() });
+      } else {
+        const host = party.players.get(party.hostId);
+        const cat = categories.find(c => c.id === party.settings.categoryId);
+        socket.emit('party-check', {
+          exists: true,
+          code: party.code,
+          phase: party.phase,
+          hostName: host?.name ?? 'Unknown',
+          playerCount: party.players.size,
+          categoryName: cat?.name ?? 'Unknown',
+        });
+      }
     });
 
     socket.on('update-settings', (settings: Partial<GameSettings> & { isPublic?: boolean }) => {
@@ -332,7 +367,7 @@ export function setupSocketServer(io: Server) {
       if (party.players.size < 2) { socket.emit('error-msg', { message: 'Need at least 2 players' }); return; }
 
       for (const player of party.players.values()) {
-        player.score = 0; player.strikes = 0; player.eliminated = false; player.guesses = 0;
+        player.score = 0; player.strikes = 0; player.eliminated = false; player.guesses = 0; player.sittingOut = false;
       }
 
       party.game = {
@@ -441,7 +476,7 @@ export function setupSocketServer(io: Server) {
       party.game = null;
       party.phase = 'lobby';
       for (const player of party.players.values()) {
-        player.score = 0; player.strikes = 0; player.eliminated = false; player.guesses = 0;
+        player.score = 0; player.strikes = 0; player.eliminated = false; player.guesses = 0; player.sittingOut = false;
       }
       io.to(code).emit('returned-to-lobby', { party: serializeParty(party) });
     });
