@@ -139,7 +139,7 @@
 
   .dropdown {
     position: absolute;
-    bottom: 100%;
+    top: 100%;
     left: 0;
     right: 0;
     margin: 0;
@@ -147,11 +147,11 @@
     list-style: none;
     background: #fffef2;
     border: 1px solid #c4b48a;
-    margin-bottom: 4px;
+    margin-top: 4px;
     max-height: 280px;
     overflow-y: auto;
     z-index: 100;
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
   .dropdown li {

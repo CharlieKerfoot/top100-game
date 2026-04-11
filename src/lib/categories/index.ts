@@ -56,6 +56,21 @@ export function getAllTags(): string[] {
   return [...tagSet].sort();
 }
 
+// Hand-picked featured categories spanning diverse genres
+const featuredIds = [
+  'most-populous-countries',    // geography
+  'highest-grossing-movies',    // entertainment
+  'most-streamed-songs',        // music
+  'forbes-billionaires',        // business
+  'best-selling-video-games',   // gaming
+];
+
+export function getFeaturedCategories(): Category[] {
+  return featuredIds
+    .map(id => categories.find(c => c.id === id))
+    .filter((c): c is Category => c !== undefined);
+}
+
 export function searchCategories(query: string, activeTag: string | null): Category[] {
   let filtered = categories;
 
