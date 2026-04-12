@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
 import { categories } from '../src/lib/categories/index.ts';
 import { FIVE_LETTER_WORDS } from './words.ts';
+import { normalizeGuess } from '../src/lib/normalize.ts';
 
 // ── Types ──────────────────────────────────────────────────
 
@@ -95,14 +96,6 @@ function generateCode(): string {
     if (!parties.has(code)) return code;
   }
   throw new Error('Could not generate unique code');
-}
-
-function normalizeGuess(text: string): string {
-  return text
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // strip diacritics
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '');
 }
 
 function serializeParty(party: Party) {

@@ -1412,16 +1412,6 @@
 </div>
 
 <style>
-  @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&display=swap");
-
-  :global(body) {
-    margin: 0;
-    font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
-    background: #f5e6c8;
-    color: #1a1a1a;
-    min-height: 100vh;
-  }
-
   .app {
     max-width: 720px;
     margin: 0 auto;
@@ -1961,8 +1951,9 @@
     font-family: "Source Serif 4", Georgia, serif;
   }
 
-  input[type="text"]:focus {
+  input[type="text"]:focus-visible {
     border-color: #8b0000;
+    box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.2);
   }
 
   .start-btn {
@@ -1985,6 +1976,11 @@
   .start-btn:hover:not(:disabled) {
     background: #fffef2;
     color: #1a1a1a;
+  }
+
+  .start-btn:focus-visible {
+    outline: 2px solid #8b0000;
+    outline-offset: 2px;
   }
 
   .start-btn:disabled {
@@ -3473,7 +3469,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     color: #555;
-    white-space: nowrap;
   }
 
   .dt-guess-area {
