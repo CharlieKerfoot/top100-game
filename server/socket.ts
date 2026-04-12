@@ -1,5 +1,5 @@
 import { Server } from 'socket.io';
-import { categories } from '../src/lib/categories/index.ts';
+import { lists } from '../src/lib/lists/index.ts';
 import { FIVE_LETTER_WORDS } from './words.ts';
 import { normalizeGuess } from '../src/lib/normalize.ts';
 
@@ -16,7 +16,7 @@ interface Player {
 }
 
 interface GameSettings {
-  categoryId: string;
+  listId: string;
   mode: 'strikes' | 'turns';
   maxStrikes: number;
   maxTurns: number;
@@ -50,11 +50,11 @@ interface GuessResult {
   valueLabel?: string;
 }
 
-interface CategorySuggestion {
+interface ListSuggestion {
   playerId: string;
   playerName: string;
-  categoryId: string;
-  categoryName: string;
+  listId: string;
+  listName: string;
 }
 
 interface Party {
@@ -65,7 +65,7 @@ interface Party {
   settings: GameSettings;
   game: GameState | null;
   phase: 'lobby' | 'playing' | 'results';
-  suggestions: Map<string, string>; // playerId -> categoryId
+  suggestions: Map<string, string>; // playerId -> listId
 }
 
 // ── State ──────────────────────────────────────────────────
@@ -99,12 +99,12 @@ function generateCode(): string {
 }
 
 function serializeParty(party: Party) {
-  const suggestions: CategorySuggestion[] = [];
-  for (const [playerId, categoryId] of party.suggestions) {
+  const suggestions: ListSuggestion[] = [];
+  for (const [playerId, listId] of party.suggestions) {
     const player = party.players.get(playerId);
-    const cat = categories.find(c => c.id === categoryId);
-    if (player && cat) {
-      suggestions.push({ playerId, playerName: player.name, categoryId, categoryName: cat.name });
+    const list = lists.find(c => c.id === listId);
+    if (player && list) {
+      suggestions.push({ playerId, playerName: player.name, listId, listName: list.name });
     }
   }
   return {
@@ -120,22 +120,22 @@ function serializeParty(party: Party) {
 
 function serializeGameState(party: Party) {
   if (!party.game) return null;
-  const cat = categories.find(c => c.id === party.settings.categoryId);
+  const list = lists.find(c => c.id === party.settings.listId);
   return {
     currentPlayerIndex: party.game.currentPlayerIndex,
     playerOrder: party.game.playerOrder,
     guessedItems: [...party.game.guessedItems.entries()].map(([idx, name]) => ({
       index: idx,
-      name: cat?.items[idx] ?? '???',
+      name: list?.items[idx] ?? '???',
       playerName: name,
-      value: cat?.values?.[idx],
+      value: list?.values?.[idx],
     })),
-    valueLabel: cat?.valueLabel,
+    valueLabel: list?.valueLabel,
     guessHistory: party.game.guessHistory,
     lastResult: party.game.lastResult,
     showResult: party.game.showResult,
     players: [...party.players.values()],
-    categoryId: party.settings.categoryId,
+    listId: party.settings.listId,
     mode: party.settings.mode,
     maxStrikes: party.settings.maxStrikes,
     maxTurns: party.settings.maxTurns,
@@ -144,16 +144,16 @@ function serializeGameState(party: Party) {
 }
 
 function getPublicParties() {
-  const result: { code: string; hostName: string; playerCount: number; categoryName: string; phase: string }[] = [];
+  const result: { code: string; hostName: string; playerCount: number; listName: string; phase: string }[] = [];
   for (const party of parties.values()) {
     if (!party.isPublic) continue;
     const host = party.players.get(party.hostId);
-    const cat = categories.find(c => c.id === party.settings.categoryId);
+    const list = lists.find(c => c.id === party.settings.listId);
     result.push({
       code: party.code,
       hostName: host?.name ?? 'Unknown',
       playerCount: party.players.size,
-      categoryName: cat?.name ?? 'Unknown',
+      listName: list?.name ?? 'Unknown',
       phase: party.phase,
     });
   }
@@ -319,7 +319,7 @@ export function setupSocketServer(io: Server) {
       const party: Party = {
         code, hostId: playerId, isPublic,
         players: new Map([[playerId, player]]),
-        settings: { categoryId: categories[0].id, mode: 'strikes', maxStrikes: 3, maxTurns: 10, hints: true },
+        settings: { listId: lists[0].id, mode: 'strikes', maxStrikes: 3, maxTurns: 10, hints: true },
         game: null, phase: 'lobby',
         suggestions: new Map(),
       };
@@ -381,14 +381,14 @@ export function setupSocketServer(io: Server) {
         socket.emit('party-check', { exists: false, code: code.toUpperCase() });
       } else {
         const host = party.players.get(party.hostId);
-        const cat = categories.find(c => c.id === party.settings.categoryId);
+        const list = lists.find(c => c.id === party.settings.listId);
         socket.emit('party-check', {
           exists: true,
           code: party.code,
           phase: party.phase,
           hostName: host?.name ?? 'Unknown',
           playerCount: party.players.size,
-          categoryName: cat?.name ?? 'Unknown',
+          listName: list?.name ?? 'Unknown',
         });
       }
     });
@@ -401,7 +401,7 @@ export function setupSocketServer(io: Server) {
       const party = parties.get(code);
       if (!party || party.hostId !== playerId) return;
 
-      if (settings.categoryId !== undefined) party.settings.categoryId = settings.categoryId;
+      if (settings.listId !== undefined) party.settings.listId = settings.listId;
       if (settings.mode !== undefined) party.settings.mode = settings.mode;
       if (settings.maxStrikes !== undefined) party.settings.maxStrikes = settings.maxStrikes;
       if (settings.maxTurns !== undefined) party.settings.maxTurns = settings.maxTurns;
@@ -454,13 +454,13 @@ export function setupSocketServer(io: Server) {
       const game = party.game;
       if (game.playerOrder[game.currentPlayerIndex] !== playerId) return;
 
-      const cat = categories.find(c => c.id === party.settings.categoryId);
-      if (!cat) return;
+      const list = lists.find(c => c.id === party.settings.listId);
+      if (!list) return;
 
       const normalized = normalizeGuess(safeGuess);
       let foundIndex = -1;
-      for (let i = 0; i < cat.items.length; i++) {
-        if (normalizeGuess(cat.items[i]) === normalized) { foundIndex = i; break; }
+      for (let i = 0; i < list.items.length; i++) {
+        if (normalizeGuess(list.items[i]) === normalized) { foundIndex = i; break; }
       }
 
       const alreadyGuessed = foundIndex >= 0 && game.guessedItems.has(foundIndex);
@@ -477,8 +477,8 @@ export function setupSocketServer(io: Server) {
       } else {
         const rank = foundIndex + 1;
         const points = rank;
-        const value = cat.values?.[foundIndex];
-        const valueLabel = cat.valueLabel;
+        const value = list.values?.[foundIndex];
+        const valueLabel = list.valueLabel;
         result = { guess: safeGuess, rank, points, isStrike: false, playerName: player.name, value, valueLabel };
         player.score += points;
         player.guesses++;
@@ -544,16 +544,16 @@ export function setupSocketServer(io: Server) {
       io.to(code).emit('returned-to-lobby', { party: serializeParty(party) });
     });
 
-    socket.on('suggest-category', ({ categoryId }: { categoryId: string }) => {
+    socket.on('suggest-list', ({ listId }: { listId: string }) => {
       const playerId = getPlayerId(socket.id);
       if (!playerId) return;
       const code = playerParty.get(playerId);
       if (!code) return;
       const party = parties.get(code);
       if (!party || party.phase !== 'lobby' || party.hostId === playerId) return;
-      if (!categories.find(c => c.id === categoryId)) return;
+      if (!lists.find(c => c.id === listId)) return;
 
-      party.suggestions.set(playerId, categoryId);
+      party.suggestions.set(playerId, listId);
       io.to(code).emit('party-updated', { party: serializeParty(party), game: null });
     });
 

@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'http';
-import { getDailyCategory, getTodayKey } from '../src/lib/daily.ts';
+import { getDailyList, getTodayKey } from '../src/lib/daily.ts';
 
 interface DayStats {
   totalScore: number;
@@ -41,7 +41,7 @@ export async function handleDailyRequest(req: IncomingMessage, res: ServerRespon
     try {
       const raw = await readBody(req);
       const body = JSON.parse(raw);
-      const { date, categoryId, score } = body;
+      const { date, listId, score } = body;
 
       // Validate date matches today
       const todayKey = getTodayKey();
@@ -50,10 +50,10 @@ export async function handleDailyRequest(req: IncomingMessage, res: ServerRespon
         return true;
       }
 
-      // Validate category matches today's daily
-      const dailyCat = getDailyCategory();
-      if (categoryId !== dailyCat.id) {
-        json(res, 400, { error: 'Category does not match today\'s daily' });
+      // Validate list matches today's daily
+      const dailyList = getDailyList();
+      if (listId !== dailyList.id) {
+        json(res, 400, { error: 'List does not match today\'s daily' });
         return true;
       }
 

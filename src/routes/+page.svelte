@@ -1,19 +1,19 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { getMultiplayerState } from "$lib/multiplayer.svelte";
-  import { getDailyCategory, loadDailyStats, getTodayKey } from "$lib/daily";
-  import { categories } from "$lib/categories/index";
+  import { getDailyList, loadDailyStats, getTodayKey } from "$lib/daily";
+  import { lists } from "$lib/lists/index";
 
   const mp = getMultiplayerState();
 
   // Daily info
-  const dailyCategory = getDailyCategory();
+  const dailyList = getDailyList();
   const todayKey = getTodayKey();
   let dailyStats = $state(loadDailyStats());
   const hasPlayed = $derived(!!dailyStats.history[todayKey]);
   const hasHistory = $derived(dailyStats.gamesPlayed > 0);
-  const allTags = $derived(
-    [...new Set(categories.flatMap((c) => c.tags))].sort(),
+  const allTopics = $derived(
+    [...new Set(lists.flatMap((c) => c.topics))].sort(),
   );
 
   // Party form state
@@ -82,8 +82,8 @@
             {#if hasPlayed}
               Played! Score: {dailyStats.history[todayKey].score}
             {:else}
-              {dailyCategory.name}
-              <span class="daily-desc">{dailyCategory.description}</span>
+              {dailyList.name}
+              <span class="daily-desc">{dailyList.description}</span>
             {/if}
           </p>
         </button>
@@ -129,7 +129,7 @@
               <div>
                 <span class="step-title">Pick a top 100 list</span>
                 <span class="step-desc"
-                  >Choose from categories like Most Populous Countries or
+                  >Choose from lists like Most Populous Countries or
                   Highest-Grossing Movies.</span
                 >
               </div>
@@ -181,10 +181,10 @@
         </div>
 
         <div class="info-col">
-          <h2 class="section-heading">Categories</h2>
+          <h2 class="section-heading">Topics</h2>
           <div class="tag-cloud">
-            {#each allTags as tag}
-              <span class="tag-chip">{tag}</span>
+            {#each allTopics as topic}
+              <span class="tag-chip">{topic}</span>
             {/each}
           </div>
         </div>
@@ -283,7 +283,7 @@
                   <div class="pp-info">
                     <span class="pp-host">{party.hostName}'s party</span>
                     <span class="pp-details"
-                      >{party.categoryName} &middot; {party.playerCount} player{party.playerCount !==
+                      >{party.listName} &middot; {party.playerCount} player{party.playerCount !==
                       1
                         ? "s"
                         : ""}</span

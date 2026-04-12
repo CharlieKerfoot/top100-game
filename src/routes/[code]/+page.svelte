@@ -2,11 +2,11 @@
   import { page } from "$app/state";
   import { goto } from "$app/navigation";
   import {
-    getAllTags,
-    getFeaturedCategories,
-    searchCategories,
-    type Category,
-  } from "$lib/categories/index";
+    getAllTopics,
+    getFeaturedLists,
+    searchLists,
+    type GameList,
+  } from "$lib/lists/index";
   import { getMultiplayerState } from "$lib/multiplayer.svelte";
   import Autocomplete from "$lib/Autocomplete.svelte";
 
@@ -22,7 +22,7 @@
     phase?: string;
     hostName?: string;
     playerCount?: number;
-    categoryName?: string;
+    listName?: string;
   } | null>(null);
   let checking = $state(true);
 
@@ -50,16 +50,16 @@
 
   const needsJoin = $derived(mp.partyCode !== routeCode || mp.phase === "home");
 
-  // Lobby category browser state
-  let categorySearch = $state("");
-  let activeTag = $state<string | null>("__featured__");
-  let previewCategory = $state<Category | null>(null);
+  // Lobby list browser state
+  let listSearch = $state("");
+  let activeTopic = $state<string | null>("__featured__");
+  let previewList = $state<GameList | null>(null);
   let previewSearch = $state("");
 
   // Non-host suggest browser state
   let showSuggestBrowser = $state(false);
   let suggestSearch = $state("");
-  let suggestTag = $state<string | null>("__featured__");
+  let suggestTopic = $state<string | null>("__featured__");
 
   // Game state
   let guessInput = $state("");
@@ -84,34 +84,34 @@
     new Map(mp.guessedItems.map((g) => [g.index, g])),
   );
 
-  const allTags = getAllTags();
+  const allTopics = getAllTopics();
   const mySuggestion = $derived(
-    mp.categorySuggestions.find((s) => s.playerId === mp.myId) ?? null,
+    mp.listSuggestions.find((s) => s.playerId === mp.myId) ?? null,
   );
-  const filteredSuggestCategories = $derived.by(() => {
-    if (suggestTag === "__featured__" && !suggestSearch.trim()) {
-      return getFeaturedCategories();
+  const filteredSuggestLists = $derived.by(() => {
+    if (suggestTopic === "__featured__" && !suggestSearch.trim()) {
+      return getFeaturedLists();
     }
-    return searchCategories(
+    return searchLists(
       suggestSearch,
-      suggestTag === "__featured__" ? null : suggestTag,
+      suggestTopic === "__featured__" ? null : suggestTopic,
     );
   });
-  const filteredCategories = $derived.by(() => {
-    if (activeTag === "__featured__" && !categorySearch.trim()) {
-      return getFeaturedCategories();
+  const filteredLists = $derived.by(() => {
+    if (activeTopic === "__featured__" && !listSearch.trim()) {
+      return getFeaturedLists();
     }
-    return searchCategories(
-      categorySearch,
-      activeTag === "__featured__" ? null : activeTag,
+    return searchLists(
+      listSearch,
+      activeTopic === "__featured__" ? null : activeTopic,
     );
   });
   const filteredPreviewItems = $derived.by(() => {
-    if (!previewCategory) return [];
+    if (!previewList) return [];
     if (!previewSearch.trim())
-      return previewCategory.items.map((item, i) => ({ item, rank: i + 1 }));
+      return previewList.items.map((item, i) => ({ item, rank: i + 1 }));
     const q = previewSearch.toLowerCase();
-    return previewCategory.items
+    return previewList.items
       .map((item, i) => ({ item, rank: i + 1 }))
       .filter(({ item }) => item.toLowerCase().includes(q));
   });
@@ -121,14 +121,14 @@
     mp.joinParty(routeCode, playerName.trim());
   }
 
-  function selectCategory(cat: Category) {
-    mp.updateSettings({ categoryId: cat.id });
-    previewCategory = null;
+  function selectList(cat: GameList) {
+    mp.updateSettings({ listId: cat.id });
+    previewList = null;
     previewSearch = "";
   }
 
   const availableHints = $derived.by(() => {
-    const hints = mp.category.hints ?? mp.category.items;
+    const hints = mp.list.hints ?? mp.list.items;
     const guessedNames = new Set(
       mp.guessedItems.map((g) => g.name.toLowerCase()),
     );
@@ -268,8 +268,8 @@
               <span class="preview-value">{partyInfo.hostName}</span>
             </div>
             <div class="preview-detail">
-              <span class="preview-label">Category</span>
-              <span class="preview-value">{partyInfo.categoryName}</span>
+              <span class="preview-label">List</span>
+              <span class="preview-value">{partyInfo.listName}</span>
             </div>
             <div class="preview-detail">
               <span class="preview-label">Players</span>
@@ -341,7 +341,7 @@
       <div class="game">
         <div class="game-desktop">
           <div class="dt-top">
-            <span class="dt-category-label">{mp.category.name}</span>
+            <span class="dt-category-label">{mp.list.name}</span>
             <div class="dt-guess-area">
               {#if mp.showResult && mp.lastResult}
                 <div
@@ -418,7 +418,7 @@
 
             <div class="dt-board">
               <div class="dt-board-header">
-                <span class="dt-board-title">{mp.category.description}</span>
+                <span class="dt-board-title">{mp.list.description}</span>
                 <span class="dt-board-count"
                   >{mp.guessedItems.length} of 100 identified</span
                 >
@@ -447,7 +447,7 @@
         <!-- Mobile spectator view -->
         <div class="game-mobile">
           <div class="game-header">
-            <div class="category-badge">{mp.category.name}</div>
+            <div class="category-badge">{mp.list.name}</div>
             <div class="mode-badge">
               {mp.mode === "strikes" ? "Strikes" : "Turns"} Mode
             </div>
@@ -689,34 +689,34 @@
         </div>
       </div>
 
-      <!-- Column 2: Category -->
+      <!-- Column 2: List -->
       <div class="lobby-col lobby-col-category">
         <div class="setup-section">
-          <label>Category</label>
+          <label>List</label>
           {#if mp.isHost}
-            {#if previewCategory}
+            {#if previewList}
               <div class="category-preview">
                 <div class="preview-header">
                   <button
                     class="back-btn"
                     onclick={() => {
-                      previewCategory = null;
+                      previewList = null;
                       previewSearch = "";
                     }}>&larr; Back</button
                   >
                   <div class="preview-title">
-                    <h3>{previewCategory.name}</h3>
-                    <p>{previewCategory.description}</p>
+                    <h3>{previewList.name}</h3>
+                    <p>{previewList.description}</p>
                   </div>
                   <button
                     class="select-btn"
-                    onclick={() => selectCategory(previewCategory!)}
+                    onclick={() => selectList(previewList!)}
                     >Select</button
                   >
                 </div>
                 <div class="preview-tags">
-                  {#each previewCategory.tags as tag}
-                    <span class="tag">{tag}</span>
+                  {#each previewList.topics as topic}
+                    <span class="tag">{topic}</span>
                   {/each}
                 </div>
                 <input
@@ -741,10 +741,10 @@
                 </div>
               </div>
             {:else}
-              {#if mp.categorySuggestions.length > 0}
+              {#if mp.listSuggestions.length > 0}
                 <div class="suggestions-panel">
                   <div class="suggestions-panel-header">Player suggestions</div>
-                  {#each mp.categorySuggestions as suggestion}
+                  {#each mp.listSuggestions as suggestion}
                     <div class="suggestion-row">
                       <div class="suggestion-row-info">
                         <span class="suggestion-row-player"
@@ -752,7 +752,7 @@
                         >
                         <span class="suggestion-row-arrow">suggested</span>
                         <span class="suggestion-row-category"
-                          >{suggestion.categoryName}</span
+                          >{suggestion.listName}</span
                         >
                       </div>
                       <div class="suggestion-row-actions">
@@ -760,7 +760,7 @@
                           class="suggestion-accept-btn"
                           onclick={() => {
                             mp.updateSettings({
-                              categoryId: suggestion.categoryId,
+                              listId: suggestion.listId,
                             });
                             mp.dismissSuggestion(suggestion.playerId);
                           }}>Accept</button
@@ -778,52 +778,52 @@
               {/if}
               <input
                 type="text"
-                bind:value={categorySearch}
-                placeholder="Search categories..."
+                bind:value={listSearch}
+                placeholder="Search lists..."
               />
               <div class="tag-bar">
                 <button
                   class="tag-btn"
-                  class:active={activeTag === "__featured__"}
-                  onclick={() => (activeTag = "__featured__")}>Featured</button
+                  class:active={activeTopic === "__featured__"}
+                  onclick={() => (activeTopic = "__featured__")}>Featured</button
                 >
                 <button
                   class="tag-btn"
-                  class:active={activeTag === null}
-                  onclick={() => (activeTag = null)}>All</button
+                  class:active={activeTopic === null}
+                  onclick={() => (activeTopic = null)}>All</button
                 >
-                {#each allTags as tag}
+                {#each allTopics as topic}
                   <button
                     class="tag-btn"
-                    class:active={activeTag === tag}
-                    onclick={() => (activeTag = activeTag === tag ? null : tag)}
-                    >{tag}</button
+                    class:active={activeTopic === topic}
+                    onclick={() => (activeTopic = activeTopic === topic ? null : tag)}
+                    >{topic}</button
                   >
                 {/each}
               </div>
               <div class="category-grid">
-                {#each filteredCategories as cat}
+                {#each filteredLists as cat}
                   <div
                     class="category-card"
-                    class:selected={mp.categoryId === cat.id}
+                    class:selected={mp.listId === cat.id}
                     role="button"
                     tabindex="0"
-                    onclick={() => mp.updateSettings({ categoryId: cat.id })}
+                    onclick={() => mp.updateSettings({ listId: cat.id })}
                     onkeydown={(e: KeyboardEvent) => {
                       if (e.key === "Enter" || e.key === " ")
-                        mp.updateSettings({ categoryId: cat.id });
+                        mp.updateSettings({ listId: cat.id });
                     }}
                   >
                     <div class="card-top">
                       <span class="card-name">{cat.name}</span>
-                      {#if mp.categoryId === cat.id}<span class="card-check"
+                      {#if mp.listId === cat.id}<span class="card-check"
                           >&#10003;</span
                         >{/if}
                     </div>
                     <span class="card-desc">{cat.description}</span>
                     <div class="card-tags">
-                      {#each cat.tags as tag}
-                        <span class="card-tag">{tag}</span>
+                      {#each cat.topics as topic}
+                        <span class="card-tag">{topic}</span>
                       {/each}
                     </div>
                   </div>
@@ -838,69 +838,69 @@
                   onclick={() => {
                     showSuggestBrowser = false;
                     suggestSearch = "";
-                    suggestTag = "__featured__";
+                    suggestTopic = "__featured__";
                   }}>&larr; Back</button
                 >
-                <span class="suggest-browser-title">Suggest a category</span>
+                <span class="suggest-browser-title">Suggest a list</span>
               </div>
               <input
                 type="text"
                 bind:value={suggestSearch}
-                placeholder="Search categories..."
+                placeholder="Search lists..."
               />
               <div class="tag-bar">
                 <button
                   class="tag-btn"
-                  class:active={suggestTag === "__featured__"}
-                  onclick={() => (suggestTag = "__featured__")}>Featured</button
+                  class:active={suggestTopic === "__featured__"}
+                  onclick={() => (suggestTopic = "__featured__")}>Featured</button
                 >
                 <button
                   class="tag-btn"
-                  class:active={suggestTag === null}
-                  onclick={() => (suggestTag = null)}>All</button
+                  class:active={suggestTopic === null}
+                  onclick={() => (suggestTopic = null)}>All</button
                 >
-                {#each allTags as tag}
+                {#each allTopics as topic}
                   <button
                     class="tag-btn"
-                    class:active={suggestTag === tag}
+                    class:active={suggestTopic === topic}
                     onclick={() =>
-                      (suggestTag = suggestTag === tag ? null : tag)}
-                    >{tag}</button
+                      (suggestTopic = suggestTopic === topic ? null : topic)}
+                    >{topic}</button
                   >
                 {/each}
               </div>
               <div class="category-grid">
-                {#each filteredSuggestCategories as cat}
+                {#each filteredSuggestLists as cat}
                   <div
                     class="category-card"
-                    class:selected={mySuggestion?.categoryId === cat.id}
+                    class:selected={mySuggestion?.listId === cat.id}
                     role="button"
                     tabindex="0"
                     onclick={() => {
-                      mp.suggestCategory(cat.id);
+                      mp.suggestList(cat.id);
                       showSuggestBrowser = false;
                       suggestSearch = "";
-                      suggestTag = "__featured__";
+                      suggestTopic = "__featured__";
                     }}
                     onkeydown={(e: KeyboardEvent) => {
                       if (e.key === "Enter" || e.key === " ") {
-                        mp.suggestCategory(cat.id);
+                        mp.suggestList(cat.id);
                         showSuggestBrowser = false;
                         suggestSearch = "";
-                        suggestTag = "__featured__";
+                        suggestTopic = "__featured__";
                       }
                     }}
                   >
                     <div class="card-top">
                       <span class="card-name">{cat.name}</span>
-                      {#if mySuggestion?.categoryId === cat.id}<span
+                      {#if mySuggestion?.listId === cat.id}<span
                           class="card-check">&#10003;</span
                         >{/if}
                     </div>
                     <span class="card-desc">{cat.description}</span>
                     <div class="card-tags">
-                      {#each cat.tags as tag}
-                        <span class="card-tag">{tag}</span>
+                      {#each cat.topics as topic}
+                        <span class="card-tag">{topic}</span>
                       {/each}
                     </div>
                   </div>
@@ -910,15 +910,15 @@
           {:else}
             <div class="category-readonly">
               <div class="category-readonly-inner">
-                <div class="category-readonly-eyebrow">Category</div>
-                <div class="category-readonly-name">{mp.category.name}</div>
+                <div class="category-readonly-eyebrow">List</div>
+                <div class="category-readonly-name">{mp.list.name}</div>
                 <div class="category-readonly-desc">
-                  {mp.category.description}
+                  {mp.list.description}
                 </div>
-                {#if mp.category.tags?.length}
+                {#if mp.list.topics?.length}
                   <div class="category-readonly-tags">
-                    {#each mp.category.tags as tag}
-                      <span class="card-tag">{tag}</span>
+                    {#each mp.list.topics as topic}
+                      <span class="card-tag">{topic}</span>
                     {/each}
                   </div>
                 {/if}
@@ -927,7 +927,7 @@
                     <div class="my-suggestion-check">&#10003;</div>
                     <div class="my-suggestion-label">Your suggestion</div>
                     <div class="my-suggestion-name">
-                      {mySuggestion.categoryName}
+                      {mySuggestion.listName}
                     </div>
                     <div class="my-suggestion-footer">
                       <button
@@ -947,7 +947,7 @@
                   <button
                     class="suggest-open-btn"
                     onclick={() => (showSuggestBrowser = true)}
-                    >Suggest a category</button
+                    >Suggest a list</button
                   >
                 {/if}
               </div>
@@ -981,7 +981,7 @@
       <!-- Desktop: full-width layout -->
       <div class="game-desktop">
         <div class="dt-top">
-          <span class="dt-category-label">{mp.category.name}</span>
+          <span class="dt-category-label">{mp.list.name}</span>
           <div class="dt-guess-area">
             {#if mp.showResult && mp.lastResult}
               <div
@@ -1074,7 +1074,7 @@
 
           <div class="dt-board">
             <div class="dt-board-header">
-              <span class="dt-board-title">{mp.category.description}</span>
+              <span class="dt-board-title">{mp.list.description}</span>
               <span class="dt-board-count"
                 >{mp.guessedItems.length} of 100 identified</span
               >
@@ -1145,7 +1145,7 @@
       <!-- Mobile: compact vertical layout -->
       <div class="game-mobile">
         <div class="game-header">
-          <div class="category-badge">{mp.category.name}</div>
+          <div class="category-badge">{mp.list.name}</div>
           <div class="mode-badge">
             {mp.mode === "strikes" ? "Strikes" : "Turns"} Mode
           </div>

@@ -1,12 +1,12 @@
-import { categories, type Category } from './categories/index';
+import { lists, type GameList } from './lists/index';
 
-// ── Deterministic daily category selection ──
+// ── Deterministic daily list selection ──
 
 const FIXED_SEED = 42;
 const LAUNCH_DATE = '2026-04-15';
 const MS_PER_DAY = 86400000;
 
-function seededShuffle(arr: Category[]): Category[] {
+function seededShuffle(arr: GameList[]): GameList[] {
   let seed = FIXED_SEED;
   const next = () => {
     seed |= 0;
@@ -23,14 +23,14 @@ function seededShuffle(arr: Category[]): Category[] {
   return copy;
 }
 
-const dailyOrder = seededShuffle(categories);
+const dailyOrder = seededShuffle(lists);
 
 export function getDayNumber(): number {
   const d = Math.floor((Date.now() - Date.parse(LAUNCH_DATE)) / MS_PER_DAY);
   return Math.max(0, d);
 }
 
-export function getDailyCategory(): Category {
+export function getDailyList(): GameList {
   return dailyOrder[getDayNumber() % dailyOrder.length];
 }
 
@@ -42,7 +42,7 @@ export function getTodayKey(): string {
 
 export interface DayResult {
   score: number;
-  categoryId: string;
+  listId: string;
   guessCount: number;
   guessedRanks: number[];
 }
@@ -89,14 +89,14 @@ export function saveDailyStats(stats: DailyStats): void {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
 }
 
-export function recordGame(score: number, categoryId: string, guessCount: number, guessedRanks: number[]): DailyStats {
+export function recordGame(score: number, listId: string, guessCount: number, guessedRanks: number[]): DailyStats {
   const stats = loadDailyStats();
   const todayKey = getTodayKey();
 
   // Already recorded today
   if (stats.history[todayKey]) return stats;
 
-  stats.history[todayKey] = { score, categoryId, guessCount, guessedRanks };
+  stats.history[todayKey] = { score, listId, guessCount, guessedRanks };
   stats.gamesPlayed++;
   if (score > stats.bestScore) stats.bestScore = score;
 
@@ -131,7 +131,7 @@ export function generateShareGrid(guessedRanks: number[]): string {
 
 export function generateShareText(opts: {
   dayNumber: number;
-  categoryName: string;
+  listName: string;
   score: number;
   streak: number;
   guessedRanks: number[];
@@ -139,7 +139,7 @@ export function generateShareText(opts: {
 }): string {
   const lines: string[] = [
     `Common Cents #${opts.dayNumber} ☀️`,
-    opts.categoryName,
+    opts.listName,
     `Score: ${opts.score.toLocaleString()}/5,050`,
     '',
     generateShareGrid(opts.guessedRanks),

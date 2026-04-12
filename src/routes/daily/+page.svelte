@@ -3,7 +3,7 @@
   import Autocomplete from "$lib/Autocomplete.svelte";
   import { normalizeGuess } from "$lib/normalize";
   import {
-    getDailyCategory,
+    getDailyList,
     getDayNumber,
     getTodayKey,
     loadDailyStats,
@@ -14,7 +14,7 @@
     type DayResult,
   } from "$lib/daily";
 
-  const category = getDailyCategory();
+  const list = getDailyList();
   const dayNumber = getDayNumber();
   const todayKey = getTodayKey();
   const dateDisplay = new Date().toLocaleDateString("en-US", {
@@ -26,10 +26,10 @@
 
   // Build normalized lookup: normalized -> { index, original }
   const itemLookup = new Map<string, { index: number; original: string }>();
-  for (let i = 0; i < category.items.length; i++) {
-    itemLookup.set(normalizeGuess(category.items[i]), {
+  for (let i = 0; i < list.items.length; i++) {
+    itemLookup.set(normalizeGuess(list.items[i]), {
       index: i,
-      original: category.items[i],
+      original: list.items[i],
     });
   }
 
@@ -72,7 +72,7 @@
     // Rebuild foundItems from guessedRanks
     const restored: { rank: number; name: string; points: number }[] = [];
     for (const rank of previousResult.guessedRanks) {
-      restored.push({ rank, name: category.items[rank - 1], points: rank });
+      restored.push({ rank, name: list.items[rank - 1], points: rank });
     }
     restored.sort((a, b) => b.rank - a.rank);
     foundItems = restored;
@@ -130,7 +130,7 @@
     phase = "results";
     const updatedStats = recordGame(
       score,
-      category.id,
+      list.id,
       guessedRanks.length,
       guessedRanks,
     );
@@ -145,7 +145,7 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           date: todayKey,
-          categoryId: category.id,
+          listId: list.id,
           score,
         }),
       });
@@ -180,7 +180,7 @@
   function handleShare() {
     const text = generateShareText({
       dayNumber,
-      categoryName: category.name,
+      listName: list.name,
       score,
       streak: stats.streak,
       guessedRanks,
@@ -225,7 +225,7 @@
   <header>
     <a href="/" class="back-link">&larr; Home</a>
     <div class="category-header">
-      <h2>{category.name}</h2>
+      <h2>{list.name}</h2>
       <p class="date-line">{dateDisplay} &middot; #{dayNumber}</p>
     </div>
   </header>
@@ -250,7 +250,7 @@
 
       <div class="guess-area">
         <Autocomplete
-          hints={category.hints ?? category.items}
+          hints={list.hints ?? list.items}
           bind:value={guessValue}
           placeholder="Type your guess..."
           onsubmit={handleGuess}
