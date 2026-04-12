@@ -5,7 +5,7 @@ export const highestGrossingTvShows: GameList = {
   id: 'highest-grossing-tv-shows',
   name: 'Highest-Grossing TV Shows of All Time',
   description: 'TV shows ranked by total franchise revenue and earnings',
-  topics: ['entertainment', 'television'],
+  topics: ['film & tv'],
   hints: highestGrossingTvShowsHints,
   valueLabel: 'Revenue',
   items: [

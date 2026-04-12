@@ -5,7 +5,7 @@ export const highestBudgetMovies: GameList = {
   id: 'highest-budget-movies',
   name: 'Movies with Highest Budget',
   description: 'Films ranked by production budget (inflation-adjusted estimates)',
-  topics: ['entertainment', 'movies', 'money'],
+  topics: ['film & tv', 'money'],
   hints: highestBudgetMoviesHints,
   valueLabel: 'Budget',
   items: [

@@ -5,7 +5,7 @@ export const oscarNominations: GameList = {
   id: 'oscar-nominations',
   name: 'Movies with Most Oscar Nominations',
   description: 'Films ranked by total Academy Award nominations (all time)',
-  topics: ['entertainment', 'movies'],
+  topics: ['film & tv'],
   hints: oscarNominationsHints,
   valueLabel: 'Nominations',
   items: [

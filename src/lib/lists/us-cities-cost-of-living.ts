@@ -5,7 +5,7 @@ export const usCitiesCostOfLiving: GameList = {
   id: 'us-cities-cost-of-living',
   name: 'US Cities by Cost of Living Index',
   description: 'US metro areas ranked by cost of living index (100 = national average)',
-  topics: ['money', 'usa'],
+  topics: ['money', 'misc'],
   hints: usCitiesCostOfLivingHints,
   valueLabel: 'COL Index',
   items: [

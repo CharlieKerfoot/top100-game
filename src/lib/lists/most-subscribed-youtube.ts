@@ -5,7 +5,7 @@ export const mostSubscribedYoutube: GameList = {
   id: 'most-subscribed-youtube',
   name: 'Most Subscribed YouTube Channels',
   description: 'YouTube channels ranked by subscriber count (2025)',
-  topics: ['social media', 'internet', 'entertainment'],
+  topics: ['internet'],
   hints: mostSubscribedYoutubeHints,
   valueLabel: 'Subscribers',
   items: [

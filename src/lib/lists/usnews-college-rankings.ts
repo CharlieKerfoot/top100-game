@@ -5,7 +5,7 @@ export const usnewsCollegeRankings: GameList = {
   id: 'usnews-college-rankings',
   name: 'US News College Rankings',
   description: 'US News & World Report Best National Universities (2025)',
-  topics: ['education', 'usa'],
+  topics: ['education', 'misc'],
   hints: usnewsCollegeRankingsHints,
   valueLabel: 'Rank',
   items: [

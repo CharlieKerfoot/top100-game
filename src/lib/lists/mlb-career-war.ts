@@ -5,7 +5,7 @@ export const mlbCareerWar: GameList = {
   id: 'mlb-career-war',
   name: 'MLB All-Time Career WAR Leaders',
   description: 'MLB players ranked by all-time career Wins Above Replacement (WAR)',
-  topics: ['sports', 'baseball'],
+  topics: ['sports'],
   hints: mlbCareerWarHints,
   valueLabel: 'Career WAR',
   items: [

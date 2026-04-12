@@ -5,7 +5,7 @@ export const grammyAwards: GameList = {
   id: 'grammy-awards',
   name: 'Most Awarded Artists (Grammys)',
   description: 'Artists ranked by total Grammy Awards won (all time)',
-  topics: ['music', 'entertainment'],
+  topics: ['music'],
   hints: grammyAwardsHints,
   valueLabel: 'Grammys Won',
   items: [

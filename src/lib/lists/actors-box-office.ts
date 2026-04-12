@@ -5,7 +5,7 @@ export const actorsBoxOffice: GameList = {
   id: 'actors-box-office',
   name: 'Actors by Total Box Office Gross',
   description: 'Actors ranked by cumulative worldwide box office (all films)',
-  topics: ['entertainment', 'movies', 'money'],
+  topics: ['film & tv', 'money'],
   hints: actorsBoxOfficeHints,
   valueLabel: 'Total Gross',
   items: [

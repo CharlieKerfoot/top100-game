@@ -5,7 +5,7 @@ export const highestGrossingMovies: GameList = {
   id: 'highest-grossing-movies',
   name: 'Highest Grossing Movies',
   description: 'All-time worldwide box office',
-  topics: ['entertainment', 'movies'],
+  topics: ['film & tv'],
   hints: highestGrossingMoviesHints,
   valueLabel: 'Box Office',
   items: [

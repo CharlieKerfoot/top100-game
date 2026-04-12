@@ -5,7 +5,7 @@ export const forbesBillionaires: GameList = {
   id: 'forbes-billionaires',
   name: 'Forbes Billionaires Top 100',
   description: "World's wealthiest people ranked by net worth (Forbes 2025)",
-  topics: ['money', 'business', 'world'],
+  topics: ['money', 'world'],
   hints: forbesBillionairesHints,
   valueLabel: 'Net Worth',
   items: [

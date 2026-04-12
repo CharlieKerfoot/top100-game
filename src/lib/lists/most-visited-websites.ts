@@ -5,7 +5,7 @@ export const mostVisitedWebsites: GameList = {
   id: 'most-visited-websites',
   name: 'Most Visited Websites',
   description: 'Websites ranked by monthly traffic (Similarweb 2025)',
-  topics: ['internet', 'technology'],
+  topics: ['internet'],
   hints: mostVisitedWebsitesHints,
   valueLabel: 'Monthly Visits',
   items: [

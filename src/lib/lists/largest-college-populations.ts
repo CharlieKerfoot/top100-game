@@ -5,7 +5,7 @@ export const largestCollegePopulations: GameList = {
   id: 'largest-college-populations',
   name: 'Largest US Colleges by Enrollment',
   description: 'US colleges and universities ranked by total enrollment',
-  topics: ['education', 'usa'],
+  topics: ['education', 'misc'],
   hints: largestCollegePopulationsHints,
   valueLabel: 'Students',
   items: [

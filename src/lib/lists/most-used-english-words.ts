@@ -5,7 +5,7 @@ export const mostUsedEnglishWords: GameList = {
   id: 'most-used-english-words',
   name: 'Most Used Words in English',
   description: 'Most frequently used words in the English language (Oxford corpus)',
-  topics: ['language', 'culture'],
+  topics: ['culture'],
   hints: mostUsedEnglishWordsHints,
   valueLabel: 'Frequency Rank',
   items: [

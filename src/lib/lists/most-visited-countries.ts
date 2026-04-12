@@ -5,7 +5,7 @@ export const mostVisitedCountries: GameList = {
   id: 'most-visited-countries',
   name: 'Most Visited Countries by Tourists',
   description: 'Countries ranked by international tourist arrivals (2024)',
-  topics: ['geography', 'world', 'travel'],
+  topics: ['geography', 'world'],
   hints: mostVisitedCountriesHints,
   valueLabel: 'Annual Visitors',
   items: [

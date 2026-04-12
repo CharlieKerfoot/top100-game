@@ -5,7 +5,7 @@ export const mostPopulousCitiesUsa: GameList = {
   id: 'most-populous-cities-usa',
   name: 'Most Populous Cities (USA)',
   description: 'US cities ranked by population (2024 Census estimates)',
-  topics: ['geography', 'usa'],
+  topics: ['geography', 'misc'],
   hints: mostPopulousCitiesUsaHints,
   valueLabel: 'Population',
   items: [
