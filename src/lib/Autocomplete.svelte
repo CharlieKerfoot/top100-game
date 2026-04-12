@@ -123,9 +123,9 @@
   .autocomplete input {
     width: 100%;
     padding: 0.6rem 0.75rem;
-    border: 1px solid #c4b48a;
-    background: #fffef2;
-    color: #1a1a1a;
+    border: 1px solid var(--color-gold);
+    background: var(--color-cream);
+    color: var(--color-ink);
     font-size: 1rem;
     box-sizing: border-box;
     outline: none;
@@ -134,7 +134,7 @@
   }
 
   .autocomplete input:focus {
-    border-color: #8b0000;
+    border-color: var(--color-crimson);
   }
 
   .dropdown {
@@ -145,8 +145,8 @@
     margin: 0;
     padding: 0;
     list-style: none;
-    background: #fffef2;
-    border: 1px solid #c4b48a;
+    background: var(--color-cream);
+    border: 1px solid var(--color-gold);
     margin-top: 4px;
     max-height: 280px;
     overflow-y: auto;
@@ -170,7 +170,7 @@
 
   .dropdown li:hover,
   .dropdown li.selected {
-    background: #f5e6c8;
-    color: #1a1a1a;
+    background: var(--color-parchment);
+    color: var(--color-ink);
   }
 </style>
