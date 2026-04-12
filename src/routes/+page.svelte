@@ -2,6 +2,7 @@
   import { goto } from "$app/navigation";
   import { getMultiplayerState } from "$lib/multiplayer.svelte";
   import { getDailyCategory, loadDailyStats, getTodayKey } from "$lib/daily";
+  import { categories } from "$lib/categories/index";
 
   const mp = getMultiplayerState();
 
@@ -11,6 +12,9 @@
   let dailyStats = $state(loadDailyStats());
   const hasPlayed = $derived(!!dailyStats.history[todayKey]);
   const hasHistory = $derived(dailyStats.gamesPlayed > 0);
+  const allTags = $derived(
+    [...new Set(categories.flatMap((c) => c.tags))].sort(),
+  );
 
   // Party form state
   let view = $state<"home" | "party">("home");
@@ -71,14 +75,15 @@
   {#if view === "home"}
     <div class="home">
       <div class="mode-selector">
-        <button class="mode-card" onclick={() => goto('/daily')}>
+        <button class="mode-card" onclick={() => goto("/daily")}>
           <div class="icon">&#9728;</div>
           <h3>Daily</h3>
           <p>
             {#if hasPlayed}
-              Already played today!
+              Played! Score: {dailyStats.history[todayKey].score}
             {:else}
-              Today: {dailyCategory.tags[0]}
+              {dailyCategory.name}
+              <span class="daily-desc">{dailyCategory.description}</span>
             {/if}
           </p>
         </button>
@@ -89,26 +94,107 @@
         </button>
       </div>
 
-      {#if hasHistory}
-        <div class="stats-bar">
-          <div class="stat">
-            <div class="stat-value">{dailyStats.streak}</div>
-            <div class="stat-label">Streak</div>
+      <div class="stats-bar">
+        <div class="stat">
+          <div class="stat-value">
+            {hasHistory ? dailyStats.streak : "\u2014"}
           </div>
-          <div class="stat">
-            <div class="stat-value">{dailyStats.bestScore}</div>
-            <div class="stat-label">Best</div>
+          <div class="stat-label">Streak</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">
+            {hasHistory ? dailyStats.bestScore : "\u2014"}
           </div>
-          <div class="stat">
-            <div class="stat-value">{dailyStats.gamesPlayed}</div>
-            <div class="stat-label">Played</div>
+          <div class="stat-label">Best</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">
+            {hasHistory ? dailyStats.gamesPlayed : "\u2014"}
+          </div>
+          <div class="stat-label">Played</div>
+        </div>
+      </div>
+      {#if !hasHistory}
+        <p class="stats-cta">Play your first daily!</p>
+      {/if}
+
+      <div class="section-divider"></div>
+
+      <section class="info-columns" aria-label="About the game">
+        <div class="info-col">
+          <h2 class="section-heading">How it Works</h2>
+          <div class="how-steps">
+            <div class="step">
+              <span class="step-num">1</span>
+              <div>
+                <span class="step-title">Pick a top 100 list</span>
+                <span class="step-desc"
+                  >Choose from categories like Most Populous Countries or
+                  Highest-Grossing Movies.</span
+                >
+              </div>
+            </div>
+            <div class="step">
+              <span class="step-num">2</span>
+              <div>
+                <span class="step-title">Name items</span>
+                <span class="step-desc"
+                  >Type your guesses. Answers off the list are strikes (0 points
+                  in turn mode).</span
+                >
+              </div>
+            </div>
+            <div class="step">
+              <span class="step-num">3</span>
+              <div>
+                <span class="step-title">Score big</span>
+                <span class="step-desc"
+                  >Rarer answers score more. #1 = 1pt. #97 = 97pts. Go obscure.</span
+                >
+              </div>
+            </div>
           </div>
         </div>
-      {/if}
+
+        <div class="info-col">
+          <h2 class="section-heading">The Scoring Trick</h2>
+          <div
+            class="scoring-example"
+            aria-label="Scoring example: naming India (#1) earns 1 point, Peru (#47) earns 47 points, Luxembourg (#97) earns 97 points. Rarer answers score more."
+          >
+            <div class="scoring-row scoring-low">
+              <span class="scoring-rank">#1</span>
+              <span class="scoring-name">India</span>
+              <span class="scoring-pts">1 pt</span>
+            </div>
+            <div class="scoring-row scoring-mid">
+              <span class="scoring-rank">#47</span>
+              <span class="scoring-name">Peru</span>
+              <span class="scoring-pts">47 pts</span>
+            </div>
+            <div class="scoring-row scoring-high">
+              <span class="scoring-rank">#97</span>
+              <span class="scoring-name">Luxembourg</span>
+              <span class="scoring-pts">97 pts</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-col">
+          <h2 class="section-heading">Categories</h2>
+          <div class="tag-cloud">
+            {#each allTags as tag}
+              <span class="tag-chip">{tag}</span>
+            {/each}
+          </div>
+        </div>
+      </section>
     </div>
   {:else}
-    <div class="home">
-      <button class="back-btn" onclick={() => (view = "home")}>&larr; Back</button>
+    <div class="home home-party">
+      <button class="back-btn" onclick={() => (view = "home")}
+        >&larr; Back</button
+      >
 
       <div class="setup-section">
         <label for="playerName">Your Name</label>
@@ -236,6 +322,12 @@
     padding: 1.5rem;
   }
 
+  @media (min-width: 900px) {
+    .app {
+      max-width: 960px;
+    }
+  }
+
   /* ─── MASTHEAD ─── */
   header {
     text-align: center;
@@ -306,6 +398,21 @@
     margin: 0 auto;
   }
 
+  @media (min-width: 600px) {
+    .home {
+      max-width: 480px;
+    }
+  }
+
+  @media (min-width: 900px) {
+    .home {
+      max-width: 100%;
+    }
+    .home.home-party {
+      max-width: 540px;
+    }
+  }
+
   /* ─── MODE SELECTOR ─── */
   .mode-selector {
     display: grid;
@@ -322,6 +429,24 @@
     background: var(--color-cream);
     transition: all 0.2s;
     font-family: inherit;
+  }
+
+  @media (min-width: 900px) {
+    .mode-card {
+      padding: 1.75rem 1.5rem;
+    }
+
+    .mode-card .icon {
+      font-size: 2.25rem;
+    }
+
+    .mode-card h3 {
+      font-size: 1.3rem;
+    }
+
+    .mode-card p {
+      font-size: 0.9rem;
+    }
   }
 
   .mode-card:hover {
@@ -355,6 +480,17 @@
 
   .mode-card:hover p {
     color: #ccc;
+  }
+
+  .daily-desc {
+    display: block;
+    font-style: italic;
+    margin-top: 0.2rem;
+    line-height: 1.3;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    overflow: hidden;
   }
 
   /* ─── STATS BAR ─── */
@@ -435,7 +571,8 @@
 
   input[type="text"]:focus-visible {
     border-color: var(--color-crimson);
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-crimson) 20%, transparent);
+    box-shadow: 0 0 0 2px
+      color-mix(in srgb, var(--color-crimson) 20%, transparent);
   }
 
   .hint {
@@ -652,5 +789,174 @@
     font-size: 0.9rem;
     padding: 1rem;
     font-style: italic;
+  }
+
+  /* ─── STATS CTA ─── */
+  .stats-cta {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #888;
+    font-style: italic;
+    margin: 0.5rem 0 0;
+  }
+
+  /* ─── INFO COLUMNS ─── */
+  .info-columns {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 900px) {
+    .info-columns {
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 2rem;
+    }
+  }
+
+  /* ─── SECTION STYLES ─── */
+  .section-heading {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #555;
+    margin: 0 0 0.75rem;
+    border-bottom: 1px solid #e8d9b8;
+    padding-bottom: 0.4rem;
+  }
+
+  .section-divider {
+    border: none;
+    border-top: 1px solid var(--color-gold);
+    margin: 1.25rem 0;
+  }
+
+  /* ─── HOW IT WORKS ─── */
+  .how-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .step {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    font-family: "Playfair Display", Georgia, serif;
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: var(--color-crimson);
+    line-height: 1;
+    min-width: 1rem;
+  }
+
+  .step-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: block;
+  }
+
+  .step-desc {
+    font-size: 0.85rem;
+    color: #666;
+    font-style: italic;
+    display: block;
+    line-height: 1.4;
+  }
+
+  /* ─── SCORING EXAMPLE ─── */
+  .scoring-example {
+    border: 1px solid var(--color-gold);
+    padding: 1rem;
+    background: var(--color-cream);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .scoring-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .scoring-rank {
+    font-family: "Courier New", Courier, monospace;
+    min-width: 2rem;
+  }
+
+  .scoring-name {
+    flex: 1;
+  }
+
+  .scoring-pts {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .scoring-low .scoring-rank {
+    font-size: 0.75rem;
+    color: #777;
+  }
+  .scoring-low .scoring-name {
+    font-size: 0.9rem;
+    color: #777;
+  }
+  .scoring-low .scoring-pts {
+    font-size: 0.9rem;
+    color: #777;
+  }
+
+  .scoring-mid .scoring-rank {
+    font-size: 0.8rem;
+    color: #555;
+  }
+  .scoring-mid .scoring-name {
+    font-size: 0.95rem;
+    color: var(--color-ink);
+  }
+  .scoring-mid .scoring-pts {
+    font-size: 0.95rem;
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  .scoring-high .scoring-rank {
+    font-size: 0.85rem;
+    color: var(--color-crimson);
+  }
+  .scoring-high .scoring-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+  .scoring-high .scoring-pts {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: var(--color-crimson);
+    font-family: "Playfair Display", Georgia, serif;
+  }
+
+  /* ─── TAG CLOUD ─── */
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .tag-chip {
+    padding: 0.25rem 0.65rem;
+    border: 1px solid var(--color-gold);
+    background: var(--color-cream);
+    font-size: 0.75rem;
+    font-family: "Source Serif 4", Georgia, serif;
+    color: #666;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
   }
 </style>
