@@ -67,6 +67,106 @@
   let showRules = $state(false);
   let showHistory = $state(false);
   let confirmAction = $state<"leave" | "end" | null>(null);
+  let showCelebration = $state(false);
+
+  // Lazily create a shared AudioContext on first user interaction
+  let audioCtx: AudioContext | null = null;
+  function getAudioCtx(): AudioContext | null {
+    try {
+      if (!audioCtx || audioCtx.state === "closed") {
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    } catch {
+      return null;
+    }
+  }
+
+  // Warm up AudioContext on any user interaction so it's ready when we need it
+  $effect(() => {
+    if (typeof window === "undefined") return;
+    const warm = () => { getAudioCtx(); window.removeEventListener("click", warm); window.removeEventListener("keydown", warm); };
+    window.addEventListener("click", warm, { once: true });
+    window.addEventListener("keydown", warm, { once: true });
+    return () => { window.removeEventListener("click", warm); window.removeEventListener("keydown", warm); };
+  });
+
+  function playCelebrationSound() {
+    const maybeCtx = getAudioCtx();
+    if (!maybeCtx) return;
+    const ctx = maybeCtx;
+    const t = ctx.currentTime;
+
+    // Typewriter bell "ding" — sharp metallic ring
+    function bell(start: number, freq: number, vol: number) {
+      const osc = ctx.createOscillator();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      // Slight inharmonic overtone for metallic quality
+      const osc2 = ctx.createOscillator();
+      osc2.type = "sine";
+      osc2.frequency.value = freq * 2.76;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(vol, start);
+      gain.gain.exponentialRampToValueAtTime(vol * 0.4, start + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.35);
+      const gain2 = ctx.createGain();
+      gain2.gain.value = 0.08;
+      const hp = ctx.createBiquadFilter();
+      hp.type = "highpass";
+      hp.frequency.value = 1000;
+      osc.connect(gain);
+      osc2.connect(gain2).connect(gain);
+      gain.connect(hp).connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + 0.4);
+      osc2.start(start);
+      osc2.stop(start + 0.4);
+    }
+
+    // Three rising bell dings as tapes fly in
+    bell(t + 0.1, 2200, 0.15);
+    bell(t + 0.25, 2600, 0.18);
+    bell(t + 0.4, 3100, 0.22);
+
+    // Press clatter: short burst of filtered noise (mechanical)
+    const clatterLen = 0.15;
+    const clatterBuf = ctx.createBuffer(1, ctx.sampleRate * clatterLen, ctx.sampleRate);
+    const clatterData = clatterBuf.getChannelData(0);
+    for (let i = 0; i < clatterData.length; i++) {
+      // Choppy noise for mechanical rattle
+      const env = Math.pow(1 - i / clatterData.length, 1.5);
+      clatterData[i] = (Math.random() * 2 - 1) * env * (Math.sin(i * 0.15) > 0 ? 1 : 0.3);
+    }
+    const clatter = ctx.createBufferSource();
+    clatter.buffer = clatterBuf;
+    const clatterBP = ctx.createBiquadFilter();
+    clatterBP.type = "bandpass";
+    clatterBP.frequency.value = 800;
+    clatterBP.Q.value = 3;
+    const clatterGain = ctx.createGain();
+    clatterGain.gain.value = 0.12;
+    clatter.connect(clatterBP).connect(clatterGain).connect(ctx.destination);
+    clatter.start(t + 0.55);
+
+    // Stamp thud when badge appears — low, punchy
+    const thud = ctx.createOscillator();
+    thud.type = "sine";
+    thud.frequency.setValueAtTime(120, t + 0.6);
+    thud.frequency.exponentialRampToValueAtTime(35, t + 0.75);
+    const thudGain = ctx.createGain();
+    thudGain.gain.setValueAtTime(0.35, t + 0.6);
+    thudGain.gain.exponentialRampToValueAtTime(0.001, t + 0.82);
+    thud.connect(thudGain).connect(ctx.destination);
+    thud.start(t + 0.6);
+    thud.stop(t + 0.85);
+
+    // Final bell ring — a clear, satisfied "ding" on the stamp
+    bell(t + 0.62, 3400, 0.2);
+  }
 
   $effect(() => {
     if (mp.phase === "playing") {
@@ -81,6 +181,11 @@
     const result = mp.lastResult;
     if (result && !result.isStrike && result.rank != null) {
       const rank = result.rank;
+      if (rank === 100) {
+        showCelebration = true;
+        playCelebrationSound();
+        setTimeout(() => { showCelebration = false; }, 4000);
+      }
       tick().then(() => {
         const slot = document.querySelector(`[data-slot="${rank - 1}"]`);
         if (!slot) return;
@@ -1353,6 +1458,39 @@
               >
                 {confirmAction === "leave" ? "Leave Game" : "End Game"}
               </button>
+            </div>
+          </div>
+        </div>
+      {/if}
+
+      {#if showCelebration}
+        <div class="cel-overlay">
+          <div class="cel-tape" style="--top: 12%; --rot: -1.5deg; --from: 110%; --to: -5%; --delay: 0.05s; --dur: 0.7s; --bg: var(--color-cream, #fffef2); --h: 28px;">
+            {#each Array(12) as _}<span>100</span> <span class="cel-dot">&bull;</span> <span class="cel-hi">#100</span> <span class="cel-dot">&bull;</span> {/each}
+          </div>
+          <div class="cel-tape" style="--top: 26%; --rot: 1deg; --from: -110%; --to: -15%; --delay: 0.12s; --dur: 0.8s; --bg: var(--color-parchment, #f5e6c8); --tape-color: var(--color-crimson, #8b0000); --h: 24px; --fs: 0.7rem;">
+            {#each Array(16) as _}<span>+100</span> <span>POINTS</span> <span class="cel-dot">&bull;</span> {/each}
+          </div>
+          <div class="cel-tape" style="--top: 40%; --rot: -0.5deg; --from: 110%; --to: -8%; --delay: 0.08s; --dur: 0.75s; --bg: var(--color-cream, #fffef2); --h: 32px; --fs: 0.95rem;">
+            {#each Array(12) as _}<span>100</span> <span class="cel-dot">&bull;</span> <span class="cel-hi">#100</span> <span class="cel-dot">&bull;</span> {/each}
+          </div>
+          <div class="cel-tape" style="--top: 56%; --rot: 2deg; --from: -110%; --to: -20%; --delay: 0.18s; --dur: 0.85s; --bg: var(--color-ink, #1a1a1a); --tape-color: var(--color-cream, #fffef2); --h: 24px; --fs: 0.65rem;">
+            {#each Array(16) as _}<span>ONE</span> <span>HUNDRED</span> <span class="cel-dot">&bull;</span> {/each}
+          </div>
+          <div class="cel-tape" style="--top: 68%; --rot: -1deg; --from: 110%; --to: -10%; --delay: 0.22s; --dur: 0.8s; --bg: var(--color-cream, #fffef2); --h: 26px;">
+            {#each Array(12) as _}<span>100</span> <span class="cel-dot">&bull;</span> <span class="cel-hi">#100</span> <span class="cel-dot">&bull;</span> {/each}
+          </div>
+          <div class="cel-tape" style="--top: 82%; --rot: 0.5deg; --from: -110%; --to: -12%; --delay: 0.28s; --dur: 0.75s; --bg: var(--color-parchment, #f5e6c8); --tape-color: var(--color-crimson, #8b0000); --h: 24px; --fs: 0.7rem;">
+            {#each Array(16) as _}<span>+100</span> <span>POINTS</span> <span class="cel-dot">&bull;</span> {/each}
+          </div>
+          <div class="cel-badge">
+            <div class="cel-badge-inner">
+              <div class="cel-badge-extra">EXTRA</div>
+              <div class="cel-badge-rule"></div>
+              <div class="cel-badge-number"><span class="cel-badge-hash">#</span>100</div>
+              <div class="cel-badge-rule"></div>
+              <div class="cel-badge-points">+100 Points</div>
+              <div class="cel-badge-stars">&#10038; &#10038; &#10038;</div>
             </div>
           </div>
         </div>
@@ -3396,6 +3534,134 @@
     font-family: "Playfair Display", Georgia, serif;
     font-size: 2rem;
     margin-bottom: 1rem;
+  }
+
+  .cel-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .cel-tape {
+    position: absolute;
+    height: var(--h, 28px);
+    width: 200vw;
+    background: var(--bg, var(--color-cream, #fffef2));
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0 1rem;
+    white-space: nowrap;
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: var(--fs, 0.8rem);
+    font-weight: 700;
+    color: var(--tape-color, var(--color-ink, #1a1a1a));
+    opacity: 0;
+    top: var(--top);
+    transform: rotate(var(--rot, 0deg));
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    animation: cel-tape-fly var(--dur, 0.8s) var(--delay, 0s) ease-out forwards;
+  }
+
+  .cel-tape span {
+    opacity: 0.3;
+  }
+
+  .cel-tape .cel-hi {
+    color: var(--color-crimson, #8b0000);
+    opacity: 1;
+    font-size: 1.1em;
+  }
+
+  .cel-tape .cel-dot {
+    opacity: 0.15;
+  }
+
+  @keyframes cel-tape-fly {
+    0% {
+      opacity: 0;
+      left: var(--from, -100%);
+    }
+    15% {
+      opacity: 0.9;
+    }
+    100% {
+      opacity: 0.85;
+      left: var(--to, -5%);
+    }
+  }
+
+  .cel-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    z-index: 10;
+    animation: cel-badge-pop 0.5s 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  @keyframes cel-badge-pop {
+    0% { transform: translate(-50%, -50%) scale(0) rotate(-10deg); }
+    100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+  }
+
+  .cel-badge-inner {
+    background: var(--color-ink, #1a1a1a);
+    color: var(--color-cream, #fffef2);
+    padding: 1.25rem 3rem;
+    position: relative;
+    text-align: center;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    outline: 1px solid var(--color-ink, #1a1a1a);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .cel-badge-extra {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--color-gold, #d4af37);
+    margin-bottom: 0.2rem;
+  }
+
+  .cel-badge-rule {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 0.15rem 0;
+  }
+
+  .cel-badge-number {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 3.5rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin: 0.1rem 0;
+  }
+
+  .cel-badge-hash {
+    color: var(--color-gold, #d4af37);
+  }
+
+  .cel-badge-points {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-gold, #d4af37);
+    margin-top: 0.1rem;
+  }
+
+  .cel-badge-stars {
+    font-size: 0.5rem;
+    letter-spacing: 0.6em;
+    color: rgba(255, 255, 255, 0.25);
+    margin-top: 0.3rem;
   }
 
   .lps-overlay {
