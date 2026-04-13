@@ -157,7 +157,7 @@
         </div>
 
         <div class="info-col">
-          <h2 class="section-heading">The Scoring Trick</h2>
+          <h2 class="section-heading">Scoring</h2>
           <div
             class="scoring-example"
             aria-label="Scoring example: naming India (#1) earns 1 point, Peru (#47) earns 47 points, Luxembourg (#97) earns 97 points. Rarer answers score more."

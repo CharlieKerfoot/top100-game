@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from "$app/state";
   import { goto } from "$app/navigation";
+  import { tick } from "svelte";
   import {
     getAllTopics,
     getFeaturedLists,
@@ -73,6 +74,17 @@
       return () => {
         document.body.style.overflow = "";
       };
+    }
+  });
+
+  $effect(() => {
+    const result = mp.lastResult;
+    if (result && !result.isStrike && result.rank != null) {
+      const rank = result.rank;
+      tick().then(() => {
+        const slot = document.querySelector(`[data-slot="${rank - 1}"]`);
+        slot?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
     }
   });
 
@@ -427,7 +439,7 @@
                 <div class="dt-slots">
                   {#each Array(100) as _, i}
                     {@const item = guessedMap.get(i)}
-                    <div class="dt-slot" class:filled={!!item}>
+                    <div class="dt-slot" class:filled={!!item} data-slot={i}>
                       <span class="dt-slot-rank">{i + 1}.</span>
                       {#if item}
                         <span class="dt-slot-name">{item.name}</span>
@@ -796,7 +808,7 @@
                   <button
                     class="tag-btn"
                     class:active={activeTopic === topic}
-                    onclick={() => (activeTopic = activeTopic === topic ? null : tag)}
+                    onclick={() => (activeTopic = activeTopic === topic ? null : topic)}
                     >{topic}</button
                   >
                 {/each}
@@ -1083,7 +1095,7 @@
               <div class="dt-slots">
                 {#each Array(100) as _, i}
                   {@const item = guessedMap.get(i)}
-                  <div class="dt-slot" class:filled={!!item}>
+                  <div class="dt-slot" class:filled={!!item} data-slot={i}>
                     <span class="dt-slot-rank">{i + 1}.</span>
                     {#if item}
                       <span class="dt-slot-name">{item.name}</span>
