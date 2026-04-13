@@ -1,9 +1,10 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { tick } from "svelte";
   import Autocomplete from "$lib/Autocomplete.svelte";
   import { normalizeGuess } from "$lib/normalize";
   import {
-    getDailyCategory,
+    getDailyList,
     getDayNumber,
     getTodayKey,
     loadDailyStats,
@@ -14,7 +15,7 @@
     type DayResult,
   } from "$lib/daily";
 
-  const category = getDailyCategory();
+  const list = getDailyList();
   const dayNumber = getDayNumber();
   const todayKey = getTodayKey();
   const dateDisplay = new Date().toLocaleDateString("en-US", {
@@ -26,10 +27,10 @@
 
   // Build normalized lookup: normalized -> { index, original }
   const itemLookup = new Map<string, { index: number; original: string }>();
-  for (let i = 0; i < category.items.length; i++) {
-    itemLookup.set(normalizeGuess(category.items[i]), {
+  for (let i = 0; i < list.items.length; i++) {
+    itemLookup.set(normalizeGuess(list.items[i]), {
       index: i,
-      original: category.items[i],
+      original: list.items[i],
     });
   }
 
@@ -39,6 +40,10 @@
   let strikes = $state(0);
   let guessValue = $state("");
   let foundItems = $state<{ rank: number; name: string; points: number }[]>([]);
+  type GuessEntry =
+    | { type: "hit"; rank: number; name: string; points: number; guess: string }
+    | { type: "strike"; guess: string };
+  let guessHistory = $state<GuessEntry[]>([]);
   let guessedRanks = $state<number[]>([]);
   let lastFeedback = $state<{
     type: "gold" | "gray" | "strike";
@@ -72,7 +77,7 @@
     // Rebuild foundItems from guessedRanks
     const restored: { rank: number; name: string; points: number }[] = [];
     for (const rank of previousResult.guessedRanks) {
-      restored.push({ rank, name: category.items[rank - 1], points: rank });
+      restored.push({ rank, name: list.items[rank - 1], points: rank });
     }
     restored.sort((a, b) => b.rank - a.rank);
     foundItems = restored;
@@ -80,6 +85,11 @@
   }
 
   const maxStrikes = 3;
+
+  // Build a map for the 100-slot board (desktop)
+  const guessedMap = $derived(
+    new Map(foundItems.map((item) => [item.rank - 1, item])),
+  );
 
   function handleGuess(value: string) {
     if (phase !== "playing" || debouncing) return;
@@ -96,6 +106,7 @@
     if (!match) {
       // Strike
       strikes++;
+      guessHistory = [{ type: "strike", guess: value }, ...guessHistory];
       showFeedback("strike");
       if (strikes >= maxStrikes) {
         endGame();
@@ -111,11 +122,20 @@
     const points = rank;
     score += points;
     guessedRanks = [...guessedRanks, rank];
-    foundItems = [...foundItems, { rank, name: match.original, points }].sort(
-      (a, b) => b.rank - a.rank,
-    );
+    foundItems = [...foundItems, { rank, name: match.original, points }];
+    guessHistory = [
+      { type: "hit", rank, name: match.original, points, guess: value },
+      ...guessHistory,
+    ];
 
     showFeedback(rank >= 50 ? "gold" : "gray", rank);
+    scrollToSlot(rank);
+  }
+
+  async function scrollToSlot(rank: number) {
+    await tick();
+    const slot = document.querySelector(`[data-slot="${rank - 1}"]`);
+    slot?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
   function showFeedback(type: "gold" | "gray" | "strike", rank?: number) {
@@ -130,7 +150,7 @@
     phase = "results";
     const updatedStats = recordGame(
       score,
-      category.id,
+      list.id,
       guessedRanks.length,
       guessedRanks,
     );
@@ -145,7 +165,7 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           date: todayKey,
-          categoryId: category.id,
+          listId: list.id,
           score,
         }),
       });
@@ -180,7 +200,7 @@
   function handleShare() {
     const text = generateShareText({
       dayNumber,
-      categoryName: category.name,
+      listName: list.name,
       score,
       streak: stats.streak,
       guessedRanks,
@@ -221,17 +241,71 @@
   const gridText = $derived(generateShareGrid(guessedRanks));
 </script>
 
-<div class="app">
+<div class="app" class:has-game={phase === "playing"}>
   <header>
     <a href="/" class="back-link">&larr; Home</a>
     <div class="category-header">
-      <h2>{category.name}</h2>
+      <h2>{list.name}</h2>
       <p class="date-line">{dateDisplay} &middot; #{dayNumber}</p>
     </div>
   </header>
 
   {#if phase === "playing"}
-    <div class="game">
+    <!-- ─── DESKTOP LAYOUT ─── -->
+    <div class="game-desktop">
+      <div class="dt-top">
+        <span class="dt-category-label">{list.name}</span>
+        <div class="dt-strikes">
+          {#each Array(maxStrikes) as _, i}
+            <span class="strike-dot" class:used={i < strikes}></span>
+          {/each}
+        </div>
+        <div
+          class="dt-score"
+          class:gold-pop={lastFeedback?.type === "gold"}
+          class:gray-pop={lastFeedback?.type === "gray"}
+          class:red-shake={lastFeedback?.type === "strike"}
+        >
+          <span class="dt-score-value">{score}</span>
+          <span class="dt-score-label">pts</span>
+        </div>
+        <div class="dt-guess-area">
+          <Autocomplete
+            hints={list.hints ?? list.items}
+            bind:value={guessValue}
+            placeholder="Type your guess..."
+            onsubmit={handleGuess}
+          />
+        </div>
+        <span class="dt-found-count">{foundItems.length} of 100</span>
+      </div>
+
+      <div class="dt-body">
+        <div class="dt-board">
+          <div class="dt-board-header">
+            <span class="dt-board-title">{list.description}</span>
+            <span class="dt-board-count">{foundItems.length} of 100 identified</span>
+          </div>
+          <div class="dt-board-body">
+            <div class="dt-slots">
+              {#each Array(100) as _, i}
+                {@const item = guessedMap.get(i)}
+                <div class="dt-slot" class:filled={!!item} data-slot={i}>
+                  <span class="dt-slot-rank">{i + 1}.</span>
+                  {#if item}
+                    <span class="dt-slot-name">{item.name}</span>
+                    <span class="dt-slot-points">+{item.points}</span>
+                  {/if}
+                </div>
+              {/each}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── MOBILE LAYOUT ─── -->
+    <div class="game-mobile">
       <div class="strikes">
         {#each Array(maxStrikes) as _, i}
           <span class="strike-dot" class:used={i < strikes}></span>
@@ -250,21 +324,31 @@
 
       <div class="guess-area">
         <Autocomplete
-          hints={category.hints ?? category.items}
+          hints={list.hints ?? list.items}
           bind:value={guessValue}
           placeholder="Type your guess..."
           onsubmit={handleGuess}
         />
       </div>
 
-      {#if foundItems.length > 0}
+      <div class="found-count">{foundItems.length} of 100 found</div>
+
+      {#if guessHistory.length > 0}
         <div class="board">
-          {#each foundItems as item}
-            <div class="board-row">
-              <span class="rank">#{item.rank}</span>
-              <span class="name">{item.name}</span>
-              <span class="points">+{item.points}</span>
-            </div>
+          {#each guessHistory as entry}
+            {#if entry.type === "hit"}
+              <div class="board-row">
+                <span class="rank">#{entry.rank}</span>
+                <span class="name">{entry.name}</span>
+                <span class="points">+{entry.points}</span>
+              </div>
+            {:else}
+              <div class="board-row strike-row">
+                <span class="strike-x">&#10060;</span>
+                <span class="name strike-name">{entry.guess}</span>
+                <span class="strike-label">Strike</span>
+              </div>
+            {/if}
           {/each}
         </div>
       {:else}
@@ -289,10 +373,6 @@
         {/if}
       </div>
 
-      <div class="share-grid-container">
-        <pre class="share-grid">{gridText}</pre>
-      </div>
-
       {#if histogram.length > 0 && histogram.some((v) => v > 0)}
         <div class="histogram">
           <h4>Score Distribution</h4>
@@ -312,6 +392,10 @@
           </div>
         </div>
       {/if}
+
+      <div class="share-grid-container">
+        <pre class="share-grid">{gridText}</pre>
+      </div>
 
       <button class="share-btn" onclick={handleShare}>
         {shareStatus === "copied" ? "Copied!" : "Share Result"}
@@ -340,6 +424,13 @@
     max-width: 480px;
     margin: 0 auto;
     padding: 1.5rem;
+  }
+
+  @media (min-width: 900px) {
+    .app.has-game {
+      max-width: 1400px;
+      padding: 1.5rem 2rem;
+    }
   }
 
   header {
@@ -376,6 +467,184 @@
     color: #888;
     margin-top: 0.25rem;
   }
+
+  /* ─── DESKTOP / MOBILE TOGGLE ─── */
+  .game-desktop {
+    display: none;
+  }
+  .game-mobile {
+    display: block;
+  }
+
+  @media (min-width: 900px) {
+    .game-desktop {
+      display: flex;
+      flex-direction: column;
+    }
+    .game-mobile {
+      display: none;
+    }
+  }
+
+  /* ═══════════════════════════════════════════
+     DESKTOP LAYOUT
+     ═══════════════════════════════════════════ */
+
+  .dt-top {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    height: 2.5rem;
+  }
+
+  .dt-category-label {
+    font-family: "Playfair Display", Georgia, serif;
+    font-weight: 900;
+    font-size: 1.3rem;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #555;
+  }
+
+  .dt-strikes {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .dt-score {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    white-space: nowrap;
+  }
+
+  .dt-score-value {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .dt-score-label {
+    font-size: 0.7rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .dt-guess-area {
+    flex: 1;
+  }
+
+  .dt-found-count {
+    font-size: 0.8rem;
+    color: var(--color-crimson);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .dt-body {
+    display: flex;
+  }
+
+  /* ─── DESKTOP BOARD ─── */
+  .dt-board {
+    flex: 1;
+    background: var(--color-cream);
+    border: 1px solid var(--color-gold);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dt-board-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 1rem;
+    border-bottom: 2px solid var(--color-ink);
+  }
+
+  .dt-board-title {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 0.8rem;
+    font-style: italic;
+    color: #666;
+  }
+
+  .dt-board-count {
+    font-size: 0.8rem;
+    color: var(--color-crimson);
+    font-weight: 600;
+  }
+
+  .dt-board-body {
+    flex: 1;
+    overflow-y: auto;
+    max-height: calc(100vh - 280px);
+  }
+
+  .dt-slots {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(25, auto);
+    grid-auto-flow: column;
+    gap: 0;
+  }
+
+  .dt-slot {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.75rem;
+    border-bottom: 1px solid #ede0c4;
+    font-size: 0.82rem;
+    min-height: 1.4rem;
+    transition: background 0.2s;
+  }
+
+  .dt-slot:nth-child(25),
+  .dt-slot:nth-child(50),
+  .dt-slot:nth-child(75),
+  .dt-slot:nth-child(100) {
+    border-bottom: none;
+  }
+
+  .dt-slot.filled {
+    background: rgba(139, 0, 0, 0.04);
+  }
+
+  .dt-slot-rank {
+    font-weight: 700;
+    min-width: 1.8rem;
+    font-size: 0.78rem;
+    color: var(--color-gold);
+  }
+
+  .dt-slot.filled .dt-slot-rank {
+    color: var(--color-crimson);
+  }
+
+  .dt-slot-name {
+    flex: 1;
+    font-weight: 500;
+    color: var(--color-ink);
+    animation: slideIn 0.2s ease-out;
+  }
+
+  .dt-slot-points {
+    color: #888;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* ═══════════════════════════════════════════
+     MOBILE LAYOUT
+     ═══════════════════════════════════════════ */
 
   /* ─── STRIKES ─── */
   .strikes {
@@ -418,12 +687,14 @@
   }
 
   /* ─── ANIMATED FEEDBACK ─── */
-  .gold-pop .big {
+  .gold-pop .big,
+  .gold-pop .dt-score-value {
     animation: goldPop 0.4s ease-out;
     color: #b8860b;
   }
 
-  .gray-pop .big {
+  .gray-pop .big,
+  .gray-pop .dt-score-value {
     animation: grayPop 0.3s ease-out;
   }
 
@@ -475,12 +746,32 @@
     }
   }
 
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   /* ─── GUESS AREA ─── */
   .guess-area {
     margin-bottom: 1rem;
   }
 
-  /* ─── BOARD ─── */
+  /* ─── FOUND COUNT ─── */
+  .found-count {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--color-crimson);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+
+  /* ─── BOARD (mobile guess history) ─── */
   .board {
     margin-bottom: 1rem;
   }
@@ -512,6 +803,28 @@
     color: #bbb;
     font-style: italic;
     justify-content: center;
+  }
+
+  .board-row.strike-row {
+    background: rgba(139, 0, 0, 0.04);
+  }
+
+  .strike-x {
+    width: 40px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .strike-name {
+    color: #999;
+    font-style: italic;
+  }
+
+  .strike-label {
+    color: var(--color-crimson);
+    font-weight: 600;
+    font-size: 0.8rem;
   }
 
   /* ─── RESULTS ─── */

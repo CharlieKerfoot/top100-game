@@ -1,7 +1,7 @@
 import { io, type Socket } from 'socket.io-client';
 import { goto } from '$app/navigation';
 import { getContext } from 'svelte';
-import { categories } from './categories/index';
+import { lists } from './lists/index';
 
 export type AppPhase = 'home' | 'lobby' | 'playing' | 'results' | 'sitting-out';
 
@@ -44,15 +44,15 @@ export interface PublicParty {
   code: string;
   hostName: string;
   playerCount: number;
-  categoryName: string;
+  listName: string;
   phase: string;
 }
 
-export interface CategorySuggestion {
+export interface ListSuggestion {
   playerId: string;
   playerName: string;
-  categoryId: string;
-  categoryName: string;
+  listId: string;
+  listName: string;
 }
 
 // In production, Socket.IO runs on the same origin. In dev, separate port.
@@ -82,7 +82,7 @@ export function createMultiplayerState() {
   let players = $state<PlayerInfo[]>([]);
 
   // Settings
-  let categoryId = $state(categories[0].id);
+  let listId = $state(lists[0].id);
   let mode = $state<'strikes' | 'turns'>('strikes');
   let maxStrikes = $state(3);
   let maxTurns = $state(10);
@@ -100,15 +100,15 @@ export function createMultiplayerState() {
   // Browse
   let publicParties = $state<PublicParty[]>([]);
 
-  // Category suggestions (lobby)
-  let categorySuggestions = $state<CategorySuggestion[]>([]);
+  // List suggestions (lobby)
+  let listSuggestions = $state<ListSuggestion[]>([]);
 
   const playerId = getOrCreatePlayerId();
 
   // Derived
   const myId = $derived(playerId);
   const isHost = $derived(myId === hostId);
-  const category = $derived(categories.find(c => c.id === categoryId) ?? categories[0]);
+  const list = $derived(lists.find(c => c.id === listId) ?? lists[0]);
   const currentPlayerId = $derived(playerOrder[currentPlayerIndex] ?? '');
   const isMyTurn = $derived(currentPlayerId === myId);
   const currentPlayer = $derived(players.find(p => p.id === currentPlayerId));
@@ -181,8 +181,8 @@ export function createMultiplayerState() {
       }
     });
 
-    s.on('public-parties', ({ parties: list }: { parties: PublicParty[] }) => {
-      publicParties = list;
+    s.on('public-parties', ({ parties: partyList }: { parties: PublicParty[] }) => {
+      publicParties = partyList;
     });
 
     s.on('joined-mid-game', ({ party, game }: { party: any; game: any }) => {
@@ -242,12 +242,12 @@ export function createMultiplayerState() {
     hostId = party.hostId;
     isPublic = party.isPublic;
     players = party.players;
-    categoryId = party.settings.categoryId;
+    listId = party.settings.listId;
     mode = party.settings.mode;
     maxStrikes = party.settings.maxStrikes;
     maxTurns = party.settings.maxTurns;
     hints = party.settings.hints ?? true;
-    categorySuggestions = party.suggestions ?? [];
+    listSuggestions = party.suggestions ?? [];
     if (party.phase === 'lobby') phase = 'lobby';
   }
 
@@ -258,7 +258,7 @@ export function createMultiplayerState() {
     lastResult = game.lastResult;
     showResult = game.showResult;
     if (game.players) players = game.players;
-    if (game.categoryId) categoryId = game.categoryId;
+    if (game.listId) listId = game.listId;
     if (game.mode) mode = game.mode;
     if (game.maxStrikes) maxStrikes = game.maxStrikes;
     if (game.maxTurns) maxTurns = game.maxTurns;
@@ -277,7 +277,7 @@ export function createMultiplayerState() {
     showResult = false;
     currentPlayerIndex = 0;
     playerOrder = [];
-    categorySuggestions = [];
+    listSuggestions = [];
     valueLabel = undefined;
   }
 
@@ -334,7 +334,7 @@ export function createMultiplayerState() {
     socket?.emit('leave-party');
   }
 
-  function checkParty(code: string): Promise<{ exists: boolean; code: string; phase?: string; hostName?: string; playerCount?: number; categoryName?: string }> {
+  function checkParty(code: string): Promise<{ exists: boolean; code: string; phase?: string; hostName?: string; playerCount?: number; listName?: string }> {
     connect();
     return new Promise((resolve) => {
       let attempts = 0;
@@ -354,8 +354,8 @@ export function createMultiplayerState() {
     });
   }
 
-  function suggestCategory(categoryId: string) {
-    socket?.emit('suggest-category', { categoryId });
+  function suggestList(listId: string) {
+    socket?.emit('suggest-list', { listId });
   }
 
   function dismissSuggestion(targetPlayerId: string) {
@@ -378,7 +378,7 @@ export function createMultiplayerState() {
     get hostId() { return hostId; },
     get isPublic() { return isPublic; },
     get players() { return players; },
-    get categoryId() { return categoryId; },
+    get listId() { return listId; },
     get mode() { return mode; },
     get maxStrikes() { return maxStrikes; },
     get maxTurns() { return maxTurns; },
@@ -391,10 +391,10 @@ export function createMultiplayerState() {
     get lastResult() { return lastResult; },
     get showResult() { return showResult; },
     get publicParties() { return publicParties; },
-    get categorySuggestions() { return categorySuggestions; },
+    get listSuggestions() { return listSuggestions; },
     get myId() { return myId; },
     get isHost() { return isHost; },
-    get category() { return category; },
+    get list() { return list; },
     get currentPlayerId() { return currentPlayerId; },
     get isMyTurn() { return isMyTurn; },
     get currentPlayer() { return currentPlayer; },
@@ -411,7 +411,7 @@ export function createMultiplayerState() {
     backToLobby,
     leaveParty,
     checkParty,
-    suggestCategory,
+    suggestList,
     dismissSuggestion,
     setPhase,
   };
