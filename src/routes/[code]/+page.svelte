@@ -83,7 +83,17 @@
       const rank = result.rank;
       tick().then(() => {
         const slot = document.querySelector(`[data-slot="${rank - 1}"]`);
-        slot?.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (!slot) return;
+        const container = slot.closest(".dt-board-body");
+        if (container) {
+          const slotTop = (slot as HTMLElement).offsetTop;
+          const slotHeight = (slot as HTMLElement).offsetHeight;
+          const containerHeight = container.clientHeight;
+          container.scrollTo({
+            top: slotTop - containerHeight / 2 + slotHeight / 2,
+            behavior: "smooth",
+          });
+        }
       });
     }
   });
@@ -1344,6 +1354,24 @@
                 {confirmAction === "leave" ? "Leave Game" : "End Game"}
               </button>
             </div>
+          </div>
+        </div>
+      {/if}
+
+      {#if mp.lastPlayerStanding}
+        <div class="lps-overlay">
+          <div class="lps-modal">
+            <div class="lps-icon">&#127942;</div>
+            <div class="lps-title">{mp.lastPlayerStanding.winnerName} wins!</div>
+            <div class="lps-subtitle">Last player standing</div>
+            {#if mp.lastPlayerStanding.winnerId === mp.myId}
+              <div class="lps-actions">
+                <button class="lps-btn end" onclick={() => mp.endGameEarly()}>End Game</button>
+                <button class="lps-btn keep" onclick={() => mp.continueGame()}>Keep Going</button>
+              </div>
+            {:else}
+              <div class="lps-waiting">Waiting for {mp.lastPlayerStanding.winnerName} to decide...</div>
+            {/if}
           </div>
         </div>
       {/if}
@@ -3368,6 +3396,89 @@
     font-family: "Playfair Display", Georgia, serif;
     font-size: 2rem;
     margin-bottom: 1rem;
+  }
+
+  .lps-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .lps-modal {
+    background: var(--color-cream, #faf6f1);
+    border: 3px solid var(--color-crimson, #8b2500);
+    padding: 2.5rem 3rem;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    animation: slideIn 0.4s ease-out;
+  }
+
+  .lps-icon {
+    font-size: 4rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .lps-title {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  .lps-subtitle {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 1.5rem;
+  }
+
+  .lps-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .lps-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: 2px solid var(--color-crimson, #8b2500);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .lps-btn.end {
+    background: var(--color-crimson, #8b2500);
+    color: white;
+  }
+
+  .lps-btn.end:hover {
+    opacity: 0.9;
+  }
+
+  .lps-btn.keep {
+    background: transparent;
+    color: var(--color-crimson, #8b2500);
+  }
+
+  .lps-btn.keep:hover {
+    background: var(--color-crimson, #8b2500);
+    color: white;
+  }
+
+  .lps-waiting {
+    color: #666;
+    font-style: italic;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   .winner-banner {

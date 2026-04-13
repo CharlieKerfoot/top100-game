@@ -96,6 +96,7 @@ export function createMultiplayerState() {
   let guessHistory = $state<GuessHistoryEntry[]>([]);
   let lastResult = $state<GuessResult | null>(null);
   let showResult = $state(false);
+  let lastPlayerStanding = $state<{ winnerId: string; winnerName: string } | null>(null);
 
   // Browse
   let publicParties = $state<PublicParty[]>([]);
@@ -215,9 +216,24 @@ export function createMultiplayerState() {
       showResult = false;
     });
 
+    s.on('last-player-standing', ({ winnerId, winnerName, game, players: updatedPlayers }: { winnerId: string; winnerName: string; game: any; players: PlayerInfo[] }) => {
+      if (game) applyGameState(game);
+      players = updatedPlayers;
+      lastPlayerStanding = { winnerId, winnerName };
+    });
+
+    s.on('game-continued', ({ game, players: updatedPlayers }: { game: any; players: PlayerInfo[] }) => {
+      if (game) applyGameState(game);
+      players = updatedPlayers;
+      lastPlayerStanding = null;
+      lastResult = null;
+      showResult = false;
+    });
+
     s.on('game-over', ({ party, game }: { party: any; game: any }) => {
       applyPartyState(party);
       if (game) applyGameState(game);
+      lastPlayerStanding = null;
       phase = 'results';
     });
 
@@ -326,6 +342,14 @@ export function createMultiplayerState() {
     socket?.emit('next-turn');
   }
 
+  function endGameEarly() {
+    socket?.emit('end-game-early');
+  }
+
+  function continueGame() {
+    socket?.emit('continue-game');
+  }
+
   function backToLobby() {
     socket?.emit('back-to-lobby');
   }
@@ -400,6 +424,7 @@ export function createMultiplayerState() {
     get currentPlayer() { return currentPlayer; },
     get rankings() { return rankings; },
     get winner() { return winner; },
+    get lastPlayerStanding() { return lastPlayerStanding; },
     connect,
     createParty,
     joinParty,
@@ -408,6 +433,8 @@ export function createMultiplayerState() {
     startGame,
     submitGuess,
     nextTurn,
+    endGameEarly,
+    continueGame,
     backToLobby,
     leaveParty,
     checkParty,

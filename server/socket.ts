@@ -516,6 +516,21 @@ export function setupSocketServer(io: Server) {
         return;
       }
 
+      // In strikes mode, check if only one player remains
+      if (party.settings.mode === 'strikes') {
+        const active = [...party.players.values()].filter(p => !p.eliminated);
+        if (active.length === 1) {
+          const winnerId = active[0].id;
+          io.to(code).emit('last-player-standing', {
+            winnerId,
+            winnerName: active[0].name,
+            game: serializeGameState(party),
+            players: [...party.players.values()],
+          });
+          return;
+        }
+      }
+
       const next = findNextActivePlayer(party);
       if (next === -1) {
         party.phase = 'results';
@@ -525,6 +540,46 @@ export function setupSocketServer(io: Server) {
 
       game.currentPlayerIndex = next;
       io.to(code).emit('turn-advanced', { game: serializeGameState(party) });
+    });
+
+    socket.on('end-game-early', () => {
+      const playerId = getPlayerId(socket.id);
+      if (!playerId) return;
+      const code = playerParty.get(playerId);
+      if (!code) return;
+      const party = parties.get(code);
+      if (!party || !party.game || party.phase !== 'playing') return;
+
+      party.phase = 'results';
+      io.to(code).emit('game-over', { party: serializeParty(party), game: serializeGameState(party) });
+    });
+
+    socket.on('continue-game', () => {
+      const playerId = getPlayerId(socket.id);
+      if (!playerId) return;
+      const code = playerParty.get(playerId);
+      if (!code) return;
+      const party = parties.get(code);
+      if (!party || !party.game || party.phase !== 'playing') return;
+
+      const game = party.game;
+      // Un-eliminate all players so the game continues
+      for (const player of party.players.values()) {
+        player.eliminated = false;
+      }
+
+      const next = findNextActivePlayer(party);
+      if (next === -1) {
+        party.phase = 'results';
+        io.to(code).emit('game-over', { party: serializeParty(party), game: serializeGameState(party) });
+        return;
+      }
+
+      game.currentPlayerIndex = next;
+      io.to(code).emit('game-continued', {
+        game: serializeGameState(party),
+        players: [...party.players.values()],
+      });
     });
 
     socket.on('back-to-lobby', () => {
