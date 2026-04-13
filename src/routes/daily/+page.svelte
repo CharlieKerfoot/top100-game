@@ -134,8 +134,13 @@
 
   async function scrollToSlot(rank: number) {
     await tick();
-    const slot = document.querySelector(`[data-slot="${rank - 1}"]`);
-    slot?.scrollIntoView({ behavior: "smooth", block: "center" });
+    const slot = document.querySelector(`[data-slot="${rank - 1}"]`) as HTMLElement | null;
+    if (!slot) return;
+    const container = slot.closest(".dt-board-body") ?? slot.closest(".board");
+    if (container) {
+      const top = slot.offsetTop - container.clientHeight / 2 + slot.clientHeight / 2;
+      container.scrollTo({ top, behavior: "smooth" });
+    }
   }
 
   function showFeedback(type: "gold" | "gray" | "strike", rank?: number) {
