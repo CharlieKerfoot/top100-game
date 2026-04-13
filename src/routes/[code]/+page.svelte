@@ -88,10 +88,17 @@
   // Warm up AudioContext on any user interaction so it's ready when we need it
   $effect(() => {
     if (typeof window === "undefined") return;
-    const warm = () => { getAudioCtx(); window.removeEventListener("click", warm); window.removeEventListener("keydown", warm); };
+    const warm = () => {
+      getAudioCtx();
+      window.removeEventListener("click", warm);
+      window.removeEventListener("keydown", warm);
+    };
     window.addEventListener("click", warm, { once: true });
     window.addEventListener("keydown", warm, { once: true });
-    return () => { window.removeEventListener("click", warm); window.removeEventListener("keydown", warm); };
+    return () => {
+      window.removeEventListener("click", warm);
+      window.removeEventListener("keydown", warm);
+    };
   });
 
   function playCelebrationSound() {
@@ -100,72 +107,104 @@
     const ctx = maybeCtx;
     const t = ctx.currentTime;
 
-    // Typewriter bell "ding" — sharp metallic ring
-    function bell(start: number, freq: number, vol: number) {
+    // Lead-in: rising tension roll (0-0.5s, plays before visual)
+    const rollLen = 0.5;
+    const rollBuf = ctx.createBuffer(
+      1,
+      ctx.sampleRate * rollLen,
+      ctx.sampleRate,
+    );
+    const rollData = rollBuf.getChannelData(0);
+    for (let i = 0; i < rollData.length; i++) {
+      const progress = i / rollData.length;
+      // Accelerating pulse rate for building tension
+      const pulseRate = 8 + progress * 40;
+      const pulse = Math.sin(progress * pulseRate * Math.PI * 2) > 0 ? 1 : 0.2;
+      rollData[i] = (Math.random() * 2 - 1) * progress * 0.6 * pulse;
+    }
+    const roll = ctx.createBufferSource();
+    roll.buffer = rollBuf;
+    const rollLP = ctx.createBiquadFilter();
+    rollLP.type = "lowpass";
+    rollLP.frequency.setValueAtTime(400, t);
+    rollLP.frequency.linearRampToValueAtTime(2000, t + rollLen);
+    const rollGain = ctx.createGain();
+    rollGain.gain.setValueAtTime(0.05, t);
+    rollGain.gain.linearRampToValueAtTime(0.2, t + rollLen);
+    roll.connect(rollLP).connect(rollGain).connect(ctx.destination);
+    roll.start(t);
+
+    // Seal stamp impact at 0.5s (when visual appears)
+    const stampTime = t + 0.5;
+
+    // Heavy wax thud: low sine sweep down
+    const thud = ctx.createOscillator();
+    thud.type = "sine";
+    thud.frequency.setValueAtTime(180, stampTime);
+    thud.frequency.exponentialRampToValueAtTime(30, stampTime + 0.2);
+    const thudGain = ctx.createGain();
+    thudGain.gain.setValueAtTime(0.4, stampTime);
+    thudGain.gain.exponentialRampToValueAtTime(0.001, stampTime + 0.3);
+    thud.connect(thudGain).connect(ctx.destination);
+    thud.start(stampTime);
+    thud.stop(stampTime + 0.35);
+
+    // Impact crack: short noise burst for the press contact
+    const crackLen = 0.06;
+    const crackBuf = ctx.createBuffer(
+      1,
+      ctx.sampleRate * crackLen,
+      ctx.sampleRate,
+    );
+    const crackData = crackBuf.getChannelData(0);
+    for (let i = 0; i < crackData.length; i++) {
+      const env = Math.pow(1 - i / crackData.length, 3);
+      crackData[i] = (Math.random() * 2 - 1) * env;
+    }
+    const crack = ctx.createBufferSource();
+    crack.buffer = crackBuf;
+    const crackHP = ctx.createBiquadFilter();
+    crackHP.type = "highpass";
+    crackHP.frequency.value = 2000;
+    const crackGain = ctx.createGain();
+    crackGain.gain.value = 0.15;
+    crack.connect(crackHP).connect(crackGain).connect(ctx.destination);
+    crack.start(stampTime);
+
+    // Gold shimmer: rising harmonic chime (plays as rings expand)
+    function chime(start: number, freq: number, vol: number) {
       const osc = ctx.createOscillator();
       osc.type = "sine";
       osc.frequency.value = freq;
-      // Slight inharmonic overtone for metallic quality
-      const osc2 = ctx.createOscillator();
-      osc2.type = "sine";
-      osc2.frequency.value = freq * 2.76;
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(vol, start);
-      gain.gain.exponentialRampToValueAtTime(vol * 0.4, start + 0.05);
-      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.35);
-      const gain2 = ctx.createGain();
-      gain2.gain.value = 0.08;
-      const hp = ctx.createBiquadFilter();
-      hp.type = "highpass";
-      hp.frequency.value = 1000;
-      osc.connect(gain);
-      osc2.connect(gain2).connect(gain);
-      gain.connect(hp).connect(ctx.destination);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(vol, start);
+      g.gain.exponentialRampToValueAtTime(0.001, start + 0.8);
+      osc.connect(g).connect(ctx.destination);
       osc.start(start);
-      osc.stop(start + 0.4);
-      osc2.start(start);
-      osc2.stop(start + 0.4);
+      osc.stop(start + 0.85);
     }
+    chime(stampTime + 0.1, 1200, 0.08);
+    chime(stampTime + 0.2, 1800, 0.06);
+    chime(stampTime + 0.35, 2400, 0.05);
 
-    // Three rising bell dings as tapes fly in
-    bell(t + 0.1, 2200, 0.15);
-    bell(t + 0.25, 2600, 0.18);
-    bell(t + 0.4, 3100, 0.22);
-
-    // Press clatter: short burst of filtered noise (mechanical)
-    const clatterLen = 0.15;
-    const clatterBuf = ctx.createBuffer(1, ctx.sampleRate * clatterLen, ctx.sampleRate);
-    const clatterData = clatterBuf.getChannelData(0);
-    for (let i = 0; i < clatterData.length; i++) {
-      // Choppy noise for mechanical rattle
-      const env = Math.pow(1 - i / clatterData.length, 1.5);
-      clatterData[i] = (Math.random() * 2 - 1) * env * (Math.sin(i * 0.15) > 0 ? 1 : 0.3);
-    }
-    const clatter = ctx.createBufferSource();
-    clatter.buffer = clatterBuf;
-    const clatterBP = ctx.createBiquadFilter();
-    clatterBP.type = "bandpass";
-    clatterBP.frequency.value = 800;
-    clatterBP.Q.value = 3;
-    const clatterGain = ctx.createGain();
-    clatterGain.gain.value = 0.12;
-    clatter.connect(clatterBP).connect(clatterGain).connect(ctx.destination);
-    clatter.start(t + 0.55);
-
-    // Stamp thud when badge appears — low, punchy
-    const thud = ctx.createOscillator();
-    thud.type = "sine";
-    thud.frequency.setValueAtTime(120, t + 0.6);
-    thud.frequency.exponentialRampToValueAtTime(35, t + 0.75);
-    const thudGain = ctx.createGain();
-    thudGain.gain.setValueAtTime(0.35, t + 0.6);
-    thudGain.gain.exponentialRampToValueAtTime(0.001, t + 0.82);
-    thud.connect(thudGain).connect(ctx.destination);
-    thud.start(t + 0.6);
-    thud.stop(t + 0.85);
-
-    // Final bell ring — a clear, satisfied "ding" on the stamp
-    bell(t + 0.62, 3400, 0.2);
+    // Final celebratory bell: clear, bright ring
+    const bell = ctx.createOscillator();
+    bell.type = "sine";
+    bell.frequency.value = 3200;
+    const bellOvertone = ctx.createOscillator();
+    bellOvertone.type = "sine";
+    bellOvertone.frequency.value = 3200 * 2.76;
+    const bellGain = ctx.createGain();
+    bellGain.gain.setValueAtTime(0.15, stampTime + 0.15);
+    bellGain.gain.exponentialRampToValueAtTime(0.001, stampTime + 0.6);
+    const bellOvGain = ctx.createGain();
+    bellOvGain.gain.value = 0.04;
+    bell.connect(bellGain).connect(ctx.destination);
+    bellOvertone.connect(bellOvGain).connect(bellGain);
+    bell.start(stampTime + 0.15);
+    bell.stop(stampTime + 0.65);
+    bellOvertone.start(stampTime + 0.15);
+    bellOvertone.stop(stampTime + 0.65);
   }
 
   $effect(() => {
@@ -182,9 +221,14 @@
     if (result && !result.isStrike && result.rank != null) {
       const rank = result.rank;
       if (rank === 100) {
-        showCelebration = true;
         playCelebrationSound();
-        setTimeout(() => { showCelebration = false; }, 4000);
+        // Lead-in audio plays for 0.5s before visuals appear
+        setTimeout(() => {
+          showCelebration = true;
+        }, 500);
+        setTimeout(() => {
+          showCelebration = false;
+        }, 4500);
       }
       tick().then(() => {
         const slot = document.querySelector(`[data-slot="${rank - 1}"]`);
@@ -837,8 +881,7 @@
                   </div>
                   <button
                     class="select-btn"
-                    onclick={() => selectList(previewList!)}
-                    >Select</button
+                    onclick={() => selectList(previewList!)}>Select</button
                   >
                 </div>
                 <div class="preview-tags">
@@ -912,7 +955,8 @@
                 <button
                   class="tag-btn"
                   class:active={activeTopic === "__featured__"}
-                  onclick={() => (activeTopic = "__featured__")}>Featured</button
+                  onclick={() => (activeTopic = "__featured__")}
+                  >Featured</button
                 >
                 <button
                   class="tag-btn"
@@ -923,7 +967,8 @@
                   <button
                     class="tag-btn"
                     class:active={activeTopic === topic}
-                    onclick={() => (activeTopic = activeTopic === topic ? null : topic)}
+                    onclick={() =>
+                      (activeTopic = activeTopic === topic ? null : topic)}
                     >{topic}</button
                   >
                 {/each}
@@ -979,7 +1024,8 @@
                 <button
                   class="tag-btn"
                   class:active={suggestTopic === "__featured__"}
-                  onclick={() => (suggestTopic = "__featured__")}>Featured</button
+                  onclick={() => (suggestTopic = "__featured__")}
+                  >Featured</button
                 >
                 <button
                   class="tag-btn"
@@ -1465,33 +1511,42 @@
 
       {#if showCelebration}
         <div class="cel-overlay">
-          <div class="cel-tape" style="--top: 12%; --rot: -1.5deg; --from: 110%; --to: -5%; --delay: 0.05s; --dur: 0.7s; --bg: var(--color-cream, #fffef2); --h: 28px;">
-            {#each Array(12) as _}<span>100</span> <span class="cel-dot">&bull;</span> <span class="cel-hi">#100</span> <span class="cel-dot">&bull;</span> {/each}
-          </div>
-          <div class="cel-tape" style="--top: 26%; --rot: 1deg; --from: -110%; --to: -15%; --delay: 0.12s; --dur: 0.8s; --bg: var(--color-parchment, #f5e6c8); --tape-color: var(--color-crimson, #8b0000); --h: 24px; --fs: 0.7rem;">
-            {#each Array(16) as _}<span>+100</span> <span>POINTS</span> <span class="cel-dot">&bull;</span> {/each}
-          </div>
-          <div class="cel-tape" style="--top: 40%; --rot: -0.5deg; --from: 110%; --to: -8%; --delay: 0.08s; --dur: 0.75s; --bg: var(--color-cream, #fffef2); --h: 32px; --fs: 0.95rem;">
-            {#each Array(12) as _}<span>100</span> <span class="cel-dot">&bull;</span> <span class="cel-hi">#100</span> <span class="cel-dot">&bull;</span> {/each}
-          </div>
-          <div class="cel-tape" style="--top: 56%; --rot: 2deg; --from: -110%; --to: -20%; --delay: 0.18s; --dur: 0.85s; --bg: var(--color-ink, #1a1a1a); --tape-color: var(--color-cream, #fffef2); --h: 24px; --fs: 0.65rem;">
-            {#each Array(16) as _}<span>ONE</span> <span>HUNDRED</span> <span class="cel-dot">&bull;</span> {/each}
-          </div>
-          <div class="cel-tape" style="--top: 68%; --rot: -1deg; --from: 110%; --to: -10%; --delay: 0.22s; --dur: 0.8s; --bg: var(--color-cream, #fffef2); --h: 26px;">
-            {#each Array(12) as _}<span>100</span> <span class="cel-dot">&bull;</span> <span class="cel-hi">#100</span> <span class="cel-dot">&bull;</span> {/each}
-          </div>
-          <div class="cel-tape" style="--top: 82%; --rot: 0.5deg; --from: -110%; --to: -12%; --delay: 0.28s; --dur: 0.75s; --bg: var(--color-parchment, #f5e6c8); --tape-color: var(--color-crimson, #8b0000); --h: 24px; --fs: 0.7rem;">
-            {#each Array(16) as _}<span>+100</span> <span>POINTS</span> <span class="cel-dot">&bull;</span> {/each}
-          </div>
-          <div class="cel-badge">
-            <div class="cel-badge-inner">
-              <div class="cel-badge-extra">EXTRA</div>
-              <div class="cel-badge-rule"></div>
-              <div class="cel-badge-number"><span class="cel-badge-hash">#</span>100</div>
-              <div class="cel-badge-rule"></div>
-              <div class="cel-badge-points">+100 Points</div>
-              <div class="cel-badge-stars">&#10038; &#10038; &#10038;</div>
-            </div>
+          {#each Array(90) as _, i}
+            <div
+              class="cel-confetti"
+              style="--x: {Math.random() * 100}vw; --drift: {(Math.random() -
+                0.5) *
+                120}px; --delay: {0.2 + Math.random() * 1.2}s; --dur: {2 +
+                Math.random() * 1.5}s; --rot: {Math.random() * 720 -
+                360}deg; --bg: {[
+                '#d4af37',
+                '#8b0000',
+                '#f5d061',
+                '#a0342b',
+                '#fffef2',
+                '#6b0000',
+              ][i % 6]}; --w: {4 + Math.random() * 6}px; --h: {6 +
+                Math.random() * 10}px;"
+            ></div>
+          {/each}
+
+          <div class="cel-shimmer-ring"></div>
+          <div class="cel-shimmer-ring"></div>
+          <div class="cel-shimmer-ring"></div>
+
+          {#each [{ size: "4px", tx: "-120px", ty: "-80px", delay: "0.35s" }, { size: "3px", tx: "100px", ty: "-110px", delay: "0.38s" }, { size: "5px", tx: "-90px", ty: "70px", delay: "0.4s" }, { size: "3px", tx: "130px", ty: "60px", delay: "0.36s" }, { size: "4px", tx: "-60px", ty: "-130px", delay: "0.42s" }, { size: "3px", tx: "80px", ty: "120px", delay: "0.39s" }, { size: "5px", tx: "150px", ty: "-40px", delay: "0.37s" }, { size: "4px", tx: "-140px", ty: "30px", delay: "0.41s" }, { size: "3px", tx: "-30px", ty: "140px", delay: "0.43s" }, { size: "4px", tx: "40px", ty: "-150px", delay: "0.34s" }, { size: "3px", tx: "-150px", ty: "-50px", delay: "0.44s" }, { size: "5px", tx: "110px", ty: "-90px", delay: "0.33s" }] as p}
+            <div
+              class="cel-gold-particle"
+              style="--size: {p.size}; --tx: {p.tx}; --ty: {p.ty}; --delay: {p.delay};"
+            ></div>
+          {/each}
+
+          <div class="cel-seal">
+            <div class="cel-seal-shimmer"></div>
+            <span class="cel-seal-no">No.</span>
+            <span class="cel-seal-number">100</span>
+            <div class="cel-seal-rule"></div>
+            <span class="cel-seal-points">+100 Points</span>
           </div>
         </div>
       {/if}
@@ -1500,15 +1555,23 @@
         <div class="lps-overlay">
           <div class="lps-modal">
             <div class="lps-icon">&#127942;</div>
-            <div class="lps-title">{mp.lastPlayerStanding.winnerName} wins!</div>
+            <div class="lps-title">
+              {mp.lastPlayerStanding.winnerName} wins!
+            </div>
             <div class="lps-subtitle">Last player standing</div>
             {#if mp.lastPlayerStanding.winnerId === mp.myId}
               <div class="lps-actions">
-                <button class="lps-btn end" onclick={() => mp.endGameEarly()}>End Game</button>
-                <button class="lps-btn keep" onclick={() => mp.continueGame()}>Keep Going</button>
+                <button class="lps-btn end" onclick={() => mp.endGameEarly()}
+                  >End Game</button
+                >
+                <button class="lps-btn keep" onclick={() => mp.continueGame()}
+                  >Keep Going</button
+                >
               </div>
             {:else}
-              <div class="lps-waiting">Waiting for {mp.lastPlayerStanding.winnerName} to decide...</div>
+              <div class="lps-waiting">
+                Waiting for {mp.lastPlayerStanding.winnerName} to decide...
+              </div>
             {/if}
           </div>
         </div>
@@ -2131,7 +2194,8 @@
 
   input[type="text"]:focus-visible {
     border-color: var(--color-crimson);
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-crimson) 20%, transparent);
+    box-shadow: 0 0 0 2px
+      color-mix(in srgb, var(--color-crimson) 20%, transparent);
   }
 
   .start-btn {
@@ -3541,127 +3605,218 @@
     inset: 0;
     z-index: 999;
     pointer-events: none;
-    overflow: hidden;
-  }
-
-  .cel-tape {
-    position: absolute;
-    height: var(--h, 28px);
-    width: 200vw;
-    background: var(--bg, var(--color-cream, #fffef2));
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
     display: flex;
     align-items: center;
-    gap: 1.5rem;
-    padding: 0 1rem;
-    white-space: nowrap;
-    font-family: "Playfair Display", Georgia, serif;
-    font-size: var(--fs, 0.8rem);
-    font-weight: 700;
-    color: var(--tape-color, var(--color-ink, #1a1a1a));
-    opacity: 0;
-    top: var(--top);
-    transform: rotate(var(--rot, 0deg));
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    animation: cel-tape-fly var(--dur, 0.8s) var(--delay, 0s) ease-out forwards;
+    justify-content: center;
+    overflow: hidden;
+    animation: cel-fade-out 0.6s 3.2s ease-in forwards;
   }
 
-  .cel-tape span {
-    opacity: 0.3;
-  }
-
-  .cel-tape .cel-hi {
-    color: var(--color-crimson, #8b0000);
-    opacity: 1;
-    font-size: 1.1em;
-  }
-
-  .cel-tape .cel-dot {
-    opacity: 0.15;
-  }
-
-  @keyframes cel-tape-fly {
+  @keyframes cel-fade-out {
     0% {
-      opacity: 0;
-      left: var(--from, -100%);
-    }
-    15% {
-      opacity: 0.9;
+      opacity: 1;
     }
     100% {
-      opacity: 0.85;
-      left: var(--to, -5%);
+      opacity: 0;
     }
   }
 
-  .cel-badge {
+  .cel-confetti {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    z-index: 10;
-    animation: cel-badge-pop 0.5s 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    top: -20px;
+    left: var(--x);
+    width: var(--w, 8px);
+    height: var(--h, 10px);
+    background: var(--bg, #d4af37);
+    opacity: 0;
+    animation: cel-confetti-fall var(--dur, 2.5s) var(--delay, 0.3s) ease-in
+      forwards;
   }
 
-  @keyframes cel-badge-pop {
-    0% { transform: translate(-50%, -50%) scale(0) rotate(-10deg); }
-    100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+  @keyframes cel-confetti-fall {
+    0% {
+      opacity: 1;
+      transform: translateY(0) translateX(0) rotate(0deg);
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(105vh) translateX(var(--drift, 0px))
+        rotate(var(--rot, 360deg));
+    }
   }
 
-  .cel-badge-inner {
-    background: var(--color-ink, #1a1a1a);
-    color: var(--color-cream, #fffef2);
-    padding: 1.25rem 3rem;
+  .cel-shimmer-ring {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 2px solid rgba(212, 175, 55, 0);
+    opacity: 0;
+    animation: cel-shimmer-expand 1.2s 0.4s ease-out forwards;
+  }
+  .cel-shimmer-ring:nth-child(2) {
+    animation-delay: 0.55s;
+  }
+  .cel-shimmer-ring:nth-child(3) {
+    animation-delay: 0.7s;
+  }
+
+  @keyframes cel-shimmer-expand {
+    0% {
+      opacity: 0.8;
+      transform: scale(1);
+      border-color: rgba(212, 175, 55, 0.6);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(4);
+      border-color: rgba(212, 175, 55, 0);
+    }
+  }
+
+  .cel-gold-particle {
+    position: absolute;
+    width: var(--size);
+    height: var(--size);
+    background: linear-gradient(135deg, #d4af37, #f5d061);
+    border-radius: 50%;
+    opacity: 0;
+    animation: cel-particle-burst 1s var(--delay) ease-out forwards;
+  }
+
+  @keyframes cel-particle-burst {
+    0% {
+      opacity: 1;
+      transform: translate(0, 0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(var(--tx), var(--ty)) scale(0);
+    }
+  }
+
+  .cel-seal {
     position: relative;
-    text-align: center;
-    border: 2px solid rgba(255, 255, 255, 0.15);
-    outline: 1px solid var(--color-ink, #1a1a1a);
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 40% 35%,
+      #a0342b,
+      #8b0000 40%,
+      #6b0000
+    );
+    box-shadow:
+      inset 0 2px 4px rgba(255, 255, 255, 0.15),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+      0 4px 20px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(2.5);
+    animation: cel-seal-press 0.4s 0.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 
-  .cel-badge-extra {
+  @keyframes cel-seal-press {
+    0% {
+      opacity: 0;
+      transform: scale(2.5);
+    }
+    60% {
+      opacity: 1;
+      transform: scale(0.9);
+    }
+    80% {
+      transform: scale(1.05);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .cel-seal::before {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .cel-seal::after {
+    content: "";
+    position: absolute;
+    inset: 14px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .cel-seal-shimmer {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: linear-gradient(
+      105deg,
+      transparent 40%,
+      rgba(212, 175, 55, 0.15) 45%,
+      rgba(212, 175, 55, 0.25) 50%,
+      rgba(212, 175, 55, 0.15) 55%,
+      transparent 60%
+    );
+    opacity: 0;
+    animation: cel-foil-sweep 1s 0.6s ease-in-out forwards;
+  }
+
+  @keyframes cel-foil-sweep {
+    0% {
+      opacity: 0;
+      transform: translateX(-100%);
+    }
+    30% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+  }
+
+  .cel-seal-no {
     font-family: "Playfair Display", Georgia, serif;
-    font-size: 0.55rem;
-    letter-spacing: 0.5em;
+    font-size: 0.6rem;
     text-transform: uppercase;
-    color: var(--color-gold, #d4af37);
-    margin-bottom: 0.2rem;
+    letter-spacing: 0.4em;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: -0.2rem;
   }
 
-  .cel-badge-rule {
-    height: 1px;
-    background: rgba(255, 255, 255, 0.2);
-    margin: 0.15rem 0;
-  }
-
-  .cel-badge-number {
+  .cel-seal-number {
     font-family: "Playfair Display", Georgia, serif;
     font-size: 3.5rem;
     font-weight: 900;
+    color: #fffef2;
     line-height: 1;
-    letter-spacing: -0.02em;
-    margin: 0.1rem 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   }
 
-  .cel-badge-hash {
-    color: var(--color-gold, #d4af37);
+  .cel-seal-rule {
+    width: 50px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.25);
+    margin: 0.2rem 0;
   }
 
-  .cel-badge-points {
-    font-family: "Source Serif 4", Georgia, serif;
-    font-size: 0.75rem;
-    letter-spacing: 0.15em;
+  .cel-seal-points {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--color-gold, #d4af37);
-    margin-top: 0.1rem;
-  }
-
-  .cel-badge-stars {
-    font-size: 0.5rem;
-    letter-spacing: 0.6em;
-    color: rgba(255, 255, 255, 0.25);
-    margin-top: 0.3rem;
+    color: rgba(255, 255, 255, 0.6);
   }
 
   .lps-overlay {
@@ -3715,7 +3870,9 @@
     font-weight: 600;
     border: 2px solid var(--color-crimson, #8b2500);
     cursor: pointer;
-    transition: background 0.2s, color 0.2s;
+    transition:
+      background 0.2s,
+      color 0.2s;
   }
 
   .lps-btn.end {
@@ -3743,8 +3900,12 @@
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   .winner-banner {
