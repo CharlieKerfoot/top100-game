@@ -5,6 +5,7 @@ interface DayStats {
   totalScore: number;
   playCount: number;
   scores: number[];
+  submittedIps: Set<string>;
 }
 
 const dailyStats = new Map<string, DayStats>();
@@ -14,7 +15,7 @@ function getOrCreateToday(): DayStats {
   const key = getTodayKey();
   let stats = dailyStats.get(key);
   if (!stats) {
-    stats = { totalScore: 0, playCount: 0, scores: [] };
+    stats = { totalScore: 0, playCount: 0, scores: [], submittedIps: new Set() };
     dailyStats.set(key, stats);
   }
   return stats;
@@ -64,6 +65,22 @@ export async function handleDailyRequest(req: IncomingMessage, res: ServerRespon
       }
 
       const stats = getOrCreateToday();
+
+      // Deduplicate by IP — one score submission per IP per day
+      const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim()
+        || req.socket.remoteAddress
+        || 'unknown';
+      if (stats.submittedIps.has(ip)) {
+        // Already submitted today — return current stats without recording again
+        const percentile = Math.round(
+          stats.scores.filter(s => s < score).length / stats.scores.length * 100
+        );
+        const avgScore = Math.round(stats.totalScore / stats.playCount);
+        json(res, 200, { percentile, avgScore, playCount: stats.playCount });
+        return true;
+      }
+      stats.submittedIps.add(ip);
+
       stats.totalScore += score;
       stats.playCount++;
 
