@@ -4,8 +4,9 @@ import { directorsBoxOfficeHints } from './hints';
 export const directorsBoxOffice: GameList = {
   id: 'directors-box-office',
   name: 'Directors by Total Box Office Gross',
-  description: 'Directors ranked by cumulative worldwide box office (all films)',
+  description: 'Directors ranked by cumulative worldwide box office, all films (The Numbers)',
   topics: ['film & tv', 'money'],
+  size: 99,
   hints: directorsBoxOfficeHints,
   valueLabel: 'Total Gross',
   items: [
@@ -27,7 +28,7 @@ export const directorsBoxOffice: GameList = {
     "Alfonso Cuarón", "Alejandro G. Iñárritu", "Barry Sonnenfeld", "Paul W.S. Anderson", "Shawn Levy",
     "Travis Knight", "Charlie Bean", "Mike Mitchell", "Kelly Asbury", "Vicky Jenson",
     "Andrew Adamson", "Conrad Vernon", "Mike Flanagan", "Damien Chazelle", "Bong Joon-ho",
-    "Luc Besson", "Wolfgang Petersen", "Tony Scott", "Kathryn Bigelow", "Denis Villeneuve",
+    "Luc Besson", "Wolfgang Petersen", "Tony Scott", "Kathryn Bigelow",
     "Spike Lee", "Joel Coen", "Paul Thomas Anderson", "Darren Aronofsky", "Sofia Coppola",
   ],
   values: [
@@ -50,6 +51,6 @@ export const directorsBoxOffice: GameList = {
     "$920M", "$910M", "$900M", "$890M", "$880M",
     "$870M", "$860M", "$850M", "$840M", "$830M",
     "$820M", "$810M", "$800M", "$790M", "$780M",
-    "$770M", "$760M", "$750M", "$740M", "$730M",
+    "$770M", "$760M", "$750M", "$740M",
   ],
 };

@@ -4,8 +4,9 @@ import { oscarNominationsHints } from './hints';
 export const oscarNominations: GameList = {
   id: 'oscar-nominations',
   name: 'Movies with Most Oscar Nominations',
-  description: 'Films ranked by total Academy Award nominations (all time)',
+  description: 'Films ranked by total Academy Award nominations, all time (Oscars.org)',
   topics: ['film & tv'],
+  size: 99,
   hints: oscarNominationsHints,
   valueLabel: 'Nominations',
   items: [
@@ -23,7 +24,7 @@ export const oscarNominations: GameList = {
     "Tootsie", "The Color Purple", "JFK", "Amadeus", "Out of Africa",
     "Kramer vs. Kramer", "One Flew Over the Cuckoo's Nest", "Annie Hall", "The Deer Hunter", "Platoon",
     "Silence of the Lambs", "Unforgiven", "No Country for Old Men", "The Departed", "American Beauty",
-    "Chicago (2002)", "Slumdog Millionaire", "The Artist", "Argo", "Parasite",
+    "Slumdog Millionaire", "The Artist", "Argo", "Parasite",
     "Nomadland", "CODA", "Everything Everywhere All at Once", "The Godfather Part II", "Chinatown",
     "Network", "Jaws", "Star Wars", "E.T. the Extra-Terrestrial", "Raiders of the Lost Ark",
     "Goodfellas", "Pulp Fiction", "Fargo", "The Shawshank Redemption", "The Pianist",
@@ -50,6 +51,6 @@ export const oscarNominations: GameList = {
     "10", "4", "11", "9", "9",
     "6", "7", "7", "7", "5",
     "7", "7", "4", "6", "4",
-    "10", "6", "12", "10", "10",
+    "10", "6", "12", "10",
   ],
 };
