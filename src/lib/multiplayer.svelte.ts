@@ -390,8 +390,14 @@ export function createMultiplayerState() {
     phase = p;
   }
 
-  // Auto-connect on creation to enable reconnect on page refresh
-  connect();
+  // Lazy connect: only auto-connect if we're on a party route (reconnect on refresh).
+  // Otherwise, connect() is called by createParty/joinParty/browseParties on demand.
+  if (typeof window !== 'undefined') {
+    const path = window.location.pathname.slice(1);
+    if (path && /^[A-Z]{5}-\d{4}$/i.test(path)) {
+      connect();
+    }
+  }
 
   return {
     get phase() { return phase; },

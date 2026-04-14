@@ -2,6 +2,7 @@
   import favicon from '$lib/assets/favicon.svg';
   import { createMultiplayerState } from '$lib/multiplayer.svelte';
   import { setContext } from 'svelte';
+  import { GAME_NAME, SITE_URL } from '$lib/seo';
 
   let { children } = $props();
 
@@ -11,6 +12,9 @@
 
 <svelte:head>
   <link rel="icon" href={favicon} />
+  <meta property="og:site_name" content={GAME_NAME} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content={SITE_URL} />
 </svelte:head>
 
 {@render children()}

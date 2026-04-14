@@ -14,8 +14,14 @@
     type DailyStats,
     type DayResult,
   } from "$lib/daily";
+  import { getListSize, getMaxScore } from "$lib/lists/index";
+  import { SITE_URL, GAME_NAME, ogImageUrl } from "$lib/seo";
 
   const list = getDailyList();
+  const listSize = getListSize(list);
+  const maxPossible = getMaxScore(list);
+  const gridCols = listSize <= 50 ? 2 : 4;
+  const gridRows = Math.ceil(listSize / gridCols);
   const dayNumber = getDayNumber();
   const todayKey = getTodayKey();
   const dateDisplay = new Date().toLocaleDateString("en-US", {
@@ -32,6 +38,16 @@
       index: i,
       original: list.items[i],
     });
+  }
+  // Add aliases to the lookup
+  if (list.aliases) {
+    for (const [alias, canonical] of Object.entries(list.aliases)) {
+      const normalizedCanonical = normalizeGuess(canonical);
+      const target = itemLookup.get(normalizedCanonical);
+      if (target) {
+        itemLookup.set(normalizeGuess(alias), target);
+      }
+    }
   }
 
   // Game state
@@ -51,6 +67,7 @@
   } | null>(null);
   let feedbackTimeout = $state<ReturnType<typeof setTimeout> | null>(null);
   let debouncing = $state(false);
+  let showAllAnswers = $state(false);
 
   // Server stats (after game over)
   let percentile = $state<number | undefined>(undefined);
@@ -205,6 +222,7 @@
       streak: stats.streak,
       guessedRanks,
       percentile,
+      listSize,
     });
     shareText = text;
 
@@ -224,7 +242,7 @@
     const update = () => {
       const now = new Date();
       const tomorrow = new Date(
-        Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1),
+        now.getFullYear(), now.getMonth(), now.getDate() + 1,
       );
       const diff = tomorrow.getTime() - now.getTime();
       const h = Math.floor(diff / 3600000);
@@ -238,8 +256,22 @@
   });
 
   const maxHistogram = $derived(Math.max(...histogram, 1));
-  const gridText = $derived(generateShareGrid(guessedRanks));
+  const gridText = $derived(generateShareGrid(guessedRanks, listSize));
 </script>
+
+<svelte:head>
+  <title>Daily #{dayNumber} - {list.name} | {GAME_NAME}</title>
+  <meta name="description" content="Daily challenge #{dayNumber}: {list.name}. {list.description}" />
+  <link rel="canonical" href="{SITE_URL}/daily" />
+  <meta property="og:title" content="Daily #{dayNumber} - {list.name} | {GAME_NAME}" />
+  <meta property="og:description" content="Daily challenge #{dayNumber}: {list.name}. {list.description}" />
+  <meta property="og:image" content={ogImageUrl({ list: list.id })} />
+  <meta property="og:url" content="{SITE_URL}/daily" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:title" content="Daily #{dayNumber} - {list.name} | {GAME_NAME}" />
+  <meta name="twitter:description" content="Daily challenge #{dayNumber}: {list.name}. {list.description}" />
+  <meta name="twitter:image" content={ogImageUrl({ list: list.id })} />
+</svelte:head>
 
 <div class="app" class:has-game={phase === "playing"}>
   <header>
@@ -277,20 +309,20 @@
             onsubmit={handleGuess}
           />
         </div>
-        <span class="dt-found-count">{foundItems.length} of 100</span>
+        <span class="dt-found-count">{foundItems.length} of {listSize}</span>
       </div>
 
       <div class="dt-body">
         <div class="dt-board">
           <div class="dt-board-header">
             <span class="dt-board-title">{list.description}</span>
-            <span class="dt-board-count">{foundItems.length} of 100 identified</span>
+            <span class="dt-board-count">{foundItems.length} of {listSize} identified</span>
           </div>
           <div class="dt-board-body">
-            <div class="dt-slots">
-              {#each Array(100) as _, i}
+            <div class="dt-slots" style="grid-template-columns: repeat({gridCols}, 1fr); grid-template-rows: repeat({gridRows}, auto)">
+              {#each Array(listSize) as _, i}
                 {@const item = guessedMap.get(i)}
-                <div class="dt-slot" class:filled={!!item} data-slot={i}>
+                <div class="dt-slot" class:filled={!!item} class:dt-slot-large={listSize <= 50} data-slot={i}>
                   <span class="dt-slot-rank">{i + 1}.</span>
                   {#if item}
                     <span class="dt-slot-name">{item.name}</span>
@@ -331,7 +363,7 @@
         />
       </div>
 
-      <div class="found-count">{foundItems.length} of 100 found</div>
+      <div class="found-count">{foundItems.length} of {listSize} found</div>
 
       {#if guessHistory.length > 0}
         <div class="board">
@@ -354,7 +386,7 @@
       {:else}
         <div class="board">
           <div class="board-row empty">
-            <span class="name">Name items from the Top 100 list...</span>
+            <span class="name">Name items from the Top {listSize} list...</span>
           </div>
         </div>
       {/if}
@@ -364,7 +396,7 @@
       <div class="result-card">
         <h3>Common Cents &middot; #{dayNumber}</h3>
         <div class="final-score">{score}</div>
-        <div class="max-score">of 5,050 possible</div>
+        <div class="max-score">of {maxPossible.toLocaleString()} possible</div>
         {#if percentile !== undefined}
           <div class="percentile">Better than {percentile}% of players</div>
         {/if}
@@ -405,6 +437,31 @@
         <div class="share-fallback">
           <p>Copy your result:</p>
           <textarea readonly rows="12">{shareText}</textarea>
+        </div>
+      {/if}
+
+      <button
+        class="answers-toggle"
+        onclick={() => (showAllAnswers = !showAllAnswers)}
+      >
+        {showAllAnswers ? "Hide" : "Show"} All Answers
+      </button>
+
+      {#if showAllAnswers}
+        <div class="all-answers">
+          <h4>Full List</h4>
+          <div class="answers-grid">
+            {#each list.items as item, i}
+              {@const found = guessedRanks.includes(i + 1)}
+              <div class="answer-row" class:found>
+                <span class="answer-rank">{i + 1}.</span>
+                <span class="answer-name">{item}</span>
+                {#if found}
+                  <span class="answer-check">&#10003;</span>
+                {/if}
+              </div>
+            {/each}
+          </div>
         </div>
       {/if}
 
@@ -589,8 +646,6 @@
 
   .dt-slots {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(25, auto);
     grid-auto-flow: column;
     gap: 0;
   }
@@ -606,10 +661,13 @@
     transition: background 0.2s;
   }
 
-  .dt-slot:nth-child(25),
-  .dt-slot:nth-child(50),
-  .dt-slot:nth-child(75),
-  .dt-slot:nth-child(100) {
+  .dt-slot-large {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.9rem;
+    min-height: 1.8rem;
+  }
+
+  .dt-slot:last-child {
     border-bottom: none;
   }
 
@@ -1012,5 +1070,87 @@
     font-weight: 700;
     color: var(--color-ink);
     font-family: "Courier New", monospace;
+  }
+
+  /* ─── ALL ANSWERS ─── */
+  .answers-toggle {
+    display: block;
+    width: 100%;
+    padding: 0.65rem;
+    border: 1px solid var(--color-gold);
+    background: transparent;
+    color: #777;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s;
+  }
+
+  .answers-toggle:hover {
+    border-color: var(--color-ink);
+    color: var(--color-ink);
+  }
+
+  .all-answers {
+    border: 1px solid var(--color-gold);
+    background: var(--color-cream);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    text-align: left;
+  }
+
+  .all-answers h4 {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+    color: #555;
+    text-align: center;
+  }
+
+  .answers-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .answer-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.5rem;
+    border-bottom: 1px solid #ede0c4;
+    font-size: 0.82rem;
+    color: #999;
+  }
+
+  .answer-row:last-child {
+    border-bottom: none;
+  }
+
+  .answer-row.found {
+    color: var(--color-ink);
+    background: rgba(139, 0, 0, 0.04);
+  }
+
+  .answer-rank {
+    font-weight: 700;
+    min-width: 2rem;
+    font-size: 0.78rem;
+  }
+
+  .answer-row.found .answer-rank {
+    color: var(--color-crimson);
+  }
+
+  .answer-name {
+    flex: 1;
+  }
+
+  .answer-check {
+    color: var(--color-crimson);
+    font-weight: 700;
   }
 </style>

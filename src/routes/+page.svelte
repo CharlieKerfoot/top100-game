@@ -3,6 +3,28 @@
   import { getMultiplayerState } from "$lib/multiplayer.svelte";
   import { getDailyList, loadDailyStats, getTodayKey } from "$lib/daily";
   import { lists } from "$lib/lists/index";
+  import {
+    SITE_URL,
+    GAME_NAME,
+    GAME_TAGLINE,
+    DEFAULT_DESCRIPTION,
+    KEYWORDS,
+    ogImageUrl,
+  } from "$lib/seo";
+
+  const canonicalUrl = SITE_URL;
+  const pageTitle = `${GAME_NAME} - ${GAME_TAGLINE}`;
+  const ogImage = ogImageUrl();
+  const jsonLd = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: GAME_NAME,
+    description: DEFAULT_DESCRIPTION,
+    url: SITE_URL,
+    applicationCategory: "Game",
+    operatingSystem: "Any",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  });
 
   const mp = getMultiplayerState();
 
@@ -13,7 +35,9 @@
   const hasPlayed = $derived(!!dailyStats.history[todayKey]);
   const hasHistory = $derived(dailyStats.gamesPlayed > 0);
   const allTopics = $derived(
-    [...new Set(lists.flatMap((c) => c.topics))].sort(),
+    [...new Set(lists.flatMap((c) => c.topics))]
+      .filter((t) => t !== "top 50" && t !== "new")
+      .sort(),
   );
 
   // Party form state
@@ -55,6 +79,22 @@
     }
   }
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+  <meta name="description" content={DEFAULT_DESCRIPTION} />
+  <meta name="keywords" content={KEYWORDS} />
+  <link rel="canonical" href={canonicalUrl} />
+  <meta property="og:title" content={pageTitle} />
+  <meta property="og:description" content={DEFAULT_DESCRIPTION} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:url" content={canonicalUrl} />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:title" content={pageTitle} />
+  <meta name="twitter:description" content={DEFAULT_DESCRIPTION} />
+  <meta name="twitter:image" content={ogImage} />
+  {@html `<script type="application/ld+json">${jsonLd}</script>`}
+</svelte:head>
 
 <div class="app">
   <header>

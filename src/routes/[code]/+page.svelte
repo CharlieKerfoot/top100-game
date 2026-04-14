@@ -6,6 +6,8 @@
     getAllTopics,
     getFeaturedLists,
     searchLists,
+    getListSize,
+    getEffectiveTopics,
     type GameList,
   } from "$lib/lists/index";
   import { getMultiplayerState } from "$lib/multiplayer.svelte";
@@ -68,6 +70,7 @@
   let showHistory = $state(false);
   let confirmAction = $state<"leave" | "end" | null>(null);
   let showCelebration = $state(false);
+  let showAllAnswers = $state(false);
 
   // Lazily create a shared AudioContext on first user interaction
   let audioCtx: AudioContext | null = null;
@@ -101,61 +104,101 @@
     };
   });
 
+  // How long the audio lead-in plays before the visual seal appears
+  const CELEBRATION_LEADIN = 1.5;
+
   function playCelebrationSound() {
     const maybeCtx = getAudioCtx();
     if (!maybeCtx) return;
     const ctx = maybeCtx;
     const t = ctx.currentTime;
 
-    // Lead-in: rising tension roll (0-0.5s, plays before visual)
-    const rollLen = 0.5;
-    const rollBuf = ctx.createBuffer(
-      1,
-      ctx.sampleRate * rollLen,
-      ctx.sampleRate,
-    );
+    // ── Phase 1: Low rumble swell (0s – 1.5s) ──
+    // Subby drone that fades in from nothing, tells players something is coming
+    const droneLen = CELEBRATION_LEADIN;
+    const drone = ctx.createOscillator();
+    drone.type = "sawtooth";
+    drone.frequency.setValueAtTime(55, t);
+    drone.frequency.linearRampToValueAtTime(80, t + droneLen);
+    const droneLP = ctx.createBiquadFilter();
+    droneLP.type = "lowpass";
+    droneLP.frequency.setValueAtTime(120, t);
+    droneLP.frequency.linearRampToValueAtTime(300, t + droneLen);
+    const droneGain = ctx.createGain();
+    droneGain.gain.setValueAtTime(0, t);
+    droneGain.gain.linearRampToValueAtTime(0.18, t + droneLen * 0.8);
+    droneGain.gain.linearRampToValueAtTime(0, t + droneLen); // dip to silence before impact
+    drone.connect(droneLP).connect(droneGain).connect(ctx.destination);
+    drone.start(t);
+    drone.stop(t + droneLen + 0.1);
+
+    // ── Phase 2: Ascending tonal steps (0.3s – 1.4s) ──
+    // Three rising tones that build anticipation, like a fanfare winding up
+    function step(start: number, freq: number, vol: number, dur: number) {
+      const osc = ctx.createOscillator();
+      osc.type = "triangle";
+      osc.frequency.value = freq;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0, start);
+      g.gain.linearRampToValueAtTime(vol, start + 0.04);
+      g.gain.setValueAtTime(vol, start + dur * 0.6);
+      g.gain.linearRampToValueAtTime(0, start + dur);
+      osc.connect(g).connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + dur + 0.05);
+    }
+    step(t + 0.3, 220, 0.06, 0.35);  // A3
+    step(t + 0.7, 330, 0.08, 0.3);   // E4
+    step(t + 1.05, 440, 0.1, 0.25);  // A4
+
+    // ── Phase 3: Accelerating tick roll (0.6s – 1.45s) ──
+    // Rapid clicks that speed up like a ratchet being wound — builds urgency
+    const rollLen = 0.85;
+    const rollStart = t + 0.6;
+    const rollBuf = ctx.createBuffer(1, ctx.sampleRate * rollLen, ctx.sampleRate);
     const rollData = rollBuf.getChannelData(0);
     for (let i = 0; i < rollData.length; i++) {
       const progress = i / rollData.length;
-      // Accelerating pulse rate for building tension
-      const pulseRate = 8 + progress * 40;
-      const pulse = Math.sin(progress * pulseRate * Math.PI * 2) > 0 ? 1 : 0.2;
-      rollData[i] = (Math.random() * 2 - 1) * progress * 0.6 * pulse;
+      // Pulse rate accelerates from 6/s to 50/s
+      const pulseRate = 6 + progress * progress * 44;
+      const pulse = Math.sin(progress * pulseRate * Math.PI * 2) > 0.7 ? 1 : 0;
+      // Volume swells then dips at the very end for the silence gap
+      const env = progress < 0.85 ? progress * 1.1 : (1 - progress) * 6;
+      rollData[i] = (Math.random() * 2 - 1) * env * 0.5 * pulse;
     }
     const roll = ctx.createBufferSource();
     roll.buffer = rollBuf;
     const rollLP = ctx.createBiquadFilter();
     rollLP.type = "lowpass";
-    rollLP.frequency.setValueAtTime(400, t);
-    rollLP.frequency.linearRampToValueAtTime(2000, t + rollLen);
+    rollLP.frequency.setValueAtTime(800, rollStart);
+    rollLP.frequency.linearRampToValueAtTime(3000, rollStart + rollLen);
     const rollGain = ctx.createGain();
-    rollGain.gain.setValueAtTime(0.05, t);
-    rollGain.gain.linearRampToValueAtTime(0.2, t + rollLen);
+    rollGain.gain.value = 0.15;
     roll.connect(rollLP).connect(rollGain).connect(ctx.destination);
-    roll.start(t);
+    roll.start(rollStart);
 
-    // Seal stamp impact at 0.5s (when visual appears)
-    const stampTime = t + 0.5;
+    // ── Phase 4: Brief silence (~0.05s gap before stamp) ──
+    // The drone and roll both fade to zero just before stampTime,
+    // creating a tiny breath that makes the impact hit harder.
+
+    // ── Phase 5: Seal stamp impact at 1.5s (when visual appears) ──
+    const stampTime = t + CELEBRATION_LEADIN;
 
     // Heavy wax thud: low sine sweep down
     const thud = ctx.createOscillator();
     thud.type = "sine";
     thud.frequency.setValueAtTime(180, stampTime);
-    thud.frequency.exponentialRampToValueAtTime(30, stampTime + 0.2);
+    thud.frequency.exponentialRampToValueAtTime(30, stampTime + 0.25);
     const thudGain = ctx.createGain();
-    thudGain.gain.setValueAtTime(0.4, stampTime);
-    thudGain.gain.exponentialRampToValueAtTime(0.001, stampTime + 0.3);
+    thudGain.gain.setValueAtTime(0.45, stampTime);
+    thudGain.gain.exponentialRampToValueAtTime(0.001, stampTime + 0.35);
     thud.connect(thudGain).connect(ctx.destination);
     thud.start(stampTime);
-    thud.stop(stampTime + 0.35);
+    thud.stop(stampTime + 0.4);
 
     // Impact crack: short noise burst for the press contact
-    const crackLen = 0.06;
-    const crackBuf = ctx.createBuffer(
-      1,
-      ctx.sampleRate * crackLen,
-      ctx.sampleRate,
-    );
+    const crackLen = 0.08;
+    const crackBuf = ctx.createBuffer(1, ctx.sampleRate * crackLen, ctx.sampleRate);
     const crackData = crackBuf.getChannelData(0);
     for (let i = 0; i < crackData.length; i++) {
       const env = Math.pow(1 - i / crackData.length, 3);
@@ -167,11 +210,11 @@
     crackHP.type = "highpass";
     crackHP.frequency.value = 2000;
     const crackGain = ctx.createGain();
-    crackGain.gain.value = 0.15;
+    crackGain.gain.value = 0.18;
     crack.connect(crackHP).connect(crackGain).connect(ctx.destination);
     crack.start(stampTime);
 
-    // Gold shimmer: rising harmonic chime (plays as rings expand)
+    // ── Phase 6: Gold shimmer chimes (post-impact) ──
     function chime(start: number, freq: number, vol: number) {
       const osc = ctx.createOscillator();
       osc.type = "sine";
@@ -220,15 +263,15 @@
     const result = mp.lastResult;
     if (result && !result.isStrike && result.rank != null) {
       const rank = result.rank;
-      if (rank === 100) {
+      if (rank === listSize) {
         playCelebrationSound();
-        // Lead-in audio plays for 0.5s before visuals appear
+        // Lead-in audio plays before visuals appear
         setTimeout(() => {
           showCelebration = true;
-        }, 500);
+        }, CELEBRATION_LEADIN * 1000);
         setTimeout(() => {
           showCelebration = false;
-        }, 4500);
+        }, CELEBRATION_LEADIN * 1000 + 4000);
       }
       tick().then(() => {
         const slot = document.querySelector(`[data-slot="${rank - 1}"]`);
@@ -254,6 +297,10 @@
   const guessedMap = $derived(
     new Map(mp.guessedItems.map((g) => [g.index, g])),
   );
+
+  const listSize = $derived(getListSize(mp.list));
+  const gridCols = $derived(listSize <= 50 ? 2 : 4);
+  const gridRows = $derived(Math.ceil(listSize / gridCols));
 
   const allTopics = getAllTopics();
   const mySuggestion = $derived(
@@ -323,6 +370,10 @@
   }
 </script>
 
+<svelte:head>
+  <meta name="robots" content="noindex" />
+</svelte:head>
+
 <div class="app">
   <header>
     <div class="title-row">
@@ -391,14 +442,14 @@
         <h2>How to Play</h2>
         <div class="rules-content">
           <p>
-            Players take turns guessing items from a ranked list of 100. The
-            closer to #100 your guess is, the more points it's worth.
+            Players take turns guessing items from a ranked list of {listSize}. The
+            closer to #{listSize} your guess is, the more points it's worth.
           </p>
           <h3>Strike Mode</h3>
           <p>
             Each wrong guess earns a strike. Reach the strike limit and you're
             eliminated. Last player standing wins, or whoever has the most
-            points when all 100 are found.
+            points when all {listSize} are found.
           </p>
           <h3>Turns Mode</h3>
           <p>
@@ -407,7 +458,7 @@
           </p>
           <h3>Scoring</h3>
           <p>
-            Points equal the item's rank: #1 = 1 point, #100 = 100 points.
+            Points equal the item's rank: #1 = 1 point, #{listSize} = {listSize} points.
             Higher-ranked (harder) items are worth more.
           </p>
         </div>
@@ -591,14 +642,14 @@
               <div class="dt-board-header">
                 <span class="dt-board-title">{mp.list.description}</span>
                 <span class="dt-board-count"
-                  >{mp.guessedItems.length} of 100 identified</span
+                  >{mp.guessedItems.length} of {listSize} identified</span
                 >
               </div>
               <div class="dt-board-body">
-                <div class="dt-slots">
-                  {#each Array(100) as _, i}
+                <div class="dt-slots" style="grid-template-columns: repeat({gridCols}, 1fr); grid-template-rows: repeat({gridRows}, auto)">
+                  {#each Array(listSize) as _, i}
                     {@const item = guessedMap.get(i)}
-                    <div class="dt-slot" class:filled={!!item} data-slot={i}>
+                    <div class="dt-slot" class:filled={!!item} class:dt-slot-large={listSize <= 50} data-slot={i}>
                       <span class="dt-slot-rank">{i + 1}.</span>
                       {#if item}
                         <span class="dt-slot-name">{item.name}</span>
@@ -678,7 +729,7 @@
                 <div class="result-text">
                   <strong>{mp.lastResult.playerName}</strong> guessed "<strong
                     >{mp.lastResult.guess}</strong
-                  >" &mdash; not in the top 100!
+                  >" &mdash; not in the top {listSize}!
                 </div>
                 <div class="result-points">Strike!</div>
               {:else}
@@ -704,7 +755,7 @@
           {/if}
 
           <div class="guessed-list">
-            <h3>Guessed so far ({mp.guessedItems.length}/100)</h3>
+            <h3>Guessed so far ({mp.guessedItems.length}/{listSize})</h3>
             <div class="guessed-grid">
               {#each sortedGuessed as item}
                 <div class="guessed-item">
@@ -885,8 +936,8 @@
                   >
                 </div>
                 <div class="preview-tags">
-                  {#each previewList.topics as topic}
-                    <span class="tag">{topic}</span>
+                  {#each getEffectiveTopics(previewList) as topic}
+                    <span class="tag" class:tag-new={topic === "new"}>{topic}</span>
                   {/each}
                 </div>
                 <input
@@ -994,8 +1045,8 @@
                     </div>
                     <span class="card-desc">{cat.description}</span>
                     <div class="card-tags">
-                      {#each cat.topics as topic}
-                        <span class="card-tag">{topic}</span>
+                      {#each getEffectiveTopics(cat) as topic}
+                        <span class="card-tag" class:card-tag-new={topic === "new"}>{topic}</span>
                       {/each}
                     </div>
                   </div>
@@ -1072,8 +1123,8 @@
                     </div>
                     <span class="card-desc">{cat.description}</span>
                     <div class="card-tags">
-                      {#each cat.topics as topic}
-                        <span class="card-tag">{topic}</span>
+                      {#each getEffectiveTopics(cat) as topic}
+                        <span class="card-tag" class:card-tag-new={topic === "new"}>{topic}</span>
                       {/each}
                     </div>
                   </div>
@@ -1088,10 +1139,10 @@
                 <div class="category-readonly-desc">
                   {mp.list.description}
                 </div>
-                {#if mp.list.topics?.length}
+                {#if getEffectiveTopics(mp.list).length}
                   <div class="category-readonly-tags">
-                    {#each mp.list.topics as topic}
-                      <span class="card-tag">{topic}</span>
+                    {#each getEffectiveTopics(mp.list) as topic}
+                      <span class="card-tag" class:card-tag-new={topic === "new"}>{topic}</span>
                     {/each}
                   </div>
                 {/if}
@@ -1186,7 +1237,7 @@
                 <Autocomplete
                   hints={mp.hints ? availableHints : []}
                   bind:value={guessInput}
-                  placeholder="Name something in the top 100..."
+                  placeholder="Name something in the top {listSize}..."
                   onsubmit={handleSubmitGuess}
                 />
                 <button
@@ -1249,14 +1300,14 @@
             <div class="dt-board-header">
               <span class="dt-board-title">{mp.list.description}</span>
               <span class="dt-board-count"
-                >{mp.guessedItems.length} of 100 identified</span
+                >{mp.guessedItems.length} of {listSize} identified</span
               >
             </div>
             <div class="dt-board-body">
-              <div class="dt-slots">
-                {#each Array(100) as _, i}
+              <div class="dt-slots" style="grid-template-columns: repeat({gridCols}, 1fr); grid-template-rows: repeat({gridRows}, auto)">
+                {#each Array(listSize) as _, i}
                   {@const item = guessedMap.get(i)}
-                  <div class="dt-slot" class:filled={!!item} data-slot={i}>
+                  <div class="dt-slot" class:filled={!!item} class:dt-slot-large={listSize <= 50} data-slot={i}>
                     <span class="dt-slot-rank">{i + 1}.</span>
                     {#if item}
                       <span class="dt-slot-name">{item.name}</span>
@@ -1376,7 +1427,7 @@
               <div class="result-text">
                 <strong>{mp.lastResult.playerName}</strong> guessed "<strong
                   >{mp.lastResult.guess}</strong
-                >" &mdash; not in the top 100!
+                >" &mdash; not in the top {listSize}!
               </div>
               <div class="result-points">Strike!</div>
             {:else}
@@ -1424,7 +1475,7 @@
         {/if}
 
         <div class="guessed-list">
-          <h3>Guessed so far ({mp.guessedItems.length}/100)</h3>
+          <h3>Guessed so far ({mp.guessedItems.length}/{listSize})</h3>
           <div class="guessed-grid">
             {#each sortedGuessed as item}
               <div class="guessed-item">
@@ -1544,9 +1595,9 @@
           <div class="cel-seal">
             <div class="cel-seal-shimmer"></div>
             <span class="cel-seal-no">No.</span>
-            <span class="cel-seal-number">100</span>
+            <span class="cel-seal-number">{listSize}</span>
             <div class="cel-seal-rule"></div>
-            <span class="cel-seal-points">+100 Points</span>
+            <span class="cel-seal-points">+{listSize} Points</span>
           </div>
         </div>
       {/if}
@@ -1635,6 +1686,31 @@
           {/each}
         </div>
       </div>
+
+      <button
+        class="answers-toggle"
+        onclick={() => (showAllAnswers = !showAllAnswers)}
+      >
+        {showAllAnswers ? "Hide" : "Show"} All Answers
+      </button>
+
+      {#if showAllAnswers}
+        <div class="all-answers">
+          <h4>Full List</h4>
+          <div class="answers-grid">
+            {#each mp.list.items as item, i}
+              {@const found = guessedMap.has(i)}
+              <div class="answer-row" class:found>
+                <span class="answer-rank">{i + 1}.</span>
+                <span class="answer-name">{item}</span>
+                {#if found}
+                  <span class="answer-check">&#10003;</span>
+                {/if}
+              </div>
+            {/each}
+          </div>
+        </div>
+      {/if}
 
       <div class="lobby-actions">
         {#if mp.isHost}
@@ -2920,6 +2996,11 @@
     color: var(--color-crimson);
     text-transform: capitalize;
   }
+  .card-tag-new {
+    background: rgba(184, 134, 11, 0.15);
+    color: #8b6914;
+    font-weight: 700;
+  }
 
   /* Category preview */
   .category-preview {
@@ -2990,6 +3071,11 @@
     background: rgba(139, 0, 0, 0.06);
     color: var(--color-crimson);
     text-transform: capitalize;
+  }
+  .tag-new {
+    background: rgba(184, 134, 11, 0.15);
+    color: #8b6914;
+    font-weight: 700;
   }
 
   .preview-list {
@@ -4206,11 +4292,9 @@
     max-height: calc(100vh - 280px);
   }
 
-  /* 100-slot list */
+  /* ranked-slot list */
   .dt-slots {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(25, auto);
     grid-auto-flow: column;
     gap: 0;
   }
@@ -4226,10 +4310,13 @@
     transition: background 0.2s;
   }
 
-  .dt-slot:nth-child(25),
-  .dt-slot:nth-child(50),
-  .dt-slot:nth-child(75),
-  .dt-slot:nth-child(100) {
+  .dt-slot-large {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.9rem;
+    min-height: 1.8rem;
+  }
+
+  .dt-slot:last-child {
     border-bottom: none;
   }
 
@@ -4266,5 +4353,87 @@
     color: #bbb;
     font-size: 0.72rem;
     font-style: italic;
+  }
+
+  /* ─── ALL ANSWERS ─── */
+  .answers-toggle {
+    display: block;
+    width: 100%;
+    padding: 0.65rem;
+    border: 1px solid var(--color-gold);
+    background: transparent;
+    color: #777;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s;
+  }
+
+  .answers-toggle:hover {
+    border-color: var(--color-ink);
+    color: var(--color-ink);
+  }
+
+  .all-answers {
+    border: 1px solid var(--color-gold);
+    background: var(--color-cream);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    text-align: left;
+  }
+
+  .all-answers h4 {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+    color: #555;
+    text-align: center;
+  }
+
+  .answers-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .answer-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.5rem;
+    border-bottom: 1px solid #ede0c4;
+    font-size: 0.82rem;
+    color: #999;
+  }
+
+  .answer-row:last-child {
+    border-bottom: none;
+  }
+
+  .answer-row.found {
+    color: var(--color-ink);
+    background: rgba(139, 0, 0, 0.04);
+  }
+
+  .answer-rank {
+    font-weight: 700;
+    min-width: 2rem;
+    font-size: 0.78rem;
+  }
+
+  .answer-row.found .answer-rank {
+    color: var(--color-crimson);
+  }
+
+  .answer-name {
+    flex: 1;
+  }
+
+  .answer-check {
+    color: var(--color-crimson);
+    font-weight: 700;
   }
 </style>
