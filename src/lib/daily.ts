@@ -3,7 +3,7 @@ import { lists, type GameList } from './lists/index';
 // ── Deterministic daily list selection ──
 
 const FIXED_SEED = 42;
-const LAUNCH_DATE = '2026-04-15';
+const LAUNCH_DATE = '2026-04-13';
 const MS_PER_DAY = 86400000;
 
 function seededShuffle(arr: GameList[]): GameList[] {
@@ -26,16 +26,21 @@ function seededShuffle(arr: GameList[]): GameList[] {
 const dailyOrder = seededShuffle(lists);
 
 export function getDayNumber(): number {
-  const d = Math.floor((Date.now() - Date.parse(LAUNCH_DATE)) / MS_PER_DAY);
-  return Math.max(0, d);
+  const now = new Date();
+  const localNow = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const [y, m, d] = LAUNCH_DATE.split('-').map(Number);
+  const localLaunch = new Date(y, m - 1, d);
+  const dayDiff = Math.floor((localNow.getTime() - localLaunch.getTime()) / MS_PER_DAY);
+  return Math.max(0, dayDiff) + 1;
 }
 
 export function getDailyList(): GameList {
-  return dailyOrder[getDayNumber() % dailyOrder.length];
+  return dailyOrder[(getDayNumber() - 1) % dailyOrder.length];
 }
 
 export function getTodayKey(): string {
-  return new Date().toISOString().slice(0, 10);
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 }
 
 // ── localStorage persistence ──
@@ -101,7 +106,8 @@ export function recordGame(score: number, listId: string, guessCount: number, gu
   if (score > stats.bestScore) stats.bestScore = score;
 
   // Streak calculation: check yesterday
-  const yesterday = new Date(Date.now() - MS_PER_DAY).toISOString().slice(0, 10);
+  const y = new Date(Date.now() - MS_PER_DAY);
+  const yesterday = `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(2, '0')}-${String(y.getDate()).padStart(2, '0')}`;
   if (stats.history[yesterday]) {
     stats.streak++;
   } else {
@@ -115,13 +121,16 @@ export function recordGame(score: number, listId: string, guessCount: number, gu
 
 // ── Share text + grid ──
 
-export function generateShareGrid(guessedRanks: number[]): string {
+export function generateShareGrid(guessedRanks: number[], listSize: number = 100): string {
   const rankSet = new Set(guessedRanks);
+  const cols = 10;
+  const totalRows = Math.ceil(listSize / cols);
   const rows: string[] = [];
-  for (let row = 0; row < 10; row++) {
+  for (let row = 0; row < totalRows; row++) {
     let line = '';
-    for (let col = 0; col < 10; col++) {
-      const rank = row * 10 + col + 1; // 1-100
+    for (let col = 0; col < cols; col++) {
+      const rank = row * cols + col + 1;
+      if (rank > listSize) break;
       line += rankSet.has(rank) ? '🟩' : '⬜';
     }
     rows.push(line);
@@ -136,13 +145,16 @@ export function generateShareText(opts: {
   streak: number;
   guessedRanks: number[];
   percentile?: number;
+  listSize?: number;
 }): string {
+  const size = opts.listSize ?? 100;
+  const maxScore = (size * (size + 1)) / 2;
   const lines: string[] = [
     `Common Cents #${opts.dayNumber} ☀️`,
     opts.listName,
-    `Score: ${opts.score.toLocaleString()}/5,050`,
+    `Score: ${opts.score.toLocaleString()}/${maxScore.toLocaleString()}`,
     '',
-    generateShareGrid(opts.guessedRanks),
+    generateShareGrid(opts.guessedRanks, size),
   ];
 
   if (opts.streak > 0) {

@@ -108,6 +108,184 @@
     new Map(foundItems.map((item) => [item.rank - 1, item])),
   );
 
+  // Filter hints to remove any that match already-guessed items (by canonical name or alias)
+  const availableHints = $derived.by(() => {
+    const allHints = list.hints ?? list.items;
+    const guessedCanonicals = new Set(
+      foundItems.map((item) => item.name.toLowerCase()),
+    );
+    return allHints.filter((h) => {
+      const lower = h.toLowerCase();
+      // Check if this hint IS a guessed canonical name
+      if (guessedCanonicals.has(lower)) return false;
+      // Check if this hint is an alias for a guessed canonical name
+      if (list.aliases) {
+        const canonical = list.aliases[h];
+        if (canonical && guessedCanonicals.has(canonical.toLowerCase())) return false;
+      }
+      return true;
+    });
+  });
+
+  // ── Audio ──
+  let audioCtx: AudioContext | null = null;
+  function getAudioCtx(): AudioContext | null {
+    try {
+      if (!audioCtx || audioCtx.state === "closed") {
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    } catch {
+      return null;
+    }
+  }
+
+  function playGuessSound(rank: number, total: number) {
+    const maybeCtx = getAudioCtx();
+    if (!maybeCtx) return;
+    const ctx = maybeCtx;
+    const t = ctx.currentTime;
+    const intensity = (rank - 1) / Math.max(total - 1, 1);
+
+    // Impact knock: filtered noise burst
+    const knockLen = 0.04 + intensity * 0.06;
+    const knockBuf = ctx.createBuffer(1, ctx.sampleRate * knockLen, ctx.sampleRate);
+    const knockData = knockBuf.getChannelData(0);
+    for (let i = 0; i < knockData.length; i++) {
+      const env = Math.pow(1 - i / knockData.length, 2 + intensity * 4);
+      knockData[i] = (Math.random() * 2 - 1) * env;
+    }
+    const knock = ctx.createBufferSource();
+    knock.buffer = knockBuf;
+    const knockLP = ctx.createBiquadFilter();
+    knockLP.type = "lowpass";
+    knockLP.frequency.value = 800 + intensity * 2500;
+    const knockGain = ctx.createGain();
+    knockGain.gain.value = 0.08 + intensity * 0.14;
+    knock.connect(knockLP).connect(knockGain).connect(ctx.destination);
+    knock.start(t);
+
+    // Body tone: sine sweep down
+    const bodyFreq = 150 + intensity * 100;
+    const bodyEnd = 40 + intensity * 30;
+    const bodyDecay = 0.08 + intensity * 0.25;
+    const body = ctx.createOscillator();
+    body.type = "sine";
+    body.frequency.setValueAtTime(bodyFreq, t);
+    body.frequency.exponentialRampToValueAtTime(bodyEnd, t + bodyDecay);
+    const bodyGain = ctx.createGain();
+    bodyGain.gain.setValueAtTime(0.06 + intensity * 0.18, t);
+    bodyGain.gain.exponentialRampToValueAtTime(0.001, t + bodyDecay);
+    body.connect(bodyGain).connect(ctx.destination);
+    body.start(t);
+    body.stop(t + bodyDecay + 0.05);
+
+    // Warm resonance at mid-range
+    if (intensity > 0.25) {
+      const resMix = (intensity - 0.25) / 0.75;
+      const res = ctx.createOscillator();
+      res.type = "sine";
+      res.frequency.value = 110 + resMix * 55;
+      const resGain = ctx.createGain();
+      const resDecay = 0.15 + resMix * 0.4;
+      resGain.gain.setValueAtTime(0.04 + resMix * 0.08, t);
+      resGain.gain.exponentialRampToValueAtTime(0.001, t + resDecay);
+      const resLP = ctx.createBiquadFilter();
+      resLP.type = "lowpass";
+      resLP.frequency.value = 300 + resMix * 200;
+      res.connect(resLP).connect(resGain).connect(ctx.destination);
+      res.start(t);
+      res.stop(t + resDecay + 0.05);
+    }
+
+    // Sub bass at high ranks
+    if (intensity > 0.55) {
+      const subMix = (intensity - 0.55) / 0.45;
+      const sub = ctx.createOscillator();
+      sub.type = "sine";
+      sub.frequency.setValueAtTime(55, t);
+      sub.frequency.exponentialRampToValueAtTime(30, t + 0.3);
+      const subGain = ctx.createGain();
+      subGain.gain.setValueAtTime(0.12 * subMix, t);
+      subGain.gain.exponentialRampToValueAtTime(0.001, t + 0.25 + subMix * 0.2);
+      sub.connect(subGain).connect(ctx.destination);
+      sub.start(t);
+      sub.stop(t + 0.5);
+    }
+
+    // Double-hit thwack at top tier
+    if (intensity > 0.8) {
+      const thwMix = (intensity - 0.8) / 0.2;
+      const delay = 0.06;
+      const thw = ctx.createOscillator();
+      thw.type = "sine";
+      thw.frequency.setValueAtTime(200, t + delay);
+      thw.frequency.exponentialRampToValueAtTime(35, t + delay + 0.2);
+      const thwGain = ctx.createGain();
+      thwGain.gain.setValueAtTime(0.15 * thwMix, t + delay);
+      thwGain.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.25);
+      thw.connect(thwGain).connect(ctx.destination);
+      thw.start(t + delay);
+      thw.stop(t + delay + 0.3);
+
+      const crLen = 0.03;
+      const crBuf = ctx.createBuffer(1, ctx.sampleRate * crLen, ctx.sampleRate);
+      const crData = crBuf.getChannelData(0);
+      for (let i = 0; i < crData.length; i++) {
+        crData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / crData.length, 3);
+      }
+      const cr = ctx.createBufferSource();
+      cr.buffer = crBuf;
+      const crBP = ctx.createBiquadFilter();
+      crBP.type = "bandpass";
+      crBP.frequency.value = 1500;
+      crBP.Q.value = 1;
+      const crGain = ctx.createGain();
+      crGain.gain.value = 0.1 * thwMix;
+      cr.connect(crBP).connect(crGain).connect(ctx.destination);
+      cr.start(t + delay);
+    }
+  }
+
+  function playMissSound() {
+    const maybeCtx = getAudioCtx();
+    if (!maybeCtx) return;
+    const ctx = maybeCtx;
+    const t = ctx.currentTime;
+
+    // Hollow wooden tap
+    const knockLen = 0.03;
+    const knockBuf = ctx.createBuffer(1, ctx.sampleRate * knockLen, ctx.sampleRate);
+    const knockData = knockBuf.getChannelData(0);
+    for (let i = 0; i < knockData.length; i++) {
+      knockData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / knockData.length, 4);
+    }
+    const knock = ctx.createBufferSource();
+    knock.buffer = knockBuf;
+    const bp = ctx.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.frequency.value = 400;
+    bp.Q.value = 2;
+    const g = ctx.createGain();
+    g.gain.value = 0.1;
+    knock.connect(bp).connect(g).connect(ctx.destination);
+    knock.start(t);
+
+    const osc = ctx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(180, t);
+    osc.frequency.exponentialRampToValueAtTime(100, t + 0.08);
+    const oscGain = ctx.createGain();
+    oscGain.gain.setValueAtTime(0.05, t);
+    oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+    osc.connect(oscGain).connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.15);
+  }
+
   function handleGuess(value: string) {
     if (phase !== "playing" || debouncing) return;
 
@@ -125,6 +303,7 @@
       strikes++;
       guessHistory = [{ type: "strike", guess: value }, ...guessHistory];
       showFeedback("strike");
+      playMissSound();
       if (strikes >= maxStrikes) {
         endGame();
       }
@@ -146,6 +325,7 @@
     ];
 
     showFeedback(rank >= 50 ? "gold" : "gray", rank);
+    playGuessSound(rank, listSize);
     scrollToSlot(rank);
   }
 
@@ -303,7 +483,7 @@
         </div>
         <div class="dt-guess-area">
           <Autocomplete
-            hints={list.hints ?? list.items}
+            hints={availableHints}
             bind:value={guessValue}
             placeholder="Type your guess..."
             onsubmit={handleGuess}
@@ -356,7 +536,7 @@
 
       <div class="guess-area">
         <Autocomplete
-          hints={list.hints ?? list.items}
+          hints={availableHints}
           bind:value={guessValue}
           placeholder="Type your guess..."
           onsubmit={handleGuess}
@@ -449,15 +629,20 @@
 
       {#if showAllAnswers}
         <div class="all-answers">
-          <h4>Full List</h4>
-          <div class="answers-grid">
-            {#each list.items as item, i}
-              {@const found = guessedRanks.includes(i + 1)}
-              <div class="answer-row" class:found>
-                <span class="answer-rank">{i + 1}.</span>
-                <span class="answer-name">{item}</span>
-                {#if found}
-                  <span class="answer-check">&#10003;</span>
+          <div class="all-answers-header">
+            <span class="all-answers-title">{list.description}</span>
+            <span class="all-answers-count">{foundItems.length} of {listSize} found</span>
+          </div>
+          <div class="dt-slots" style="grid-template-columns: repeat({gridCols}, 1fr); grid-template-rows: repeat({gridRows}, auto)">
+            {#each Array(listSize) as _, i}
+              {@const item = guessedMap.get(i)}
+              <div class="dt-slot" class:filled={!!item} class:dt-slot-large={listSize <= 50} class:dt-slot-missed={!item}>
+                <span class="dt-slot-rank">{i + 1}.</span>
+                {#if item}
+                  <span class="dt-slot-name">{item.name}</span>
+                  <span class="dt-slot-points">+{item.points}</span>
+                {:else}
+                  <span class="dt-slot-name dt-slot-missed-name">{list.items[i]}</span>
                 {/if}
               </div>
             {/each}
@@ -1095,62 +1280,43 @@
   .all-answers {
     border: 1px solid var(--color-gold);
     background: var(--color-cream);
-    padding: 1rem;
+    padding: 0;
     margin-bottom: 1rem;
     text-align: left;
   }
 
-  .all-answers h4 {
-    font-family: "Playfair Display", Georgia, serif;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 0.75rem;
-    color: #555;
-    text-align: center;
-  }
-
-  .answers-grid {
+  .all-answers-header {
     display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .answer-row {
-    display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.25rem 0.5rem;
-    border-bottom: 1px solid #ede0c4;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--color-gold);
+  }
+
+  .all-answers-title {
+    font-family: "Source Serif 4", "Source Serif Pro", Georgia, serif;
     font-size: 0.82rem;
-    color: #999;
-  }
-
-  .answer-row:last-child {
-    border-bottom: none;
-  }
-
-  .answer-row.found {
+    font-weight: 600;
     color: var(--color-ink);
-    background: rgba(139, 0, 0, 0.04);
   }
 
-  .answer-rank {
-    font-weight: 700;
-    min-width: 2rem;
-    font-size: 0.78rem;
+  .all-answers-count {
+    font-size: 0.75rem;
+    color: #888;
   }
 
-  .answer-row.found .answer-rank {
-    color: var(--color-crimson);
+  .all-answers .dt-slots {
+    max-height: 60vh;
+    overflow-y: auto;
   }
 
-  .answer-name {
-    flex: 1;
+  .dt-slot-missed {
+    opacity: 0.5;
   }
 
-  .answer-check {
-    color: var(--color-crimson);
-    font-weight: 700;
+  .dt-slot-missed-name {
+    font-style: italic;
+    color: #999 !important;
+    font-weight: 400 !important;
   }
 </style>

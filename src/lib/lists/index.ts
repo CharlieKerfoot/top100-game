@@ -11,7 +11,7 @@
 //   - name:        display name
 //   - description: short one-liner shown in the picker
 //   - topics:      array of lowercase topics for filtering
-//   - items:       exactly 100 strings, ranked #1 to #100
+//   - items:       ranked strings, #1 to #N (100 by default, or set size: 50)
 // ============================================================
 
 export type { GameList } from './types';
@@ -53,6 +53,8 @@ import { actorsBoxOffice } from './actors-box-office';
 import { directorsBoxOffice } from './directors-box-office';
 import { grammyAwards } from './grammy-awards';
 import { usCitiesCostOfLiving } from './us-cities-cost-of-living';
+import { mostWatchedAnime } from './most-watched-anime';
+import { largestGreekOrganizations } from './largest-greek-organizations';
 
 import type { GameList } from './types';
 
@@ -94,8 +96,32 @@ export const lists: GameList[] = [
   directorsBoxOffice,
   grammyAwards,
   usCitiesCostOfLiving,
+  mostWatchedAnime,
+  largestGreekOrganizations,
 ];
 
+/** Returns the effective topics for a list, including "new" if within the newUntil date. */
+export function getEffectiveTopics(list: GameList): string[] {
+  const now = new Date();
+  const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  if (list.newUntil && localDate <= list.newUntil) {
+    return ['new', ...list.topics];
+  }
+  return list.topics;
+}
+
+/** Number of ranked items in a list (50 or 100). */
+export function getListSize(list: GameList): number {
+  return list.size ?? 100;
+}
+
+/** Maximum possible score for a list: sum of 1..N. */
+export function getMaxScore(list: GameList): number {
+  const n = getListSize(list);
+  return (n * (n + 1)) / 2;
+}
+
+/** Topics for the filter bar. Excludes meta-topics like "new". */
 export function getAllTopics(): string[] {
   const topicSet = new Set<string>();
   for (const list of lists) {
@@ -103,6 +129,7 @@ export function getAllTopics(): string[] {
       topicSet.add(topic);
     }
   }
+  topicSet.delete('new');
   return [...topicSet].sort();
 }
 

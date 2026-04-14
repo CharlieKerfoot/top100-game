@@ -38,6 +38,8 @@ interface GameState {
   guessHistory: GuessHistoryEntry[];
   lastResult: GuessResult | null;
   showResult: boolean;
+  /** Set when the winner chooses "keep going" — only this player gets turns */
+  winnerId: string | null;
 }
 
 interface GuessResult {
@@ -134,6 +136,7 @@ function serializeGameState(party: Party) {
     guessHistory: party.game.guessHistory,
     lastResult: party.game.lastResult,
     showResult: party.game.showResult,
+    winnerId: party.game.winnerId,
     players: [...party.players.values()],
     listId: party.settings.listId,
     mode: party.settings.mode,
@@ -431,6 +434,7 @@ export function setupSocketServer(io: Server) {
         guessHistory: [],
         lastResult: null,
         showResult: false,
+        winnerId: null,
       };
       party.phase = 'playing';
 
@@ -461,6 +465,17 @@ export function setupSocketServer(io: Server) {
       let foundIndex = -1;
       for (let i = 0; i < list.items.length; i++) {
         if (normalizeGuess(list.items[i]) === normalized) { foundIndex = i; break; }
+      }
+      // Check aliases if no direct match
+      if (foundIndex < 0 && list.aliases) {
+        for (const [alias, canonical] of Object.entries(list.aliases)) {
+          if (normalizeGuess(alias) === normalized) {
+            for (let i = 0; i < list.items.length; i++) {
+              if (normalizeGuess(list.items[i]) === normalizeGuess(canonical)) { foundIndex = i; break; }
+            }
+            break;
+          }
+        }
       }
 
       const alreadyGuessed = foundIndex >= 0 && game.guessedItems.has(foundIndex);
@@ -516,18 +531,43 @@ export function setupSocketServer(io: Server) {
         return;
       }
 
+      // If the winner is in "keep going" mode, they play solo
+      if (game.winnerId) {
+        const winner = party.players.get(game.winnerId);
+        if (!winner || winner.eliminated) {
+          // Winner got their final strike — game over, show results
+          party.phase = 'results';
+          io.to(code).emit('game-over', { party: serializeParty(party), game: serializeGameState(party) });
+          return;
+        }
+        // Winner keeps going — turn stays on them
+        const winnerIndex = game.playerOrder.indexOf(game.winnerId);
+        game.currentPlayerIndex = winnerIndex;
+        io.to(code).emit('turn-advanced', { game: serializeGameState(party) });
+        return;
+      }
+
       // In strikes mode, check if only one player remains
       if (party.settings.mode === 'strikes') {
         const active = [...party.players.values()].filter(p => !p.eliminated);
         if (active.length === 1) {
-          const winnerId = active[0].id;
-          io.to(code).emit('last-player-standing', {
-            winnerId,
-            winnerName: active[0].name,
-            game: serializeGameState(party),
-            players: [...party.players.values()],
-          });
-          return;
+          const lastPlayer = active[0];
+          const otherScores = [...party.players.values()]
+            .filter(p => p.id !== lastPlayer.id)
+            .map(p => p.score);
+          const highestOtherScore = otherScores.length > 0 ? Math.max(...otherScores) : 0;
+          if (lastPlayer.score > highestOtherScore) {
+            // Last player standing AND has the highest score — they win
+            io.to(code).emit('last-player-standing', {
+              winnerId: lastPlayer.id,
+              winnerName: lastPlayer.name,
+              game: serializeGameState(party),
+              players: [...party.players.values()],
+            });
+            return;
+          }
+          // Last player standing but NOT in the lead — they keep playing solo
+          // (findNextActivePlayer will return them since they're the only one left)
         }
       }
 
@@ -563,19 +603,19 @@ export function setupSocketServer(io: Server) {
       if (!party || !party.game || party.phase !== 'playing') return;
 
       const game = party.game;
-      // Un-eliminate all players so the game continues
-      for (const player of party.players.values()) {
-        player.eliminated = false;
-      }
-
-      const next = findNextActivePlayer(party);
-      if (next === -1) {
+      // Only the winner keeps playing — other players stay eliminated
+      game.winnerId = playerId;
+      // Un-eliminate the winner so they can keep guessing
+      const winner = party.players.get(playerId);
+      if (winner) winner.eliminated = false;
+      // Set the current player to the winner
+      const winnerIndex = game.playerOrder.indexOf(playerId);
+      if (winnerIndex === -1) {
         party.phase = 'results';
         io.to(code).emit('game-over', { party: serializeParty(party), game: serializeGameState(party) });
         return;
       }
-
-      game.currentPlayerIndex = next;
+      game.currentPlayerIndex = winnerIndex;
       io.to(code).emit('game-continued', {
         game: serializeGameState(party),
         players: [...party.players.values()],

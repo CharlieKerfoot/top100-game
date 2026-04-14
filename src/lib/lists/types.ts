@@ -7,4 +7,10 @@ export interface GameList {
   hints?: string[];
   values?: string[];
   valueLabel?: string;
+  /** Number of items in this list (defaults to 100). Use 50 for "top 50" lists. */
+  size?: number;
+  /** ISO date (YYYY-MM-DD). If today <= this date, a "new" topic is shown on the list. */
+  newUntil?: string;
+  /** Maps alternate accepted names to canonical item names. e.g. { "APhi": "Alpha Phi" } */
+  aliases?: Record<string, string>;
 }

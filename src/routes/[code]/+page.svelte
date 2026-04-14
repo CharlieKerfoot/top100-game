@@ -72,6 +72,7 @@
   let confirmAction = $state<"leave" | "end" | null>(null);
   let showCelebration = $state(false);
   let showAllAnswers = $state(false);
+  let winnerCelebrationReady = $state(false);
 
   // Lazily create a shared AudioContext on first user interaction
   let audioCtx: AudioContext | null = null;
@@ -251,6 +252,275 @@
     bellOvertone.stop(stampTime + 0.65);
   }
 
+  const WINNER_LEADIN = 0.6;
+
+  function playWinnerSound() {
+    const maybeCtx = getAudioCtx();
+    if (!maybeCtx) return;
+    const ctx = maybeCtx;
+    const t = ctx.currentTime;
+
+    // Helper: play a brass-like fanfare note (square + sawtooth layered)
+    function fanfare(start: number, freq: number, vol: number, dur: number) {
+      const sq = ctx.createOscillator();
+      sq.type = "square";
+      sq.frequency.value = freq;
+      const saw = ctx.createOscillator();
+      saw.type = "sawtooth";
+      saw.frequency.value = freq * 1.002; // slight detune for richness
+      const lp = ctx.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.value = freq * 3;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0, start);
+      g.gain.linearRampToValueAtTime(vol, start + 0.02);
+      g.gain.setValueAtTime(vol * 0.85, start + dur * 0.7);
+      g.gain.linearRampToValueAtTime(0, start + dur);
+      sq.connect(lp);
+      saw.connect(lp);
+      lp.connect(g).connect(ctx.destination);
+      sq.start(start);
+      sq.stop(start + dur + 0.05);
+      saw.start(start);
+      saw.stop(start + dur + 0.05);
+    }
+
+    // ── Fanfare: quick ascending "ta-da-da-DAAAA" in Bb major ──
+    fanfare(t, 466.16, 0.06, 0.12);         // Bb4 — "ta"
+    fanfare(t + 0.12, 587.33, 0.07, 0.12);  // D5  — "da"
+    fanfare(t + 0.24, 698.46, 0.08, 0.12);  // F5  — "da"
+    fanfare(t + 0.38, 932.33, 0.10, 0.8);   // Bb5 — "DAAAA" (long hold)
+
+    // Harmony on the big note — major triad underneath
+    fanfare(t + 0.38, 587.33, 0.05, 0.7);   // D5
+    fanfare(t + 0.38, 698.46, 0.04, 0.7);   // F5
+
+    // ── Synthesized crowd cheering (filtered noise with vowel formants) ──
+    const cheerLen = 2.5;
+    const cheerBuf = ctx.createBuffer(1, ctx.sampleRate * cheerLen, ctx.sampleRate);
+    const cheerData = cheerBuf.getChannelData(0);
+    for (let i = 0; i < cheerData.length; i++) {
+      // Modulated noise — random amplitude wobble simulates crowd dynamics
+      const progress = i / cheerData.length;
+      const wobble = 0.7 + 0.3 * Math.sin(progress * 18) * Math.sin(progress * 7.3);
+      const fadeIn = Math.min(1, progress * 5);
+      const fadeOut = progress > 0.7 ? (1 - progress) / 0.3 : 1;
+      cheerData[i] = (Math.random() * 2 - 1) * wobble * fadeIn * fadeOut;
+    }
+    const cheer = ctx.createBufferSource();
+    cheer.buffer = cheerBuf;
+    // Bandpass to sound voice-like (~300-3000Hz)
+    const cheerBP = ctx.createBiquadFilter();
+    cheerBP.type = "bandpass";
+    cheerBP.frequency.value = 1200;
+    cheerBP.Q.value = 0.5;
+    // Second formant peak for "ahh" vowel sound
+    const cheerPeak = ctx.createBiquadFilter();
+    cheerPeak.type = "peaking";
+    cheerPeak.frequency.value = 2500;
+    cheerPeak.gain.value = 6;
+    cheerPeak.Q.value = 2;
+    const cheerGain = ctx.createGain();
+    cheerGain.gain.setValueAtTime(0, t + 0.3);
+    cheerGain.gain.linearRampToValueAtTime(0.12, t + 0.6);
+    cheerGain.gain.setValueAtTime(0.12, t + 1.0);
+    cheerGain.gain.linearRampToValueAtTime(0.06, t + 2.0);
+    cheerGain.gain.linearRampToValueAtTime(0, t + 2.8);
+    cheer.connect(cheerBP).connect(cheerPeak).connect(cheerGain).connect(ctx.destination);
+    cheer.start(t + 0.3);
+
+    // ── Cymbal crash on the big note ──
+    const crashLen = 1.5;
+    const crashBuf = ctx.createBuffer(1, ctx.sampleRate * crashLen, ctx.sampleRate);
+    const crashData = crashBuf.getChannelData(0);
+    for (let i = 0; i < crashData.length; i++) {
+      const env = Math.pow(1 - i / crashData.length, 1.5);
+      crashData[i] = (Math.random() * 2 - 1) * env;
+    }
+    const crash = ctx.createBufferSource();
+    crash.buffer = crashBuf;
+    const crashHP = ctx.createBiquadFilter();
+    crashHP.type = "highpass";
+    crashHP.frequency.value = 4000;
+    const crashGain = ctx.createGain();
+    crashGain.gain.value = 0.08;
+    crash.connect(crashHP).connect(crashGain).connect(ctx.destination);
+    crash.start(t + 0.36);
+
+    // ── Impact bass thump on the big note ──
+    const thump = ctx.createOscillator();
+    thump.type = "sine";
+    thump.frequency.setValueAtTime(120, t + 0.38);
+    thump.frequency.exponentialRampToValueAtTime(40, t + 0.65);
+    const thumpGain = ctx.createGain();
+    thumpGain.gain.setValueAtTime(0.3, t + 0.38);
+    thumpGain.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+    thump.connect(thumpGain).connect(ctx.destination);
+    thump.start(t + 0.38);
+    thump.stop(t + 0.75);
+  }
+
+  // Sound for each guess — physical impacts that get heavier and more satisfying
+  function playGuessSound(rank: number, total: number) {
+    const maybeCtx = getAudioCtx();
+    if (!maybeCtx) return;
+    const ctx = maybeCtx;
+    const t = ctx.currentTime;
+
+    // 0 = #1 (dead tap), 1 = #total (massive hit)
+    const intensity = (rank - 1) / Math.max(total - 1, 1);
+
+    // ── Impact knock: filtered noise burst, gets louder and crunchier ──
+    const knockLen = 0.04 + intensity * 0.06;
+    const knockBuf = ctx.createBuffer(1, ctx.sampleRate * knockLen, ctx.sampleRate);
+    const knockData = knockBuf.getChannelData(0);
+    for (let i = 0; i < knockData.length; i++) {
+      const env = Math.pow(1 - i / knockData.length, 2 + intensity * 4);
+      knockData[i] = (Math.random() * 2 - 1) * env;
+    }
+    const knock = ctx.createBufferSource();
+    knock.buffer = knockBuf;
+    const knockLP = ctx.createBiquadFilter();
+    knockLP.type = "lowpass";
+    knockLP.frequency.value = 800 + intensity * 2500;
+    const knockGain = ctx.createGain();
+    knockGain.gain.value = 0.08 + intensity * 0.14;
+    knock.connect(knockLP).connect(knockGain).connect(ctx.destination);
+    knock.start(t);
+
+    // ── Body tone: sine sweep down, gets deeper and louder ──
+    const bodyFreq = 150 + intensity * 100; // starts higher, sweeps lower
+    const bodyEnd = 40 + intensity * 30;
+    const bodyDecay = 0.08 + intensity * 0.25;
+    const body = ctx.createOscillator();
+    body.type = "sine";
+    body.frequency.setValueAtTime(bodyFreq, t);
+    body.frequency.exponentialRampToValueAtTime(bodyEnd, t + bodyDecay);
+    const bodyGain = ctx.createGain();
+    bodyGain.gain.setValueAtTime(0.06 + intensity * 0.18, t);
+    bodyGain.gain.exponentialRampToValueAtTime(0.001, t + bodyDecay);
+    body.connect(bodyGain).connect(ctx.destination);
+    body.start(t);
+    body.stop(t + bodyDecay + 0.05);
+
+    // ── Warm resonance: appears at mid-range, adds weight ──
+    if (intensity > 0.25) {
+      const resMix = (intensity - 0.25) / 0.75; // 0→1 over the usable range
+      const res = ctx.createOscillator();
+      res.type = "sine";
+      res.frequency.value = 110 + resMix * 55; // A2 → ~D3, warm register
+      const resGain = ctx.createGain();
+      const resDecay = 0.15 + resMix * 0.4;
+      resGain.gain.setValueAtTime(0.04 + resMix * 0.08, t);
+      resGain.gain.exponentialRampToValueAtTime(0.001, t + resDecay);
+      // Gentle lowpass to keep it warm, not buzzy
+      const resLP = ctx.createBiquadFilter();
+      resLP.type = "lowpass";
+      resLP.frequency.value = 300 + resMix * 200;
+      res.connect(resLP).connect(resGain).connect(ctx.destination);
+      res.start(t);
+      res.stop(t + resDecay + 0.05);
+    }
+
+    // ── Sub bass: kicks in at high ranks, you feel it in your chest ──
+    if (intensity > 0.55) {
+      const subMix = (intensity - 0.55) / 0.45;
+      const sub = ctx.createOscillator();
+      sub.type = "sine";
+      sub.frequency.setValueAtTime(55, t);
+      sub.frequency.exponentialRampToValueAtTime(30, t + 0.3);
+      const subGain = ctx.createGain();
+      subGain.gain.setValueAtTime(0.12 * subMix, t);
+      subGain.gain.exponentialRampToValueAtTime(0.001, t + 0.25 + subMix * 0.2);
+      sub.connect(subGain).connect(ctx.destination);
+      sub.start(t);
+      sub.stop(t + 0.5);
+    }
+
+    // ── Thwack: top tier gets a second delayed punch, like a double-hit ──
+    if (intensity > 0.8) {
+      const thwMix = (intensity - 0.8) / 0.2;
+      const delay = 0.06;
+      const thw = ctx.createOscillator();
+      thw.type = "sine";
+      thw.frequency.setValueAtTime(200, t + delay);
+      thw.frequency.exponentialRampToValueAtTime(35, t + delay + 0.2);
+      const thwGain = ctx.createGain();
+      thwGain.gain.setValueAtTime(0.15 * thwMix, t + delay);
+      thwGain.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.25);
+      thw.connect(thwGain).connect(ctx.destination);
+      thw.start(t + delay);
+      thw.stop(t + delay + 0.3);
+
+      // Crunch on the second hit
+      const crLen = 0.03;
+      const crBuf = ctx.createBuffer(1, ctx.sampleRate * crLen, ctx.sampleRate);
+      const crData = crBuf.getChannelData(0);
+      for (let i = 0; i < crData.length; i++) {
+        crData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / crData.length, 3);
+      }
+      const cr = ctx.createBufferSource();
+      cr.buffer = crBuf;
+      const crBP = ctx.createBiquadFilter();
+      crBP.type = "bandpass";
+      crBP.frequency.value = 1500;
+      crBP.Q.value = 1;
+      const crGain = ctx.createGain();
+      crGain.gain.value = 0.1 * thwMix;
+      cr.connect(crBP).connect(crGain).connect(ctx.destination);
+      cr.start(t + delay);
+    }
+  }
+
+  function playMissSound() {
+    const maybeCtx = getAudioCtx();
+    if (!maybeCtx) return;
+    const ctx = maybeCtx;
+    const t = ctx.currentTime;
+
+    // Hollow wooden tap — dead and unsatisfying
+    const knockLen = 0.03;
+    const knockBuf = ctx.createBuffer(1, ctx.sampleRate * knockLen, ctx.sampleRate);
+    const knockData = knockBuf.getChannelData(0);
+    for (let i = 0; i < knockData.length; i++) {
+      knockData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / knockData.length, 4);
+    }
+    const knock = ctx.createBufferSource();
+    knock.buffer = knockBuf;
+    const bp = ctx.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.frequency.value = 400;
+    bp.Q.value = 2;
+    const g = ctx.createGain();
+    g.gain.value = 0.1;
+    knock.connect(bp).connect(g).connect(ctx.destination);
+    knock.start(t);
+
+    // Quick dead tone that drops away
+    const osc = ctx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(180, t);
+    osc.frequency.exponentialRampToValueAtTime(100, t + 0.08);
+    const oscGain = ctx.createGain();
+    oscGain.gain.setValueAtTime(0.05, t);
+    oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+    osc.connect(oscGain).connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.15);
+  }
+
+  // Trigger winner celebration when lastPlayerStanding appears
+  $effect(() => {
+    if (mp.lastPlayerStanding) {
+      playWinnerSound();
+      setTimeout(() => {
+        winnerCelebrationReady = true;
+      }, WINNER_LEADIN * 1000);
+    } else {
+      winnerCelebrationReady = false;
+    }
+  });
+
   $effect(() => {
     if (mp.phase === "playing") {
       document.body.style.overflow = "hidden";
@@ -262,17 +532,23 @@
 
   $effect(() => {
     const result = mp.lastResult;
-    if (result && !result.isStrike && result.rank != null) {
+    if (!result) return;
+    if (result.isStrike) {
+      playMissSound();
+      return;
+    }
+    if (result.rank != null) {
       const rank = result.rank;
       if (rank === listSize) {
         playCelebrationSound();
-        // Lead-in audio plays before visuals appear
         setTimeout(() => {
           showCelebration = true;
         }, CELEBRATION_LEADIN * 1000);
         setTimeout(() => {
           showCelebration = false;
         }, CELEBRATION_LEADIN * 1000 + 4000);
+      } else {
+        playGuessSound(rank, listSize);
       }
       tick().then(() => {
         const slot = document.querySelector(`[data-slot="${rank - 1}"]`);
@@ -351,7 +627,16 @@
     const guessedNames = new Set(
       mp.guessedItems.map((g) => g.name.toLowerCase()),
     );
-    return hints.filter((h) => !guessedNames.has(h.toLowerCase()));
+    return hints.filter((h) => {
+      const lower = h.toLowerCase();
+      if (guessedNames.has(lower)) return false;
+      // Also filter out aliases whose canonical item was already guessed
+      if (mp.list.aliases) {
+        const canonical = mp.list.aliases[h];
+        if (canonical && guessedNames.has(canonical.toLowerCase())) return false;
+      }
+      return true;
+    });
   });
 
   function handleSubmitGuess(val: string) {
@@ -1614,27 +1899,34 @@
 
       {#if mp.lastPlayerStanding}
         <div class="lps-overlay">
-          <div class="lps-modal">
-            <div class="lps-icon">&#127942;</div>
-            <div class="lps-title">
-              {mp.lastPlayerStanding.winnerName} wins!
+          {#each Array(60) as _, i}
+            <div
+              class="lps-confetti"
+              style="--x: {Math.random() * 100}vw; --drift: {(Math.random() - 0.5) * 120}px; --delay: {0.2 + Math.random() * 1.2}s; --dur: {2 + Math.random() * 1.5}s; --rot: {Math.random() * 720 - 360}deg; --bg: {['#d4af37', '#8b0000', '#f5d061', '#a0342b', '#fffef2', '#6b0000'][i % 6]}; --w: {4 + Math.random() * 6}px; --h: {6 + Math.random() * 10}px;"
+            ></div>
+          {/each}
+
+          {#if winnerCelebrationReady}
+            <div class="lps-card">
+              <div class="lps-seal">
+                <div class="lps-seal-shimmer"></div>
+                <span class="lps-seal-letter">{mp.lastPlayerStanding.winnerName[0]}</span>
+              </div>
+              <div class="lps-name">{mp.lastPlayerStanding.winnerName}</div>
+              <div class="lps-rule"></div>
+              <div class="lps-label">Winner</div>
+              {#if mp.lastPlayerStanding.winnerId === mp.myId}
+                <div class="lps-actions">
+                  <button class="lps-btn end" onclick={() => mp.endGameEarly()}>End Game</button>
+                  <button class="lps-btn keep" onclick={() => mp.continueGame()}>Keep Going</button>
+                </div>
+              {:else}
+                <div class="lps-waiting">
+                  Waiting for {mp.lastPlayerStanding.winnerName} to decide...
+                </div>
+              {/if}
             </div>
-            <div class="lps-subtitle">Last player standing</div>
-            {#if mp.lastPlayerStanding.winnerId === mp.myId}
-              <div class="lps-actions">
-                <button class="lps-btn end" onclick={() => mp.endGameEarly()}
-                  >End Game</button
-                >
-                <button class="lps-btn keep" onclick={() => mp.continueGame()}
-                  >Keep Going</button
-                >
-              </div>
-            {:else}
-              <div class="lps-waiting">
-                Waiting for {mp.lastPlayerStanding.winnerName} to decide...
-              </div>
-            {/if}
-          </div>
+          {/if}
         </div>
       {/if}
     </div>
@@ -1706,15 +1998,21 @@
 
       {#if showAllAnswers}
         <div class="all-answers">
-          <h4>Full List</h4>
-          <div class="answers-grid">
-            {#each mp.list.items as item, i}
-              {@const found = guessedMap.has(i)}
-              <div class="answer-row" class:found>
-                <span class="answer-rank">{i + 1}.</span>
-                <span class="answer-name">{item}</span>
-                {#if found}
-                  <span class="answer-check">&#10003;</span>
+          <div class="all-answers-header">
+            <span class="all-answers-title">{mp.list.description}</span>
+            <span class="all-answers-count">{mp.guessedItems.length} of {listSize} found</span>
+          </div>
+          <div class="dt-slots" style="grid-template-columns: repeat({gridCols}, 1fr); grid-template-rows: repeat({gridRows}, auto)">
+            {#each Array(listSize) as _, i}
+              {@const item = guessedMap.get(i)}
+              <div class="dt-slot" class:filled={!!item} class:dt-slot-large={listSize <= 50} class:dt-slot-missed={!item}>
+                <span class="dt-slot-rank">{i + 1}.</span>
+                {#if item}
+                  <span class="dt-slot-name">{item.name}</span>
+                  {#if item.value}<span class="dt-slot-value">{item.value}</span>{/if}
+                  <span class="dt-slot-by">{item.playerName}</span>
+                {:else}
+                  <span class="dt-slot-name dt-slot-missed-name">{mp.list.items[i]}</span>
                 {/if}
               </div>
             {/each}
@@ -3918,81 +4216,217 @@
   .lps-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.55);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
-    animation: fadeIn 0.3s ease-out;
+    overflow: hidden;
+    animation: lps-bg-in 0.5s ease-out;
   }
 
-  .lps-modal {
+  @keyframes lps-bg-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .lps-confetti {
+    position: absolute;
+    top: -20px;
+    left: var(--x);
+    width: var(--w, 8px);
+    height: var(--h, 10px);
+    background: var(--bg, #d4af37);
+    opacity: 0;
+    animation: lps-confetti-fall var(--dur, 2.5s) var(--delay, 0.3s) ease-in forwards;
+    pointer-events: none;
+  }
+
+  @keyframes lps-confetti-fall {
+    0% { opacity: 1; transform: translateY(0) translateX(0) rotate(0deg); }
+    80% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(105vh) translateX(var(--drift, 0px)) rotate(var(--rot, 360deg)); }
+  }
+
+  .lps-card {
+    position: relative;
     background: var(--color-cream, #faf6f1);
-    border: 3px solid var(--color-crimson, #8b2500);
-    padding: 2.5rem 3rem;
+    border: 2px solid var(--color-ink, #1a1a1a);
+    padding: 2rem 2.5rem 1.75rem;
     text-align: center;
-    max-width: 400px;
-    width: 90%;
-    animation: slideIn 0.4s ease-out;
+    max-width: 360px;
+    width: 88%;
+    z-index: 1;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: lps-card-in 0.4s 0.1s ease-out forwards;
   }
 
-  .lps-icon {
-    font-size: 4rem;
-    margin-bottom: 0.75rem;
+  @keyframes lps-card-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
-  .lps-title {
+  /* Wax seal with winner initial */
+  .lps-seal {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #a0342b, #8b0000 40%, #6b0000);
+    box-shadow:
+      inset 0 2px 4px rgba(255, 255, 255, 0.15),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+      0 4px 16px rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+    position: relative;
+    opacity: 0;
+    transform: scale(2);
+    animation: lps-seal-press 0.35s 0.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .lps-seal::before {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.18);
+  }
+
+  .lps-seal::after {
+    content: "";
+    position: absolute;
+    inset: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .lps-seal-shimmer {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: linear-gradient(
+      105deg,
+      transparent 40%,
+      rgba(212, 175, 55, 0.15) 45%,
+      rgba(212, 175, 55, 0.25) 50%,
+      rgba(212, 175, 55, 0.15) 55%,
+      transparent 60%
+    );
+    opacity: 0;
+    animation: lps-foil-sweep 0.8s 0.5s ease-in-out forwards;
+  }
+
+  @keyframes lps-foil-sweep {
+    0% { opacity: 0; transform: translateX(-100%); }
+    30% { opacity: 1; }
+    100% { opacity: 0; transform: translateX(100%); }
+  }
+
+  @keyframes lps-seal-press {
+    0% { opacity: 0; transform: scale(2); }
+    60% { opacity: 1; transform: scale(0.92); }
+    80% { transform: scale(1.04); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  .lps-seal-letter {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 2.8rem;
+    font-weight: 900;
+    color: #fffef2;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    line-height: 1;
+    position: relative;
+  }
+
+  .lps-name {
     font-family: "Playfair Display", Georgia, serif;
     font-size: 1.75rem;
-    font-weight: 700;
-    margin-bottom: 0.25rem;
+    font-weight: 900;
+    color: var(--color-ink, #1a1a1a);
+    line-height: 1.15;
+    margin-bottom: 0.75rem;
+    opacity: 0;
+    animation: lps-fade-up 0.35s 0.3s ease-out forwards;
   }
 
-  .lps-subtitle {
-    font-size: 1rem;
-    color: #666;
+  .lps-rule {
+    width: 60px;
+    height: 2px;
+    background: var(--color-crimson, #8b2500);
+    margin: 0 auto 0.6rem;
+    opacity: 0;
+    animation: lps-fade-up 0.3s 0.4s ease-out forwards;
+  }
+
+  .lps-label {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 0.8rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
     margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: lps-fade-up 0.3s 0.45s ease-out forwards;
+  }
+
+  @keyframes lps-fade-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .lps-actions {
     display: flex;
     gap: 1rem;
     justify-content: center;
+    opacity: 0;
+    animation: lps-fade-up 0.3s 0.55s ease-out forwards;
   }
 
   .lps-btn {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
+    padding: 0.65rem 1.25rem;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 0.95rem;
     font-weight: 600;
-    border: 2px solid var(--color-crimson, #8b2500);
+    border: 2px solid var(--color-ink, #1a1a1a);
     cursor: pointer;
-    transition:
-      background 0.2s,
-      color 0.2s;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .lps-btn:active {
+    transform: scale(0.97);
   }
 
   .lps-btn.end {
-    background: var(--color-crimson, #8b2500);
-    color: white;
+    background: var(--color-ink, #1a1a1a);
+    color: var(--color-parchment, #faf6f1);
   }
 
   .lps-btn.end:hover {
-    opacity: 0.9;
+    background: var(--color-crimson, #8b2500);
+    border-color: var(--color-crimson, #8b2500);
   }
 
   .lps-btn.keep {
     background: transparent;
-    color: var(--color-crimson, #8b2500);
+    color: var(--color-ink, #1a1a1a);
   }
 
   .lps-btn.keep:hover {
-    background: var(--color-crimson, #8b2500);
-    color: white;
+    background: var(--color-ink, #1a1a1a);
+    color: var(--color-parchment, #faf6f1);
   }
 
   .lps-waiting {
-    color: #666;
+    color: #888;
+    font-family: "Source Serif 4", Georgia, serif;
     font-style: italic;
+    font-size: 0.9rem;
+    opacity: 0;
+    animation: lps-fade-up 0.3s 0.55s ease-out forwards;
   }
 
   @keyframes fadeIn {
@@ -4388,62 +4822,43 @@
   .all-answers {
     border: 1px solid var(--color-gold);
     background: var(--color-cream);
-    padding: 1rem;
+    padding: 0;
     margin-bottom: 1rem;
     text-align: left;
   }
 
-  .all-answers h4 {
-    font-family: "Playfair Display", Georgia, serif;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 0.75rem;
-    color: #555;
-    text-align: center;
-  }
-
-  .answers-grid {
+  .all-answers-header {
     display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .answer-row {
-    display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.25rem 0.5rem;
-    border-bottom: 1px solid #ede0c4;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--color-gold);
+  }
+
+  .all-answers-title {
+    font-family: "Source Serif 4", "Source Serif Pro", Georgia, serif;
     font-size: 0.82rem;
-    color: #999;
-  }
-
-  .answer-row:last-child {
-    border-bottom: none;
-  }
-
-  .answer-row.found {
+    font-weight: 600;
     color: var(--color-ink);
-    background: rgba(139, 0, 0, 0.04);
   }
 
-  .answer-rank {
-    font-weight: 700;
-    min-width: 2rem;
-    font-size: 0.78rem;
+  .all-answers-count {
+    font-size: 0.75rem;
+    color: #888;
   }
 
-  .answer-row.found .answer-rank {
-    color: var(--color-crimson);
+  .all-answers .dt-slots {
+    max-height: 60vh;
+    overflow-y: auto;
   }
 
-  .answer-name {
-    flex: 1;
+  .dt-slot-missed {
+    opacity: 0.5;
   }
 
-  .answer-check {
-    color: var(--color-crimson);
-    font-weight: 700;
+  .dt-slot-missed-name {
+    font-style: italic;
+    color: #999 !important;
+    font-weight: 400 !important;
   }
 </style>
