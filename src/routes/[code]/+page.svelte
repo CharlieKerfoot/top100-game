@@ -2,6 +2,7 @@
   import { page } from "$app/state";
   import { goto } from "$app/navigation";
   import { tick } from "svelte";
+  import { SITE_URL, GAME_NAME, DEFAULT_DESCRIPTION, ogImageUrl } from "$lib/seo";
   import {
     getAllTopics,
     getFeaturedLists,
@@ -371,7 +372,16 @@
 </script>
 
 <svelte:head>
+  <title>Join Party | {GAME_NAME}</title>
   <meta name="robots" content="noindex" />
+  <meta property="og:title" content="Join my {GAME_NAME} party!" />
+  <meta property="og:description" content={DEFAULT_DESCRIPTION} />
+  <meta property="og:image" content={ogImageUrl()} />
+  <meta property="og:url" content="{SITE_URL}/{routeCode}" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:title" content="Join my {GAME_NAME} party!" />
+  <meta name="twitter:description" content={DEFAULT_DESCRIPTION} />
+  <meta name="twitter:image" content={ogImageUrl()} />
 </svelte:head>
 
 <div class="app">
