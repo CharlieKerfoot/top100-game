@@ -5,7 +5,7 @@ export const sportsTeamsByRevenue: GameList = {
   id: 'sports-teams-by-revenue',
   name: 'Most Valuable Sports Franchises',
   description: 'Sports franchises ranked by total value (Sportico 2025)',
-  topics: ['sports', 'money'],
+  topics: ['sports', 'business'],
   hints: sportsTeamsByRevenueHints,
   valueLabel: 'Valuation',
   items: [

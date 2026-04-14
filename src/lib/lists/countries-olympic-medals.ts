@@ -5,7 +5,7 @@ export const countriesOlympicMedals: GameList = {
   id: 'countries-olympic-medals',
   name: 'Countries by All-Time Olympic Medals',
   description: 'Countries ranked by total Olympic medals, Summer + Winter through 2024 (IOC/Wikipedia)',
-  topics: ['sports', 'world'],
+  topics: ['sports', 'geography'],
   hints: countriesOlympicMedalsHints,
   valueLabel: 'Total Medals',
   items: [

@@ -5,7 +5,7 @@ export const longestRivers: GameList = {
   id: 'longest-rivers',
   name: 'Longest Rivers in the World',
   description: 'Top 100 rivers ranked by total length',
-  topics: ['geography', 'world'],
+  topics: ['geography'],
   hints: longestRiversHints,
   valueLabel: 'Length',
   items: [

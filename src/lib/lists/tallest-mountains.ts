@@ -5,7 +5,7 @@ export const tallestMountains: GameList = {
   id: 'tallest-mountains',
   name: 'Tallest Mountains in the World',
   description: 'Mountain peaks ranked by elevation above sea level (Wikipedia / Survey data)',
-  topics: ['nature', 'world'],
+  topics: ['geography'],
   hints: tallestMountainsHints,
   valueLabel: 'Elevation',
   items: [

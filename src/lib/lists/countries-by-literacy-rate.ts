@@ -5,7 +5,7 @@ export const countriesByLiteracyRate: GameList = {
   id: 'countries-by-literacy-rate',
   name: 'Countries by Literacy Rate (Lowest)',
   description: 'Countries ranked by adult literacy rate, lowest first (UNESCO)',
-  topics: ['education', 'world'],
+  topics: ['education', 'geography'],
   hints: countriesByLiteracyRateHints,
   valueLabel: 'Literacy Rate',
   items: [

@@ -5,7 +5,7 @@ export const highestGrossingFranchises: GameList = {
   id: 'highest-grossing-franchises',
   name: 'Highest-Grossing Film Franchises',
   description: 'Film franchises ranked by combined worldwide box office (Box Office Mojo / Wikipedia)',
-  topics: ['film & tv', 'money'],
+  topics: ['film & tv', 'business'],
   size: 50,
   hints: highestGrossingFranchisesHints,
   valueLabel: 'Box Office',

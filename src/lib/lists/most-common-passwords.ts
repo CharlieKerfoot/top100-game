@@ -9,7 +9,7 @@ export const mostCommonPasswords: GameList = {
   id: 'most-common-passwords',
   name: 'Most Common Passwords',
   description: 'The most frequently used passwords worldwide (NordPass 2024)',
-  topics: ['technology'],
+  topics: ['internet'],
   hints: mostCommonPasswordsHints,
   valueLabel: 'Frequency Rank',
   items: [

@@ -6,7 +6,7 @@ export const highestPaidAthletes: GameList = {
   id: 'highest-paid-athletes',
   name: 'Highest-Paid Athletes',
   description: 'Athletes ranked by annual earnings (Forbes 2024)',
-  topics: ['sports', 'money'],
+  topics: ['sports', 'business'],
   hints: highestPaidAthletesHints,
   valueLabel: 'Earnings',
   items: [

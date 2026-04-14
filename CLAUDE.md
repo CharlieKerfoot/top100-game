@@ -17,3 +17,13 @@ Key routing rules:
 - Architecture review → invoke plan-eng-review
 - Save progress, checkpoint, resume → invoke checkpoint
 - Code quality, health check → invoke health
+
+## List topics
+
+The 10 list topics are **final** and must not be changed, added to, or removed:
+
+`entertainment`, `education`, `film & tv`, `geography`, `internet`, `misc`, `business`, `music`, `sports`, `food`
+
+Additionally, `new` and `top50` are meta-topics describing list format, not content categories.
+
+When creating new lists, assign one or two of the above topics. If a list doesn't fit any specific topic, use `misc`. Never introduce new topics.

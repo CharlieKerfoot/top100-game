@@ -5,7 +5,7 @@ export const countriesByHappiness: GameList = {
   id: 'countries-by-happiness',
   name: 'Countries by Happiness',
   description: 'Countries ranked by the World Happiness Report 2025 score',
-  topics: ['world'],
+  topics: ['geography'],
   hints: countriesByHappinessHints,
   valueLabel: 'Score',
   items: [

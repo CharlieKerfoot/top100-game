@@ -5,7 +5,7 @@ export const largestCities: GameList = {
   id: 'largest-cities',
   name: 'Largest Cities by Population',
   description: "World's largest urban areas",
-  topics: ['geography', 'world'],
+  topics: ['geography'],
   hints: largestCitiesHints,
   valueLabel: 'Metro Population',
   items: [

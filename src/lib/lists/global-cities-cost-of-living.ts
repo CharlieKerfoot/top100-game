@@ -5,7 +5,7 @@ export const globalCitiesCostOfLiving: GameList = {
   id: 'global-cities-cost-of-living',
   name: 'Global Cities by Cost of Living',
   description: 'Cities ranked by Cost of Living Index (Numbeo 2025, NYC = 100)',
-  topics: ['money', 'world', 'geography'],
+  topics: ['business', 'geography'],
   hints: globalCitiesCostOfLivingHints,
   valueLabel: 'COL Index',
   items: [

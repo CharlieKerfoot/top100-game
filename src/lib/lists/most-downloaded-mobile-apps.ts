@@ -7,7 +7,7 @@ export const mostDownloadedMobileApps: GameList = {
   id: 'most-downloaded-mobile-apps',
   name: 'Most Downloaded Mobile Apps',
   description: 'Mobile apps ranked by all-time cumulative downloads across iOS & Android (AppMagic, 2026)',
-  topics: ['technology', 'culture'],
+  topics: ['internet', 'entertainment'],
   hints: mostDownloadedMobileAppsHints,
   valueLabel: 'All-Time Downloads',
   newUntil: '2025-08-01',

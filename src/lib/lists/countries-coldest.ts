@@ -5,7 +5,7 @@ export const countriesColdest: GameList = {
   id: 'countries-coldest',
   name: 'Countries by Average Temperature (Coldest)',
   description: 'Countries ranked by average annual temperature, coldest first (World Bank Climate Portal)',
-  topics: ['geography', 'world'],
+  topics: ['geography'],
   hints: countriesColdestHints,
   valueLabel: 'Avg Temp',
   items: [

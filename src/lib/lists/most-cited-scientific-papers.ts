@@ -8,7 +8,7 @@ export const mostCitedScientificPapers: GameList = {
   id: 'most-cited-scientific-papers',
   name: 'Most Cited Scientific Papers',
   description: 'Papers ranked by citation count (Nature / Web of Science 2014)',
-  topics: ['science'],
+  topics: ['misc'],
   hints: mostCitedScientificPapersHints,
   valueLabel: 'Citations',
   items: [

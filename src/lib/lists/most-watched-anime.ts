@@ -4,7 +4,7 @@ export const mostWatchedAnime: GameList = {
   id: 'most-watched-anime',
   name: 'Most Watched Anime',
   description: 'Top 50 anime by global cultural popularity (curated from MAL, AniList & viewership data)',
-  topics: ['entertainment', 'top 50'],
+  topics: ['entertainment'],
   size: 50,
   newUntil: '2026-04-15',
   items: [

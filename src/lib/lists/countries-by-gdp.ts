@@ -5,7 +5,7 @@ export const countriesByGdp: GameList = {
   id: 'countries-by-gdp',
   name: 'Countries by GDP',
   description: 'Countries ranked by nominal GDP (IMF 2024 estimates)',
-  topics: ['money', 'world'],
+  topics: ['business', 'geography'],
   hints: countriesByGdpHints,
   valueLabel: 'GDP',
   items: [

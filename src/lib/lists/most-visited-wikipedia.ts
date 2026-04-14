@@ -5,7 +5,7 @@ export const mostVisitedWikipedia: GameList = {
   id: 'most-visited-wikipedia',
   name: 'Most-Visited Wikipedia Articles',
   description: 'Wikipedia articles ranked by annual page views (Wikimedia API, 2024)',
-  topics: ['culture'],
+  topics: ['entertainment'],
   hints: mostVisitedWikipediaHints,
   valueLabel: 'Views (2024)',
   items: [

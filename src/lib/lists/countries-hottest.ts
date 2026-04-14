@@ -5,7 +5,7 @@ export const countriesHottest: GameList = {
   id: 'countries-hottest',
   name: 'Countries by Average Temperature (Hottest)',
   description: 'Countries ranked by average annual temperature, hottest first (World Bank Climate Portal)',
-  topics: ['geography', 'world'],
+  topics: ['geography'],
   hints: countriesHottestHints,
   valueLabel: 'Avg Temp',
   items: [
