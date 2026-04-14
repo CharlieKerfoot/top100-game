@@ -16,7 +16,7 @@
   } from "$lib/daily";
   import { getListSize, getMaxScore } from "$lib/lists/index";
   import { SITE_URL, GAME_NAME, ogImageUrl } from "$lib/seo";
-  import { getAudioCtx, playGuessSound, playStrikeSound } from "$lib/sounds";
+  import { playGuessSound, playStrikeSound } from "$lib/sounds";
 
   const list = getDailyList();
   const listSize = getListSize(list);
@@ -29,7 +29,6 @@
     month: "long",
     day: "numeric",
     year: "numeric",
-    timeZone: "UTC",
   });
 
   // Build normalized lookup: normalized -> { index, original }
