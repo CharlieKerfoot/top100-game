@@ -9,106 +9,26 @@ export const longestChartingHot100: GameList = {
   hints: longestChartingHot100Hints,
   valueLabel: 'Weeks on Chart',
   items: [
-    "Lose Control - Teddy Swims",                              // 1
-    "Heat Waves - Glass Animals",                              // 2
-    "Blinding Lights - The Weeknd",                           // 3
-    "Beautiful Things - Benson Boone",                        // 4
-    "Radioactive - Imagine Dragons",                          // 5
-    "Sail - AWOLNATION",                                      // 6
-    "All I Want for Christmas Is You - Mariah Carey",         // 7
-    "Levitating - Dua Lipa",                                  // 8
-    "A Bar Song (Tipsy) - Shaboozey",                         // 9
-    "I'm Yours - Jason Mraz",                                 // 10
-    "Wildflower - Billie Eilish",                             // 11
-    "Rockin' Around the Christmas Tree - Brenda Lee",         // 12
-    "Jingle Bell Rock - Bobby Helms",                         // 13
-    "Stay - The Kid Laroi & Justin Bieber",                   // 14
-    "Believer - Imagine Dragons",                             // 15
-    "Old Town Road - Lil Nas X ft. Billy Ray Cyrus",         // 16
-    "Shape of You - Ed Sheeran",                              // 17
-    "Last Night - Morgan Wallen",                             // 18
-    "Someone You Loved - Lewis Capaldi",                      // 19
-    "The Christmas Song - Nat King Cole",                     // 20
-    "Sunflower - Post Malone & Swae Lee",                     // 21
-    "Circles - Post Malone",                                  // 22
-    "Rockstar - Post Malone ft. 21 Savage",                  // 23
-    "Last Christmas - Wham!",                                 // 24
-    "It's the Most Wonderful Time of the Year - Andy Williams", // 25
-    "Dance Monkey - Tones and I",                             // 26
-    "God's Plan - Drake",                                     // 27
-    "A Holly Jolly Christmas - Burl Ives",                    // 28
-    "Shallow - Lady Gaga & Bradley Cooper",                   // 29
-    "Drivers License - Olivia Rodrigo",                       // 30
-    "Bad Guy - Billie Eilish",                                // 31
-    "Closer - The Chainsmokers ft. Halsey",                  // 32
-    "Uptown Funk - Mark Ronson ft. Bruno Mars",               // 33
-    "Anti-Hero - Taylor Swift",                               // 34
-    "Cruel Summer - Taylor Swift",                            // 35
-    "Rolling in the Deep - Adele",                            // 36
-    "White Christmas - Bing Crosby",                          // 37
-    "Feliz Navidad - José Feliciano",                         // 38
-    "Happy - Pharrell Williams",                              // 39
-    "Let It Snow! Let It Snow! Let It Snow! - Dean Martin",   // 40
-    "Counting Stars - OneRepublic",                           // 41
-    "Despacito - Luis Fonsi ft. Daddy Yankee",               // 42
-    "Stay With Me - Sam Smith",                               // 43
-    "Good 4 U - Olivia Rodrigo",                              // 44
-    "Shake It Off - Taylor Swift",                            // 45
-    "Roar - Katy Perry",                                      // 46
-    "Save Your Tears - The Weeknd",                           // 47
-    "Starboy - The Weeknd ft. Daft Punk",                    // 48
-    "Girls Like You - Maroon 5 ft. Cardi B",                 // 49
-    "Easy on Me - Adele",                                     // 50
-    "Watermelon Sugar - Harry Styles",                        // 51
-    "Can't Feel My Face - The Weeknd",                        // 52
-    "Sicko Mode - Travis Scott",                              // 53
-    "Mood - 24kGoldn ft. iann dior",                         // 54
-    "Flowers - Miley Cyrus",                                  // 55
-    "7 Rings - Ariana Grande",                                // 56
-    "Señorita - Shawn Mendes & Camila Cabello",              // 57
-    "One Dance - Drake",                                      // 58
-    "Perfect - Ed Sheeran",                                   // 59
-    "Hotline Bling - Drake",                                  // 60
-    "Thinking Out Loud - Ed Sheeran",                        // 61
-    "Thunder - Imagine Dragons",                              // 62
-    "As It Was - Harry Styles",                               // 63
-    "Peaches - Justin Bieber ft. Daniel Caesar & Giveon",    // 64
-    "Don't Start Now - Dua Lipa",                             // 65
-    "Lean On - Major Lazer & DJ Snake ft. MO",               // 66
-    "All of Me - John Legend",                                // 67
-    "Cheap Thrills - Sia",                                    // 68
-    "Blank Space - Taylor Swift",                             // 69
-    "That's What I Like - Bruno Mars",                        // 70
-    "Havana - Camila Cabello ft. Young Thug",                // 71
-    "In My Feelings - Drake",                                 // 72
-    "Die For You - The Weeknd",                               // 73
-    "Thank U, Next - Ariana Grande",                          // 74
-    "New Rules - Dua Lipa",                                   // 75
-    "WAP - Cardi B ft. Megan Thee Stallion",                 // 76
-    "Bodak Yellow - Cardi B",                                 // 77
-    "Vampire - Olivia Rodrigo",                               // 78
-    "Espresso - Sabrina Carpenter",                           // 79
-    "Die with a Smile - Lady Gaga & Bruno Mars",              // 80
-    "Butter - BTS",                                           // 81
-    "24K Magic - Bruno Mars",                                 // 82
-    "HUMBLE. - Kendrick Lamar",                               // 83
-    "Sorry - Justin Bieber",                                  // 84
-    "Treat You Better - Shawn Mendes",                        // 85
-    "What Do You Mean? - Justin Bieber",                      // 86
-    "Locked Out of Heaven - Bruno Mars",                      // 87
-    "Photograph - Ed Sheeran",                                // 88
-    "Say You Won't Let Go - James Arthur",                    // 89
-    "Running Up That Hill - Kate Bush",                       // 90
-    "Dynamite - BTS",                                         // 91
-    "Stay - Rihanna ft. Mikky Ekko",                          // 92
-    "Diamonds - Rihanna",                                     // 93
-    "Work - Rihanna ft. Drake",                               // 94
-    "We Found Love - Rihanna ft. Calvin Harris",              // 95
-    "Don't Let Me Down - The Chainsmokers ft. Daya",         // 96
-    "Love Yourself - Justin Bieber",                          // 97
-    "Not Like Us - Kendrick Lamar",                           // 98
-    "Please Please Please - Sabrina Carpenter",               // 99
-    "Umbrella - Rihanna",                                     // 100
+    "Lose Control - Teddy Swims", "Heat Waves - Glass Animals", "Blinding Lights - The Weeknd", "Beautiful Things - Benson Boone", "Radioactive - Imagine Dragons",
+    "All I Want for Christmas Is You - Mariah Carey", "Sail - AWOLNATION", "Levitating - Dua Lipa", "A Bar Song (Tipsy) - Shaboozey", "I'm Yours - Jason Mraz",
+    "Wildflower - Billie Eilish", "Rockin' Around the Christmas Tree - Brenda Lee", "Jingle Bell Rock - Bobby Helms", "Stay - The Kid Laroi & Justin Bieber", "Believer - Imagine Dragons",
+    "Old Town Road - Lil Nas X ft. Billy Ray Cyrus", "Shape of You - Ed Sheeran", "Last Night - Morgan Wallen", "Someone You Loved - Lewis Capaldi", "The Christmas Song - Nat King Cole",
+    "Sunflower - Post Malone & Swae Lee", "Circles - Post Malone", "Rockstar - Post Malone ft. 21 Savage", "Last Christmas - Wham!", "Dance Monkey - Tones and I",
+    "It's the Most Wonderful Time of the Year - Andy Williams", "God's Plan - Drake", "A Holly Jolly Christmas - Burl Ives", "Drivers License - Olivia Rodrigo", "Shallow - Lady Gaga & Bradley Cooper",
+    "Bad Guy - Billie Eilish", "Closer - The Chainsmokers ft. Halsey", "Uptown Funk - Mark Ronson ft. Bruno Mars", "Anti-Hero - Taylor Swift", "Cruel Summer - Taylor Swift",
+    "Rolling in the Deep - Adele", "White Christmas - Bing Crosby", "Feliz Navidad - José Feliciano", "Happy - Pharrell Williams", "Let It Snow! Let It Snow! Let It Snow! - Dean Martin",
+    "Despacito - Luis Fonsi ft. Daddy Yankee", "Counting Stars - OneRepublic", "Good 4 U - Olivia Rodrigo", "Stay With Me - Sam Smith", "Roar - Katy Perry",
+    "Shake It Off - Taylor Swift", "Starboy - The Weeknd ft. Daft Punk", "Save Your Tears - The Weeknd", "Girls Like You - Maroon 5 ft. Cardi B", "Sicko Mode - Travis Scott",
+    "Watermelon Sugar - Harry Styles", "Can't Feel My Face - The Weeknd", "Mood - 24kGoldn ft. iann dior", "Easy on Me - Adele", "One Dance - Drake",
+    "Señorita - Shawn Mendes & Camila Cabello", "Flowers - Miley Cyrus", "7 Rings - Ariana Grande", "Perfect - Ed Sheeran", "Thinking Out Loud - Ed Sheeran",
+    "Thunder - Imagine Dragons", "Hotline Bling - Drake", "Lean On - Major Lazer & DJ Snake ft. MO", "As It Was - Harry Styles", "Peaches - Justin Bieber ft. Daniel Caesar & Giveon",
+    "Don't Start Now - Dua Lipa", "That's What I Like - Bruno Mars", "Cheap Thrills - Sia", "All of Me - John Legend", "Blank Space - Taylor Swift",
+    "Thank U, Next - Ariana Grande", "In My Feelings - Drake", "Havana - Camila Cabello ft. Young Thug", "Die For You - The Weeknd", "WAP - Cardi B ft. Megan Thee Stallion",
+    "Bodak Yellow - Cardi B", "Vampire - Olivia Rodrigo", "Espresso - Sabrina Carpenter", "New Rules - Dua Lipa", "HUMBLE. - Kendrick Lamar",
+    "Sorry - Justin Bieber", "Treat You Better - Shawn Mendes", "Die with a Smile - Lady Gaga & Bruno Mars", "24K Magic - Bruno Mars", "What Do You Mean? - Justin Bieber",
+    "Butter - BTS", "Running Up That Hill - Kate Bush", "Stay - Rihanna ft. Mikky Ekko", "Photograph - Ed Sheeran", "Say You Won't Let Go - James Arthur",
+    "Dynamite - BTS", "Locked Out of Heaven - Bruno Mars", "Diamonds - Rihanna", "Don't Let Me Down - The Chainsmokers ft. Daya", "Work - Rihanna ft. Drake",
+    "We Found Love - Rihanna ft. Calvin Harris", "Umbrella - Rihanna", "Please Please Please - Sabrina Carpenter", "Love Yourself - Justin Bieber", "Not Like Us - Kendrick Lamar",
   ],
   values: [
     "112 weeks", "91 weeks",  "90 weeks",  "89 weeks",  "87 weeks",

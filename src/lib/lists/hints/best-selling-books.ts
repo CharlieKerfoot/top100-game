@@ -1,4 +1,5 @@
 export const bestSellingBooksHints: string[] = [
+  // ===== TOP 100 ANSWERS =====
   "A Tale of Two Cities", "The Little Prince", "The Alchemist", "Harry Potter and the Philosopher's Stone", "And Then There Were None",
   "Dream of the Red Chamber", "The Hobbit", "Alice's Adventures in Wonderland", "She: A History of Adventure", "The Da Vinci Code",
   "Harry Potter and the Chamber of Secrets", "The Catcher in the Rye", "Harry Potter and the Prisoner of Azkaban", "Harry Potter and the Goblet of Fire", "Harry Potter and the Order of the Phoenix",
@@ -19,7 +20,8 @@ export const bestSellingBooksHints: string[] = [
   "Paul et Virginie", "What to Expect When You're Expecting", "Love You Forever", "The Women's Room", "The Diary of Adrian Mole",
   "Kitchen", "The Naked Ape", "The Revolt of Mamie Stover", "Inferno", "Twilight",
   "The Notebook", "The Martian", "The Girl Who Kicked the Hornet's Nest", "Fifty Shades of Grey", "Think and Grow Rich",
-  // Beyond top 100
+
+  // ===== EXISTING EXTRAS (beyond top 100) =====
   "Harry Potter", "The Lord of the Rings", "The Fellowship of the Ring", "The Two Towers", "The Return of the King",
   "The Lion, the Witch and the Wardrobe", "The Chronicles of Narnia", "Matilda", "The BFG",
   "1984", "Animal Farm", "Brave New World", "Fahrenheit 451", "The Handmaid's Tale",
@@ -34,4 +36,319 @@ export const bestSellingBooksHints: string[] = [
   "The Midnight Library", "Project Hail Mary", "The Hitchhiker's Guide to the Galaxy", "Ender's Game", "Ready Player One",
   "A Song of Ice and Fire", "Throne of Glass", "A Court of Thorns and Roses", "Divergent", "The Maze Runner",
   "Percy Jackson and the Lightning Thief", "The Giver", "The Outsiders", "The Perks of Being a Wallflower", "Speak",
+
+  // ===== CLASSIC LITERATURE =====
+  // Dickens
+  "Oliver Twist", "Great Expectations", "David Copperfield", "A Christmas Carol", "Bleak House",
+  "Nicholas Nickleby", "The Pickwick Papers", "Little Dorrit", "Our Mutual Friend", "Hard Times",
+  // Austen (additional)
+  "Mansfield Park", "Lady Susan",
+  // Brontës
+  "The Tenant of Wildfell Hall", "Villette", "Agnes Grey", "Shirley",
+  // Dostoevsky
+  "Notes from Underground", "The Idiot", "Demons", "The Gambler",
+  // Tolstoy
+  "Resurrection", "The Death of Ivan Ilyich", "Hadji Murad",
+  // Hugo
+  "Les Misérables", "The Hunchback of Notre-Dame",
+  // Twain
+  "The Adventures of Tom Sawyer", "A Connecticut Yankee in King Arthur's Court", "The Prince and the Pauper",
+  // Dumas
+  "The Count of Monte Cristo", "The Three Musketeers", "The Man in the Iron Mask",
+  // Other classic authors
+  "The Scarlet Letter", "Tess of the d'Urbervilles", "Far from the Madding Crowd", "The Mayor of Casterbridge",
+  "Middlemarch", "Silas Marner", "The Mill on the Floss",
+  "The Jungle Book", "Kim", "Just So Stories",
+  "Heart of Darkness", "Lord Jim", "Nostromo",
+  "Gulliver's Travels", "Robinson Crusoe", "Treasure Island", "Kidnapped",
+  "Around the World in Eighty Days", "Twenty Thousand Leagues Under the Sea", "Journey to the Center of the Earth",
+  "The War of the Worlds", "The Time Machine", "The Invisible Man",
+  "The Call of the Wild", "White Fang", "The Iron Heel",
+  "Little Women", "Little Men", "Jo's Boys",
+  "The Secret Garden", "A Little Princess", "The Wonderful Wizard of Oz",
+  "Uncle Tom's Cabin", "The Phantom of the Opera", "The Strange Case of Dr Jekyll and Mr Hyde",
+  "The Portrait of a Lady", "The Turn of the Screw", "Washington Square",
+  "Ulysses", "A Portrait of the Artist as a Young Man", "Dubliners",
+  "Mrs Dalloway", "To the Lighthouse", "Orlando",
+  "The Trial", "The Metamorphosis", "The Castle",
+  "The Stranger", "The Plague", "The Fall",
+  "Siddhartha", "Steppenwolf", "The Glass Bead Game",
+  "All Quiet on the Western Front", "The Tin Drum", "Buddenbrooks",
+  "Doctor Zhivago", "The Master and Margarita", "Dead Souls",
+  "Fathers and Sons", "Eugene Onegin", "A Hero of Our Time",
+  "Candide", "Dangerous Liaisons", "Germinal",
+  "Nana", "The Red and the Black",
+  "Swann's Way", "In Search of Lost Time",
+  "The Canterbury Tales", "Paradise Lost", "Beowulf",
+  "The Iliad", "The Odyssey", "The Aeneid",
+  "The Divine Comedy", "Decameron",
+
+  // ===== MODERN LITERARY FICTION =====
+  // Pulitzer / Booker winners & notable literary fiction
+  "Beloved", "Song of Solomon", "The Bluest Eye", "Sula",
+  "The Road", "No Country for Old Men", "Blood Meridian", "All the Pretty Horses",
+  "The Corrections", "Freedom", "Purity",
+  "The Brief Wondrous Life of Oscar Wao", "The Amazing Adventures of Kavalier & Clay",
+  "The Known World", "Gilead", "Housekeeping",
+  "A Gentleman in Moscow", "The Goldfinch", "The Secret History",
+  "The Lovely Bones", "The Time Traveler's Wife", "Life of Pi",
+  "Atonement", "Never Let Me Go", "The Remains of the Day", "Klara and the Sun",
+  "White Teeth", "On Beauty",
+  "The God of Small Things", "Shantaram", "A Fine Balance",
+  "The Shadow of the Wind", "The House of the Spirits",
+  "Love in the Time of Cholera", "Chronicle of a Death Foretold",
+  "The Unbearable Lightness of Being", "The Book Thief",
+  "All the Light We Cannot See", "The Nightingale",
+  "Circe", "The Song of Achilles",
+  "A Man Called Ove", "My Brilliant Friend",
+  "A Thousand Splendid Suns",
+  "Pachinko", "The Sympathizer",
+  "The Underground Railroad", "Homegoing",
+  "Americanah", "Half of a Yellow Sun", "Purple Hibiscus",
+  "The Vegetarian", "Convenience Store Woman",
+  "Norwegian Wood", "Kafka on the Shore", "1Q84", "The Wind-Up Bird Chronicle",
+  "Memoirs of a Geisha", "Snow Falling on Cedars",
+  "The Poisonwood Bible", "The Joy Luck Club", "The Kitchen God's Wife",
+  "White Oleander", "She's Come Undone",
+  "The Alienist", "The Historian",
+  "The Pillars of the Earth", "World Without End",
+  "Shogun", "Tai-Pan",
+  "Cold Mountain", "The English Patient",
+  "Middlesex", "The Virgin Suicides",
+
+  // ===== MYSTERY / THRILLER =====
+  // Agatha Christie
+  "Murder on the Orient Express", "The Murder of Roger Ackroyd", "Death on the Nile", "The ABC Murders",
+  "The Mousetrap", "Evil Under the Sun", "Crooked House", "Curtain",
+  "Five Little Pigs", "A Murder Is Announced", "The Body in the Library",
+  "Peril at End House", "The Mysterious Affair at Styles", "After the Funeral",
+  // Dan Brown
+  "Digital Fortress", "Deception Point", "Origin",
+  // James Patterson
+  "Along Came a Spider", "Kiss the Girls", "Cat & Mouse", "Pop Goes the Weasel",
+  "Roses Are Red", "Violets Are Blue", "The Women's Murder Club",
+  // John Grisham
+  "The Firm", "A Time to Kill", "The Pelican Brief", "The Client",
+  "The Rainmaker", "The Runaway Jury", "The Partner", "The Street Lawyer",
+  "A Painted House", "The Testament",
+  // Tom Clancy
+  "The Hunt for Red October", "Patriot Games", "Clear and Present Danger",
+  "The Sum of All Fears", "Rainbow Six", "Red Storm Rising",
+  // Lee Child
+  "Killing Floor", "Die Trying", "Tripwire", "The Affair",
+  // Michael Crichton
+  "Jurassic Park", "The Lost World", "Congo", "Sphere", "Timeline", "Prey",
+  // Robert Ludlum
+  "The Bourne Identity", "The Bourne Supremacy", "The Bourne Ultimatum",
+  // Other thriller
+  "The Silence of the Lambs", "Red Dragon", "Hannibal",
+  "The Girl Who Played with Fire",
+  "In the Woods", "The Likeness",
+  "The Woman in the Window", "The Silent Patient",
+  "The Husband's Secret",
+  "Sharp Objects", "Dark Places",
+  "The No. 1 Ladies' Detective Agency",
+  "Tinker, Tailor, Soldier, Spy", "The Spy Who Came in from the Cold",
+  "Casino Royale", "From Russia with Love", "Goldfinger", "Thunderball",
+  "The Talented Mr. Ripley", "Strangers on a Train",
+  "My Cousin Rachel",
+
+  // ===== ROMANCE =====
+  // Nicholas Sparks
+  "A Walk to Remember", "The Last Song", "Dear John", "Message in a Bottle",
+  "Nights in Rodanthe", "The Lucky One", "Safe Haven", "The Best of Me", "The Longest Ride",
+  // Nora Roberts
+  "The Witness", "Montana Sky", "Blue Smoke", "Northern Lights",
+  "Vision in White", "Bed of Roses", "Savor the Moment", "Happy Ever After",
+  // Danielle Steel
+  "The Gift", "Heartbeat", "Accident", "Five Days in Paris", "Malice", "Silent Honor",
+  // Colleen Hoover
+  "It Ends with Us", "It Starts with Us", "Verity", "Ugly Love",
+  "November 9", "Confess", "Reminders of Him",
+  // Other romance
+  "Fifty Shades Darker", "Fifty Shades Freed",
+  "Outlander", "Dragonfly in Amber", "Voyager",
+  "Me Before You", "After You", "Still Me",
+  "Pride and Prejudice and Zombies",
+  "The Rosie Project", "Eleanor Oliphant Is Completely Fine",
+  "Beach Read", "People We Meet on Vacation", "Book Lovers",
+  "The Hating Game", "The Kiss Quotient",
+
+  // ===== SCI-FI / FANTASY =====
+  // Tolkien
+  "The Silmarillion", "Unfinished Tales", "The Children of Húrin",
+  // Asimov
+  "Foundation", "Foundation and Empire", "Second Foundation",
+  "I, Robot", "The Caves of Steel", "The Naked Sun",
+  // Clarke
+  "2001: A Space Odyssey", "Rendezvous with Rama", "Childhood's End",
+  // Herbert
+  "Dune Messiah", "Children of Dune", "God Emperor of Dune",
+  // Rowling (already included above via Harry Potter)
+  // Sanderson
+  "Mistborn: The Final Empire", "The Way of Kings", "Words of Radiance",
+  "Oathbringer", "Rhythm of War", "Elantris", "Warbreaker",
+  // GRRM
+  "A Game of Thrones", "A Clash of Kings", "A Storm of Swords",
+  "A Feast for Crows", "A Dance with Dragons",
+  // Other sci-fi/fantasy
+  "The Left Hand of Darkness", "The Dispossessed",
+  "Slaughterhouse-Five", "Cat's Cradle", "Breakfast of Champions",
+  "Neuromancer", "Snow Crash", "The Diamond Age",
+  "Do Androids Dream of Electric Sheep?", "A Scanner Darkly",
+  "The Wheel of Time", "The Eye of the World", "The Great Hunt",
+  "The Colour of Magic", "The Light Fantastic", "Mort", "Guards! Guards!", "Small Gods", "Going Postal",
+  "Good Omens", "American Gods", "Neverwhere", "Coraline", "The Graveyard Book", "Stardust",
+  "The Name of the Wind", "The Wise Man's Fear",
+  "Eragon", "Eldest", "Brisingr", "Inheritance",
+  "The Golden Compass", "The Subtle Knife", "The Amber Spyglass",
+  "Artemis Fowl", "Artemis Fowl: The Arctic Incident",
+  "A Wrinkle in Time", "A Wind in the Door",
+  "The Chronicles of Amber",
+  "Ringworld", "The Moon Is a Harsh Mistress", "Stranger in a Strange Land",
+  "Starship Troopers", "The Forever War",
+  "Solaris", "Contact",
+  "The Expanse", "Leviathan Wakes",
+  "Old Man's War",
+  "Red Rising", "Golden Son", "Morning Star",
+  "The Fifth Season", "The Obelisk Gate",
+  "Piranesi", "Jonathan Strange & Mr Norrell",
+  "The Princess Bride",
+  "The Earthsea Cycle", "A Wizard of Earthsea", "The Tombs of Atuan",
+
+  // ===== HORROR =====
+  // Stephen King
+  "It", "The Shining", "Carrie", "Salem's Lot", "Misery",
+  "Pet Sematary", "The Stand", "The Green Mile", "The Dark Tower",
+  "Doctor Sleep", "11/22/63", "Cujo", "Christine", "Firestarter",
+  "Needful Things", "Desperation", "Cell", "Under the Dome",
+  "The Institute", "Billy Summers", "Holly",
+  "Different Seasons", "Night Shift", "Skeleton Crew",
+  // Dean Koontz
+  "Watchers", "Phantoms", "Intensity", "Odd Thomas", "The Bad Place",
+  "Lightning", "Midnight", "Strangers",
+  // Other horror
+  "The Exorcist", "Rosemary's Baby", "The Haunting of Hill House",
+  "Interview with the Vampire", "The Vampire Lestat", "Queen of the Damned",
+  "World War Z", "The Passage",
+  "House of Leaves", "Bird Box",
+  "Mexican Gothic",
+
+  // ===== CHILDREN'S / YA =====
+  // Dr. Seuss
+  "Green Eggs and Ham", "The Cat in the Hat", "One Fish Two Fish Red Fish Blue Fish",
+  "Oh, the Places You'll Go!", "How the Grinch Stole Christmas!", "Horton Hears a Who!",
+  "Fox in Socks", "Hop on Pop", "The Lorax", "Yertle the Turtle",
+  // Roald Dahl
+  "Danny the Champion of the World", "The Witches", "Fantastic Mr Fox", "George's Marvellous Medicine",
+  "The Twits", "Boy", "Going Solo",
+  // Diary of a Wimpy Kid
+  "Diary of a Wimpy Kid", "Diary of a Wimpy Kid: Rodrick Rules", "Diary of a Wimpy Kid: The Last Straw",
+  "Diary of a Wimpy Kid: Dog Days", "Diary of a Wimpy Kid: The Ugly Truth",
+  // Other children's / YA
+  "Goodnight Moon", "The Giving Tree", "Guess How Much I Love You",
+  "The Polar Express", "Brown Bear, Brown Bear, What Do You See?",
+  "If You Give a Mouse a Cookie", "Corduroy", "Curious George",
+  "Clifford the Big Red Dog", "Where the Sidewalk Ends", "A Light in the Attic",
+  "The Phantom Tollbooth", "Bridge to Terabithia", "Holes",
+  "Hatchet", "My Side of the Mountain", "Island of the Blue Dolphins",
+  "Number the Stars", "Roll of Thunder, Hear My Cry",
+  "The Velveteen Rabbit", "Winnie-the-Pooh", "The House at Pooh Corner",
+  "Stuart Little", "The Trumpet of the Swan",
+  "Pippi Longstocking", "The Neverending Story", "Momo",
+  "The Borrowers",
+  "The Railway Children", "Swallows and Amazons",
+  "The Famous Five", "The Secret Seven",
+  "Nancy Drew", "The Hardy Boys",
+  "Goosebumps", "Fear Street",
+  "Captain Underpants", "Dork Diaries",
+  "Dog Man", "Big Nate",
+  "The Baby-Sitters Club", "Sweet Valley High",
+  "A Series of Unfortunate Events", "The Bad Beginning",
+  "The Lightning Thief", "The Sea of Monsters",
+  "Miss Peregrine's Home for Peculiar Children",
+  "The Absolutely True Diary of a Part-Time Indian",
+  "Tuck Everlasting", "From the Mixed-Up Files of Mrs. Basil E. Frankweiler",
+  "Harriet the Spy", "The Cricket in Times Square",
+  "Stellaluna", "The Rainbow Fish",
+  "The Snowy Day", "Harold and the Purple Crayon",
+  "Llama Llama Red Pajama",
+  "Pete the Cat", "The Gruffalo",
+  "Giraffes Can't Dance", "Dragons Love Tacos",
+  "The Day the Crayons Quit",
+  "Wonder", "Auggie & Me",
+  "The War That Saved My Life",
+  "Redwall", "Hoot",
+
+  // ===== NON-FICTION =====
+  // Self-help / personal development
+  "Rich Dad Poor Dad", "The 48 Laws of Power", "Atomic Habits",
+  "The Subtle Art of Not Giving a F*ck", "You Are a Badass",
+  "The Four Agreements",
+  "Man's Search for Meaning", "Meditations",
+  "12 Rules for Life", "Beyond Order",
+  "The Power of Now", "A New Earth",
+  "Thinking, Fast and Slow", "Outliers", "Blink", "The Tipping Point", "Talking to Strangers",
+  "Quiet: The Power of Introverts", "Grit",
+  "Daring Greatly", "Brené Brown",
+  "The Life-Changing Magic of Tidying Up",
+  "Mindset: The New Psychology of Success",
+  "Deep Work", "Digital Minimalism",
+  "The Lean Startup", "Zero to One",
+  "Good to Great", "Built to Last",
+  "Start with Why", "Leaders Eat Last",
+  "The Innovator's Dilemma",
+  // Memoirs / biography
+  "The Autobiography of Malcolm X", "Long Walk to Freedom",
+  "Steve Jobs", "Elon Musk",
+  "When Breath Becomes Air", "Tuesdays with Morrie",
+  "The Last Lecture", "Wild",
+  "Eat, Pray, Love", "A Year in Provence",
+  "Into the Wild", "Into Thin Air",
+  "Unbroken", "Seabiscuit",
+  "Night",
+  "Angela's Ashes",
+  "Open", "Greenlights",
+  "Shoe Dog", "Spare",
+  "Michelle Obama", "The Promised Land",
+  // History
+  "Sapiens", "Homo Deus", "21 Lessons for the 21st Century",
+  "Guns, Germs, and Steel", "Collapse",
+  "A People's History of the United States",
+  "The Rise and Fall of the Third Reich",
+  "Team of Rivals", "1776",
+  "The Art of War", "The Prince",
+  "Freakonomics", "SuperFreakonomics",
+  // Science
+  "A Short History of Nearly Everything", "The Selfish Gene", "The Blind Watchmaker",
+  "The Origin of Species", "Silent Spring",
+  "The Structure of Scientific Revolutions",
+  "Astrophysics for People in a Hurry",
+  "The Elegant Universe", "The Hidden Life of Trees",
+  "Surely You're Joking, Mr. Feynman!",
+  "The Double Helix", "The Gene",
+  "Why We Sleep", "Breath",
+
+  // ===== RELIGIOUS / SPIRITUAL =====
+  "The Bible", "The Holy Bible", "The Quran", "The Torah",
+  "Erta Ale", "The Book of Mormon",
+  "The Bhagavad Gita", "The Upanishads",
+  "Tao Te Ching", "The Art of Happiness",
+  "The Tibetan Book of the Dead", "Autobiography of a Yogi",
+  "Mere Christianity", "The Screwtape Letters",
+  "The Case for Christ", "The Case for Faith",
+  "Jesus Calling", "Left Behind",
+  "The Pilgrim's Progress",
+
+  // ===== MANGA / GRAPHIC NOVELS =====
+  "One Piece", "Naruto", "Dragon Ball", "Dragon Ball Z",
+  "Attack on Titan", "Death Note", "My Hero Academia",
+  "Demon Slayer", "Fullmetal Alchemist", "Bleach",
+  "One Punch Man", "Sailor Moon", "Astro Boy",
+  "Akira", "Ghost in the Shell",
+  "Maus", "Persepolis", "Watchmen",
+  "The Sandman", "V for Vendetta", "Batman: The Dark Knight Returns",
+  "The Walking Dead", "Saga",
+  "Fun Home", "Blankets",
+  "Bone", "Scott Pilgrim",
 ];

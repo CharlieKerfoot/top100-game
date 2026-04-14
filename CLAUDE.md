@@ -27,3 +27,11 @@ The 10 list topics are **final** and must not be changed, added to, or removed:
 Additionally, `new` and `top50` are meta-topics describing list format, not content categories.
 
 When creating new lists, assign one or two of the above topics. If a list doesn't fit any specific topic, use `misc`. Never introduce new topics.
+
+## Lists and Hints
+Hints are search bar autocomplete suggestions. There must be far more possible suggestions than actual answers otherwise the game is too easy. It should not be difficult to get a strike.
+
+For Top 100 Lists, there should be at the very least 500+ hints (for fixed groups like countries, every possible answer is adequate). The aim should really be for 750-1000 if possible.
+For Top 50 Lists, the bare minimum should be 250. Again, aim for at least 500 is possible.
+
+Make sure that all hints are unique (no duplicates) and don't repeat with difference in punctuation or capitalization either.

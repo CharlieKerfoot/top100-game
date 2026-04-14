@@ -1,5 +1,5 @@
 export const mostSubscribedYoutubeHints: string[] = [
-  // Top 100 (the actual answers)
+  // ===== TOP 100 (the actual answers) =====
   "MrBeast", "T-Series", "Cocomelon - Nursery Rhymes", "SET India", "Vlad and Niki",
   "Kids Diana Show", "Stokes Twins", "Like Nastya", "김프로KIMPRO", "Zee Music Company",
   "WWE", "Alejo Igoa", "PewDiePie", "Goldmines", "Sony SAB",
@@ -20,15 +20,274 @@ export const mostSubscribedYoutubeHints: string[] = [
   "Ishtar Music", "Real Fools Shorts Official", "Bad Bunny", "T-Series Bollywood Classics", "BETER BÖCÜK",
   "IShowSpeed", "Sierra & Rhia FAM", "Techno Gamerz", "IndiaTV", "Maria Clara & JP",
   "PowerKids TV", "Fernanfloo", "ABP NEWS", "Shakira", "Karla Bustillos",
-  // Beyond top 100 (additional plausible guesses)
-  "Logan Paul", "KSI", "Ninja", "Linus Tech Tips", "Vsauce", "Kurzgesagt – In a Nutshell",
-  "CGP Grey", "3Blue1Brown", "Veritasium", "SmarterEveryDay", "James Charles", "NikkieTutorials",
-  "Jeffree Star", "David Dobrik", "Jake Paul", "Ryan's World", "Blippi", "CoComelon - Songs",
-  "Nastya", "Pinkfong", "GachaLife", "Aphmau", "DanTDM", "Stampy Long Head", "CaptainSparklez",
-  "Dream", "GeorgeNotFound", "Technoblade", "SypherPK", "Ali-A", "Muselk",
-  "Unspeakable", "Preston", "Lankybox", "SSundee", "PopularMMOs", "Jordan Matter",
-  "FGTeeV", "Guava Juice", "Collins Key", "Rosanna Pansino", "Binging with Babish",
-  "Gordon Ramsay", "Joshua Weissman", "Tasty", "BuzzFeed", "Vice", "CNN",
-  "BBC News", "Fox News", "ESPN", "NBA", "NFL", "FIFA", "Real Madrid CF",
+
+  // ===== GAMING CHANNELS =====
+  "Markiplier", "Jacksepticeye", "Ninja", "DanTDM", "Stampy Long Head",
+  "CaptainSparklez", "Dream", "GeorgeNotFound", "Technoblade", "SypherPK",
+  "Ali-A", "Muselk", "Unspeakable", "Preston", "SSundee",
+  "PopularMMOs", "FGTeeV", "Aphmau", "Lankybox", "VanossGaming",
+  "Typical Gamer", "Tfue", "TimTheTatman", "DrDisRespect", "Shroud",
+  "xQc", "Pokimane", "Valkyrae", "Ludwig", "CourageJD",
+  "Lazarbeam", "Lachlan", "Fresh", "BajanCanadian", "JeromeASF",
+  "SSSniperWolf", "LazarBeam", "Kwebbelkop", "Jelly", "Slogoman",
+  "Crainer", "iBallisticSquid", "TheDiamondMinecart", "Sky Does Minecraft", "AntVenom",
+  "Mumbo Jumbo", "Grian", "Hermitcraft", "Sapnap", "Karl Jacobs",
+  "Quackity", "TommyInnit", "Tubbo", "Ranboo", "Wilbur Soot",
+  "Ph1LzA", "SmallAnt", "RTGame", "CallMeKevin", "Jacksfilms",
+  "Coryxkenshin", "8-BitRyan", "TheGamingBeaver", "Anomaly", "Ksi Gaming",
+  "LOUD", "LOUD Coringa", "Nobru", "Cellbit", "Gaules",
+  "Vegetta777", "ElRubiusOMG", "TheWillyrex", "AuronPlay", "Rubius",
+  "iFerg", "JEFFY", "Haminations", "GamersNexus",
+
+  // ===== KIDS & FAMILY CHANNELS =====
+  "Ryan's World", "Blippi", "CoComelon - Songs", "Nastya", "Pinkfong",
+  "GachaLife", "Guava Juice", "Collins Key", "EvanTubeHD", "Sis vs Bro",
+  "Troom Troom", "A for Adley", "The Royalty Family", "Ohana Adventure",
+  "Familia Diamond", "Eh Bee Family", "That YouTub3 Family", "Shot of The Yeagers",
+  "SuperHeroKids", "Chad Wild Clay", "Vy Qwaint", "Spy Ninja",
+  "Diana and Roma", "Peppa Pig Official Channel", "Thomas & Friends",
+  "Hey Bear Sensory", "Bounce Patrol", "Dave and Ava", "Little Baby Bum",
+  "Super Simple Songs", "Paw Patrol Official", "Sesame Street",
+  "Moonbug Kids", "BabyBus", "Pocoyo", "Morphle", "Little Angel",
+  "Barbie", "Hot Wheels", "LEGO", "Playmobil",
+
+  // ===== MUSIC ARTIST CHANNELS =====
+  "BTS", "TWICE", "EXO", "SEVENTEEN", "Stray Kids",
+  "Drake", "The Weeknd", "Post Malone", "Dua Lipa", "Rihanna",
+  "Beyoncé", "Bruno Mars", "Katy Perry", "Lady Gaga", "Adele",
+  "Selena Gomez", "Demi Lovato", "Shawn Mendes", "Camila Cabello", "Harry Styles",
+  "Nicki Minaj", "Cardi B", "Megan Thee Stallion", "Travis Scott", "Kanye West",
+  "Juice WRLD", "XXXTentacion", "Lil Nas X", "Doja Cat", "SZA",
+  "Olivia Rodrigo", "Imagine Dragons", "Coldplay", "Maroon 5", "OneRepublic",
+  "Twenty One Pilots", "Panic! At The Disco", "Fall Out Boy", "Linkin Park", "Green Day",
+  "Metallica", "AC/DC", "Queen Official", "The Beatles", "Pink Floyd",
+  "Ozuna", "Daddy Yankee", "J Balvin", "Maluma", "Anuel AA",
+  "Karol G", "Rauw Alejandro", "Farruko", "Sech", "Natti Natasha",
+  "Luis Fonsi", "Enrique Iglesias", "Marc Anthony", "Romeo Santos", "Aventura",
+  "Anitta", "Luisa Sonza", "Gusttavo Lima", "Marilia Mendonca", "Jorge & Mateus",
+  "Henrique & Juliano", "Wesley Safadao", "Luan Santana", "Zé Neto & Cristiano",
+  "BIA", "Sam Smith", "Lizzo", "Khalid", "Lauv",
+  "Tones and I", "Lewis Capaldi", "Sia", "Calvin Harris", "David Guetta",
+  "Tiësto", "Avicii", "Alan Walker", "Martin Garrix", "Kygo",
+  "ROSÉ", "Lisa", "Jungkook", "V", "Jimin",
+  "IU", "aespa", "ITZY", "Red Velvet", "NCT",
+  "Arijit Singh", "Neha Kakkar", "Guru Randhawa", "Yo Yo Honey Singh", "Badshah",
+  "Atif Aslam", "Shreya Ghoshal", "Jubin Nautiyal", "B Praak", "Darshan Raval",
+
+  // ===== MUSIC LABELS & COMPANIES =====
+  "Warner Music", "Universal Music", "Sony Music", "Atlantic Records", "Republic Records",
+  "Interscope Records", "Def Jam Recordings", "Capitol Records", "Columbia Records",
+  "Big Hit Music", "SM Entertainment", "JYP Entertainment", "YG Entertainment",
+  "Speed Records", "Desi Music Factory", "White Hill Music", "Eros Now",
+  "Ultra Music", "Spinnin' Records", "Monstercat", "NCS", "Trap Nation",
+  "Bass Nation", "MrSuicideSheep", "Proximity", "Majestic Casual",
+  "Vevo", "WorldStarHipHop", "Lyrical Lemonade",
+
+  // ===== ENTERTAINMENT & COMEDY =====
+  "Logan Paul", "KSI", "Jake Paul", "David Dobrik", "Jordan Matter",
+  "Lele Pons", "Hannah Stocking", "King Bach", "Liza Koshy", "Lilly Singh",
+  "Trevor Noah", "Jimmy Kimmel Live", "The Tonight Show Starring Jimmy Fallon",
+  "The Late Late Show with James Corden", "Saturday Night Live",
+  "Jimmy Fallon", "Stephen Colbert", "Conan O'Brien", "The Ellen Show",
+  "Smosh", "Good Mythical Morning", "Rhett & Link", "Corridor Crew", "Corridor Digital",
+  "Brandon Farris", "Danny Gonzalez", "Drew Gooden", "Kurtis Conner", "Cody Ko",
+  "Noel Miller", "Eddy Burback", "penguinz0", "Dunkey", "Internet Historian",
+  "CasuallyExplained", "Sam O'Nella Academy", "Jaiden Animations",
+  "TheOdd1sOut", "Domics", "Let Me Explain Studios", "Swoozie",
+  "CalebCity", "Lenarr Young", "Zach King", "Jay Shetty",
+  "Yes Theory", "Matt D'Avella", "Thomas Frank",
+  "Jenna Marbles", "Shane Dawson", "Philip DeFranco", "Casey Neistat",
+  "Emma Chamberlain", "James Marriott", "Memeulous", "WillNE",
+  "ImAllexx", "KSIOlajidebt", "Sidemen",
+
+  // ===== TECH CHANNELS =====
+  "Linus Tech Tips", "MKBHD", "Unbox Therapy", "iJustine", "Austin Evans",
+  "Dave Lee", "Mrwhosetheboss", "JerryRigEverything", "Lew Later", "ShortCircuit",
+  "Techquickie", "Marques Brownlee", "Jonathan Morrison", "UrAvgConsumer",
+  "The Verge", "Wired", "Digital Foundry", "Hardware Unboxed",
+  "Gamers Nexus", "Bitwit", "JayzTwoCents", "Paul's Hardware",
+  "LinusTechTips", "TechLinked", "Android Authority",
+  "SuperSaf", "CNET", "Tom's Guide", "Arun Maini",
+  "Technical Guruji", "Trakin Tech", "Geekyranjit",
+
+  // ===== EDUCATIONAL CHANNELS =====
+  "Vsauce", "Kurzgesagt – In a Nutshell", "CGP Grey", "3Blue1Brown",
+  "Veritasium", "SmarterEveryDay", "MinutePhysics", "MinuteEarth",
+  "Numberphile", "Computerphile", "Tom Scott", "Real Engineering",
+  "Wendover Productions", "Half as Interesting", "PolyMatter",
+  "Economics Explained", "CrashCourse", "Khan Academy", "TED",
+  "TED-Ed", "Vox", "Explained", "RealLifeLore", "Geography Now",
+  "Oversimplified", "History Matters", "Kings and Generals", "Epic History TV",
+  "The Infographics Show", "Bright Side", "AsapSCIENCE",
+  "SciShow", "PBS Space Time", "Science Asylum", "Domain of Science",
+  "Mathologer", "Stand-up Maths", "Primer", "Lemmino",
+  "Johnny Harris", "Polymatter", "ColdFusion",
+
+  // ===== BEAUTY & LIFESTYLE =====
+  "James Charles", "NikkieTutorials", "Jeffree Star", "Tati Westbrook",
+  "Manny MUA", "Jackie Aina", "Patrick Starrr", "RawBeautyKristi",
+  "Bailey Sarian", "Robert Welsh", "Hyram", "Dr. Dray",
+  "Alexandra Anele", "Wayne Goss", "Lisa Eldridge",
+  "Huda Beauty", "Fenty Beauty", "Sephora", "Ulta Beauty",
+
+  // ===== SPORTS CHANNELS =====
+  "ESPN", "NBA", "NFL", "FIFA", "Real Madrid CF",
   "FC Barcelona", "Manchester United", "Liverpool FC", "Chelsea FC",
+  "Manchester City", "Arsenal", "Tottenham Hotspur", "Juventus",
+  "Paris Saint-Germain", "Bayern Munich", "Borussia Dortmund",
+  "Premier League", "La Liga", "UEFA Champions League", "Bundesliga",
+  "Serie A", "NFL Films", "NBA Highlights", "ESPN FC",
+  "Sky Sports", "BT Sport", "DAZN", "beIN Sports",
+  "UFC", "Bellator MMA", "Boxing", "SHOWTIME Sports",
+  "Red Bull", "GoPro", "X Games", "Olympics",
+  "ICC Cricket", "BCCI", "IPL", "Cricket Australia",
+  "Cricbuzz", "Willow Sports",
+
+  // ===== NEWS CHANNELS =====
+  "CNN", "BBC News", "Fox News", "MSNBC", "ABC News",
+  "CBS News", "NBC News", "Sky News", "Al Jazeera English",
+  "WION", "Republic World", "NDTV", "TV9 Bharatvarsh",
+  "Zee News", "News18 India", "Republic Bharat",
+  "NHK World", "DW News", "France 24 English", "RT",
+  "The New York Times", "The Washington Post", "The Guardian",
+  "Wall Street Journal", "Bloomberg", "CNBC",
+  "Vice News", "Now This",
+
+  // ===== COOKING & FOOD =====
+  "Gordon Ramsay", "Rosanna Pansino", "Binging with Babish", "Joshua Weissman",
+  "Tasty", "BuzzFeed", "Bon Appétit", "Epicurious",
+  "Food Wishes", "Nisha Madhulika", "SanjeevKapoorKhazana", "Kabita's Kitchen",
+  "Hebbars Kitchen", "Yummy", "HowToBBQRight", "Guga Foods",
+  "Nick DiGiovanni", "Adam Ragusea", "Ethan Chlebowski",
+  "Chinese Cooking Demystified", "Maangchi", "Jun's Kitchen",
+  "Cooking with Dog", "Chocolate Cacao", "Sorted Food",
+  "Jamie Oliver", "Nigella Lawson", "MatPat Food Theory",
+
+  // ===== INDIAN YOUTUBE CHANNELS =====
+  "CarryMinati", "Amit Bhadana", "BB Ki Vines", "Ashish Chanchlani",
+  "Round2Hell", "Triggered Insaan", "Harsh Beniwal", "Gaurav Taneja",
+  "MostlySane", "Dhruv Rathee", "Sandeep Maheshwari", "Vivek Bindra",
+  "Total Gaming", "Mortal", "Scout", "Dynamo Gaming",
+  "Nischay Malhan", "Sourav Joshi Vlogs", "Flying Beast", "Manoj Dey",
+  "Rajat Dalal", "UK07 Rider", "Elvish Yadav", "Mr Indian Hacker",
+  "Crazy XYZ", "Technical Sagar", "Mumbiker Nikhil", "Be YouNick",
+  "Slayy Point", "Tanmay Bhat", "AIB", "TVF",
+  "FilterCopy", "Dice Media", "The Viral Fever", "Bhuvan Bam",
+
+  // ===== BRAZILIAN / PORTUGUESE CHANNELS =====
+  "Felipe Neto", "Whindersson Nunes", "Luccas Neto", "Enaldinho",
+  "Porta dos Fundos", "Você Sabia?", "Manual do Mundo", "Rezende Evil",
+  "AuthenticGames", "Cris Minegirl", "Camila Loures", "Carlinhos Maia",
+  "Virgínia Fonseca", "Bibi", "Lucas Neto", "T3ddy",
+  "Gato Galactico", "Tazer Craft", "Flakes Power", "Irmãos Neto",
+  "Alanzoka", "BRKsEDU", "Coisa de Nerd", "Wuant",
+
+  // ===== SPANISH-LANGUAGE CHANNELS =====
+  "Luisito Comunica", "Kimberly Loaiza", "Badabun", "Los Polinesios",
+  "Yuya", "Enchufe.tv", "HolaSoyGerman", "Pautips",
+  "YOLO", "Katie Angel", "Daniel El Travieso", "La Divaza",
+  "Ami Rodriguez", "Sebastian Villalobos", "DrossRotzank",
+  "Oxlack Investigador", "Jaime Altozano", "Ibai",
+  "Wismichu", "DavidParody", "TheGrefg", "Lolito Fernandez",
+  "BySta X", "elcsjbkgrabi", "El Demente", "Yoss Bones",
+
+  // ===== K-POP & ASIAN CHANNELS =====
+  "SMTOWN", "1theK", "Stone Music Entertainment",
+  "Mnet K-POP", "KBS Kpop", "MBCkpop",
+  "TOMORROW X TOGETHER", "ENHYPEN", "LE SSERAFIM",
+  "NewJeans", "(G)I-DLE", "MAMAMOO",
+  "GOT7", "Monsta X", "ATEEZ", "TXT",
+  "TREASURE", "iKON", "WINNER",
+  "Shanti Music", "Bollywood Classics",
+  "Rajshri", "Eros Now Music", "Speed Records Punjabi",
+
+  // ===== PRANK & CHALLENGE CHANNELS =====
+  "Troom Troom FOOD", "123 GO!", "ACTUALLY HAPPENED",
+  "The ACE Family", "Ben Azelart", "Brent Rivera",
+  "SteveWillDoIt", "NELK", "Ross Creations", "ThatWasEpic",
+  "Just For Laughs Gags", "BigDawsTv", "Ed Bassmaster",
+  "Jack Vale Films", "Vitalyzdtv", "RomanAtwood",
+  "Dennis Roady", "FouseyTube", "JoeySalads",
+
+  // ===== VLOG CHANNELS =====
+  "Roman Atwood Vlogs", "Jesse Wellens", "fouseyTUBE",
+  "Tana Mongeau", "Trisha Paytas", "Gabbie Hanna",
+  "Wengie", "Superwoman", "Bethany Mota",
+  "Zoella", "PointlessBlog", "Joe Sugg", "KSI Clips",
+  "Deji", "JJ Olatunji", "W2S", "Miniminter",
+  "Vikkstar123", "TBJZL", "Zerkaa", "Behzinga",
+
+  // ===== DIY & CRAFT CHANNELS =====
+  "Troom Troom SELECT", "123 GO! GOLD", "5-Minute Crafts PLAY",
+  "Blossom", "So Yummy", "Nifty", "First Media",
+  "Mr. Kate", "DIY Creators", "I Like To Make Stuff",
+  "Laura Kampf", "Simone Giertz", "The Sorry Girls",
+  "Fix This Build That", "Home RenoVision DIY", "This Old House",
+  "Bob Vila", "Essential Craftsman",
+
+  // ===== MOVIE & TV CLIP CHANNELS =====
+  "Screen Rant", "WatchMojo", "Looper", "CinemaSins",
+  "Honest Trailers", "New Rockstars", "Film Theory",
+  "Nerdwriter1", "Every Frame a Painting", "Chris Stuckmann",
+  "Jeremy Jahns", "Flick Pick", "Heavy Spoilers",
+  "Emergency Awesome", "ComicBookCast2", "Mr Sunday Movies",
+  "Marvel Entertainment", "DC", "Warner Bros. Pictures",
+  "Sony Pictures Entertainment", "Universal Pictures", "Pixar",
+  "Disney", "Paramount Pictures", "Lionsgate Movies",
+  "A24", "Netflix", "HBO", "Hulu", "Amazon Prime Video",
+  "Apple TV", "Peacock",
+
+  // ===== ANIMATION CHANNELS =====
+  "Kurzgesagt – Animation", "Alan Becker", "Cas van de Pol",
+  "Flashgitz", "Telepurte", "Worthikids", "Felix Colgrave",
+  "Gooseworx", "Vivziepop", "Helluva Boss", "Hazbin Hotel",
+  "Meat Canyon", "psychicpebbles", "OneyPlays",
+  "Sr Pelo", "GingerPale", "Hamations", "illymation",
+  "Tabbes", "IceCreamSandwich", "Brewstew",
+
+  // ===== SCIENCE & NATURE =====
+  "National Geographic", "Discovery", "BBC Earth", "Animal Planet",
+  "Nat Geo Wild", "Nature on PBS", "Wildlife Aid",
+  "The Dodo", "Daily Dose of Internet", "It's Okay to Be Smart",
+  "Steve Mould", "Stuff Made Here", "NileRed", "NileBlue",
+  "Cody'sLab", "Applied Science", "Technology Connections",
+  "ElectroBOOM", "Practical Engineering", "The Action Lab",
+  "The Slow Mo Guys", "Beyond the Press", "Hydraulic Press Channel",
+  "Mark Roper", "Destin Sandlin", "Physics Girl",
+
+  // ===== PODCAST & TALK CHANNELS =====
+  "Joe Rogan", "The Joe Rogan Experience", "H3H3Productions",
+  "Theo Von", "Lex Fridman", "Andrew Huberman",
+  "Jordan Peterson", "Ben Shapiro", "PragerU", "TYT",
+  "Valuetainment", "GaryVee", "Tom Bilyeu", "Lewis Howes",
+  "Jay Shetty Podcast", "The Breakfast Club",
+  "Hot Ones", "First We Feast", "Complex",
+
+  // ===== FITNESS & HEALTH =====
+  "Blogilates", "POPSUGAR Fitness", "Pamela Reif", "Chloe Ting",
+  "Jeff Nippard", "Athlean-X", "Jeremy Ethier", "Greg Doucette",
+  "Natacha Oceane", "MattDoesFitness", "Chris Heria", "THENX",
+  "FitnessBlender", "Yoga With Adriene", "Boho Beautiful",
+
+  // ===== CAR & MOTORSPORT CHANNELS =====
+  "Doug DeMuro", "Donut Media", "Top Gear", "The Grand Tour",
+  "Formula 1", "MotoGP", "NASCAR", "CarWow",
+  "Supercar Blondie", "Shmee150", "TheStradman",
+
+  // ===== MUSIC REACTION & COVER CHANNELS =====
+  "Kurt Hugo Schneider", "Boyce Avenue", "Alex Aiono",
+  "Sam Tsui", "Pentatonix", "Lindsey Stirling", "The Piano Guys",
+  "Two Cellos", "Postmodern Jukebox", "Walk off the Earth",
+
+  // ===== MISC & OTHER POPULAR CHANNELS =====
+  "BuzzFeedVideo", "Vice", "Insider", "Business Insider",
+  "Morning Brew", "Graham Stephan", "Andrei Jikh", "Meet Kevin",
+  "Dave Ramsey", "Grant Cardone", "Tai Lopez",
+  "Mark Dice", "The Young Turks", "NowThis News",
+  "Jubilee", "Cut", "REACT", "FBE",
+  "Studio C", "Dhar Mann", "Nas Daily", "Peter McKinnon",
+  "Mango", "Mango Telugu Cinema", "Goldmines Hindi",
+  "Venus", "Eagle Hindi Movies",
+  "B4U Movies", "Ultra Movie Parlour", "Rajshri Movies",
+  "SRS Media", "NH Studioz", "Pen Movies",
 ];

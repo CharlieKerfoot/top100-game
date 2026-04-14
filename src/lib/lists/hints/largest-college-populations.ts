@@ -31,7 +31,7 @@ export const largestCollegePopulationsHints: string[] = [
   "University of Rochester", "Boston College", "Georgia Tech",
   "UC Irvine", "UC San Diego", "William & Mary",
   "Brandeis", "Case Western Reserve", "Villanova",
-  "Lehigh", "Pepperdine", "Rensselaer Polytechnic Institute",
+  "Lehigh", "Pepperdine", "Rensselaer Polytechnic Institute", "Tulane",
   "Santa Clara University", "George Washington University",
   "University of Miami", "Fordham", "Stevens Institute of Technology",
   "Drexel", "Loyola Marymount", "Gonzaga",
