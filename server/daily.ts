@@ -17,6 +17,10 @@ function getOrCreateToday(): DayStats {
   if (!stats) {
     stats = { totalScore: 0, playCount: 0, scores: [], submittedIps: new Set() };
     dailyStats.set(key, stats);
+    // Evict old entries — keep only today
+    for (const k of dailyStats.keys()) {
+      if (k !== key) dailyStats.delete(k);
+    }
   }
   return stats;
 }
