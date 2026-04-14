@@ -226,5 +226,5 @@ export function searchLists(query: string, activeTopic: string | null): GameList
     );
   }
 
-  return filtered;
+  return filtered.sort((a, b) => a.name.localeCompare(b.name));
 }
