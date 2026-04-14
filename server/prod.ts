@@ -13,7 +13,7 @@ const httpServer = createServer(async (req: IncomingMessage, res: ServerResponse
   }
 });
 const io = new Server(httpServer, {
-  cors: { origin: '*' },
+  cors: { origin: process.env.CORS_ORIGIN || 'https://commoncents.fun' },
 });
 
 setupSocketServer(io);
