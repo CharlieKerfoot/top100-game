@@ -4,7 +4,7 @@ import { nflCareerPprHints } from './hints/nfl-career-ppr';
 export const nflCareerPpr: GameList = {
   id: 'nfl-career-ppr',
   name: 'NFL All-Time Career PPR Fantasy Points',
-  description: 'NFL players ranked by all-time career PPR fantasy points scored',
+  description: 'NFL players ranked by all-time career PPR fantasy points (Pro Football Reference)',
   topics: ['sports'],
   hints: nflCareerPprHints,
   valueLabel: 'PPR Points',

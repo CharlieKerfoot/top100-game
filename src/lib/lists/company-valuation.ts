@@ -4,7 +4,7 @@ import { companyValuationHints } from './hints';
 export const companyValuation: GameList = {
   id: 'company-valuation',
   name: 'Most Valuable Companies',
-  description: 'Companies ranked by market capitalization (2025)',
+  description: 'Companies ranked by market capitalization (companiesmarketcap.com, 2025)',
   topics: ['money'],
   hints: companyValuationHints,
   valueLabel: 'Market Cap',

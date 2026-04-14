@@ -2596,31 +2596,6 @@
     font-style: italic;
   }
 
-  .party-code-section {
-    text-align: center;
-    background: var(--color-cream);
-    border: 1px solid var(--color-gold);
-    padding: 1.25rem;
-    margin-bottom: 1rem;
-  }
-
-  .code-label {
-    display: block;
-    font-family: "Playfair Display", Georgia, serif;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #777;
-    margin-bottom: 0.5rem;
-  }
-
-  .code-display {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
   .code-text {
     font-size: 1.6rem;
     font-weight: 800;
@@ -2648,41 +2623,6 @@
   .copy-btn.copied {
     border-color: #2d7a2d;
     color: #2d7a2d;
-  }
-
-  .public-toggle {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .public-toggle.small {
-    max-width: 200px;
-    margin: 0.5rem auto;
-  }
-
-  .toggle-btn {
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--color-gold);
-    background: var(--color-cream);
-    color: #888;
-    font-family: "Source Serif 4", Georgia, serif;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .toggle-btn.small {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.8rem;
-  }
-
-  .toggle-btn.active {
-    border-color: var(--color-ink);
-    background: var(--color-ink);
-    color: var(--color-parchment);
   }
 
   .player-list {
@@ -2739,14 +2679,6 @@
     font-size: 1rem;
   }
 
-  .setting-desc {
-    display: block;
-    font-size: 0.8rem;
-    color: #888;
-    margin-top: 0.15rem;
-    font-style: italic;
-  }
-
   .category-readonly {
     flex: 1;
     display: flex;
@@ -2794,14 +2726,6 @@
     flex-wrap: wrap;
     gap: 0.4rem;
     justify-content: center;
-    margin-bottom: 1.25rem;
-  }
-
-  .category-readonly-note {
-    font-size: 0.75rem;
-    color: #999;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
     margin-bottom: 1.25rem;
   }
 

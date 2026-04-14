@@ -4,7 +4,7 @@ import { mostStreamedSongsHints } from './hints';
 export const mostStreamedSongs: GameList = {
   id: 'most-streamed-songs',
   name: 'Most Streamed Songs on Spotify',
-  description: 'All-time most streamed tracks',
+  description: 'All-time most streamed tracks on Spotify (Wikipedia/Spotify Charts)',
   topics: ['music'],
   hints: mostStreamedSongsHints,
   valueLabel: 'Streams',

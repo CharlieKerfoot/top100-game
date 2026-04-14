@@ -22,7 +22,7 @@ export const nbaCareerPointsHints: string[] = [
   // Additional plausible guesses
   "Klay Thompson", "Draymond Green", "Kevin Love", "Blake Griffin", "DeAndre Jordan",
   "DeMarcus Cousins", "Marc Gasol", "Al Horford", "Andre Drummond", "Hassan Whiteside",
-  "Jimmy Butler", "Kawhi Leonard", "Paul George", "Bradley Beal", "Zach LaVine",
+  "Jimmy Butler", "Kawhi Leonard", "Bradley Beal", "Zach LaVine",
   "Jayson Tatum", "Jaylen Brown", "Donovan Mitchell", "Trae Young", "Luka Doncic",
   "Joel Embiid", "Ben Simmons", "Tobias Harris", "Seth Curry", "Tyrese Maxey",
   "Julius Randle", "RJ Barrett", "Evan Fournier", "Kemba Walker", "Terry Rozier",
@@ -31,6 +31,6 @@ export const nbaCareerPointsHints: string[] = [
   "Scottie Barnes", "Evan Mobley", "Franz Wagner", "Cole Anthony", "R.J. Hampton",
   "Willis Reed", "Dave DeBusschere", "Dick Barnett", "Bill Bradley", "Monroe",
   "Nate Archibald", "Pete Maravich", "Spencer Haywood", "Connie Hawkins", "Bob Boozer",
-  "Bailey Howell", "Tom Heinsohn", "Bill Sharman", "Bob Cousy", "Bill Russell",
-  "Wes Unseld", "Elvin Hayes", "Phil Chenier", "Cazzie Russell", "Dave Cowens",
+  "Tom Heinsohn", "Bill Sharman", "Bob Cousy", "Bill Russell",
+  "Wes Unseld", "Phil Chenier", "Cazzie Russell", "Dave Cowens",
 ];

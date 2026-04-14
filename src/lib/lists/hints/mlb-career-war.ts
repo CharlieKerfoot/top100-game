@@ -30,8 +30,8 @@ export const mlbCareerWarHints: string[] = [
   "Mike Piazza", "Ivan Rodriguez", "Carlton Fisk", "Gary Carter", "Yogi Berra",
   "Bill Dickey", "Mickey Cochrane", "Gabby Hartnett", "Ernie Banks", "Billy Williams",
   "Ferguson Jenkins", "Ron Santo", "Sammy Sosa", "Ryne Sandberg", "Mark Grace",
-  "Joe Torre", "Eddie Murray", "Brooks Robinson", "Jim Palmer", "Frank Robinson",
+  "Joe Torre", "Eddie Murray", "Jim Palmer",
   "Roberto Alomar", "Barry Larkin", "Dave Concepcion", "Eric Davis", "Ken Griffey Sr.",
-  "Willie McCovey", "Orlando Cepeda", "Juan Marichal", "Gaylord Perry", "Willie Stargell",
-  "Roberto Clemente", "Dave Parker", "Bill Mazeroski", "Dick Groat", "Bob Friend",
+  "Willie McCovey", "Orlando Cepeda", "Juan Marichal", "Willie Stargell",
+  "Dave Parker", "Bill Mazeroski", "Dick Groat", "Bob Friend",
 ];

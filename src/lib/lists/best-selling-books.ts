@@ -4,7 +4,7 @@ import { bestSellingBooksHints } from './hints';
 export const bestSellingBooks: GameList = {
   id: 'best-selling-books',
   name: 'Best-Selling Books of All Time',
-  description: 'Books ranked by estimated all-time copies sold',
+  description: 'Books ranked by estimated all-time copies sold (Wikipedia)',
   topics: ['culture'],
   hints: bestSellingBooksHints,
   valueLabel: 'Copies Sold',

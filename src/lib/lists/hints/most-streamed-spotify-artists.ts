@@ -22,7 +22,7 @@ export const mostStreamedSpotifyArtistsHints: string[] = [
   "Snoop Dogg", "DaBaby", "50 Cent", "Romeo Santos", "Natanael Cano",
   // Beyond top 100 (additional plausible guesses)
   "Daddy Yankee", "Don Omar", "Wisin", "Yandel",
-  "Becky G", "Anitta", "Karol G", "Rosalía", "Bad Gyal", "C. Tangana",
+  "Becky G", "Anitta", "Rosalía", "Bad Gyal", "C. Tangana",
   "Paulo Londra", "Bizarrap", "Trueno", "Duki", "Cazzu", "Nicki Nicole",
   "Jhay Cortez", "Lunay", "Sech", "Dalex",
   "Luke Combs", "Chris Stapleton", "Blake Shelton", "Carrie Underwood", "Thomas Rhett",

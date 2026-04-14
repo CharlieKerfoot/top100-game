@@ -2,8 +2,8 @@ import type { GameList } from './types';
 
 export const largestGreekOrganizations: GameList = {
   id: 'largest-greek-organizations',
-  name: 'Greek Fraternities & Sororities',
-  description: 'North American Greek letter organizations',
+  name: 'Largest Fraternities & Sororities',
+  description: 'North American Greek letter organizations ranked by active chapters (NIC/NPC/NPHC)',
   topics: ['education'],
   size: 126,
   newUntil: '2026-05-15',

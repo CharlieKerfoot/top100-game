@@ -55,6 +55,35 @@ import { grammyAwards } from './grammy-awards';
 import { usCitiesCostOfLiving } from './us-cities-cost-of-living';
 import { mostWatchedAnime } from './most-watched-anime';
 import { largestGreekOrganizations } from './largest-greek-organizations';
+import { elementsEarthsCrust } from './elements-earths-crust';
+import { countriesByArea } from './countries-by-area';
+import { usSurnames } from './us-surnames';
+import { mostTranslatedBooks } from './most-translated-books';
+import { tallestMountains } from './tallest-mountains';
+import { globalCitiesCostOfLiving } from './global-cities-cost-of-living';
+import { safestCitiesUsa } from './safest-cities-usa';
+import { highestGrossingAnimatedMovies } from './highest-grossing-animated-movies';
+import { largestFastFoodChains } from './largest-fast-food-chains';
+import { longestRunningTvSeries } from './longest-running-tv-series';
+import { mostVisitedNationalParks } from './most-visited-national-parks';
+import { longestRivers } from './longest-rivers';
+import { mostCommonPasswords } from './most-common-passwords';
+import { sportingEventsAttendance } from './sporting-events-attendance';
+import { mostDownloadedMobileApps } from './most-downloaded-mobile-apps';
+import { qsWorldUniversityRankings } from './qs-world-university-rankings';
+import { longestChartingHot100 } from './longest-charting-hot100';
+import { sportsBySale } from './sports-cards-by-sale';
+import { mostViewedYoutubeMusicVideos } from './most-viewed-youtube-music-videos';
+import { countriesByLifeExpectancy } from './countries-by-life-expectancy';
+import { countriesByHappiness } from './countries-by-happiness';
+import { bestSellingAlbums } from './best-selling-albums';
+import { imdbTopMovies } from './imdb-top-movies';
+import { imdbTopTvShows } from './imdb-top-tv-shows';
+import { highestGrossingFranchises } from './highest-grossing-franchises';
+import { mostConsumedBeverages } from './most-consumed-beverages';
+import { mostVisitedWikipedia } from './most-visited-wikipedia';
+import { highestPaidAthletes } from './highest-paid-athletes';
+import { mostCitedScientificPapers } from './most-cited-scientific-papers';
 
 import type { GameList } from './types';
 
@@ -98,6 +127,35 @@ export const lists: GameList[] = [
   usCitiesCostOfLiving,
   mostWatchedAnime,
   largestGreekOrganizations,
+  elementsEarthsCrust,
+  countriesByArea,
+  usSurnames,
+  mostTranslatedBooks,
+  tallestMountains,
+  globalCitiesCostOfLiving,
+  safestCitiesUsa,
+  highestGrossingAnimatedMovies,
+  largestFastFoodChains,
+  longestRunningTvSeries,
+  mostVisitedNationalParks,
+  longestRivers,
+  mostCommonPasswords,
+  sportingEventsAttendance,
+  mostDownloadedMobileApps,
+  qsWorldUniversityRankings,
+  longestChartingHot100,
+  sportsBySale,
+  mostViewedYoutubeMusicVideos,
+  countriesByLifeExpectancy,
+  countriesByHappiness,
+  bestSellingAlbums,
+  imdbTopMovies,
+  imdbTopTvShows,
+  highestGrossingFranchises,
+  mostConsumedBeverages,
+  mostVisitedWikipedia,
+  highestPaidAthletes,
+  mostCitedScientificPapers,
 ];
 
 /** Returns the effective topics for a list, including "new" if within the newUntil date. */

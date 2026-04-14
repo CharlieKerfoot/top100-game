@@ -4,7 +4,7 @@ import { largestCollegePopulationsHints } from './hints';
 export const largestCollegePopulations: GameList = {
   id: 'largest-college-populations',
   name: 'Largest US Colleges by Enrollment',
-  description: 'US colleges and universities ranked by total enrollment',
+  description: 'US colleges and universities ranked by total enrollment (NCES/IPEDS)',
   topics: ['education', 'misc'],
   hints: largestCollegePopulationsHints,
   valueLabel: 'Students',

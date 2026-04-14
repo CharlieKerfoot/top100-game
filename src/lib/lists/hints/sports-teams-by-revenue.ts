@@ -33,5 +33,5 @@ export const sportsTeamsByRevenueHints: string[] = [
   "Vegas Golden Knights", "Seattle Kraken", "San Jose Sharks", "Anaheim Ducks", "Colorado Avalanche",
   "Minnesota Wild", "Nashville Predators", "St. Louis Blues", "Columbus Blue Jackets", "Detroit Red Wings",
   "Carolina Hurricanes", "Tampa Bay Lightning", "Florida Panthers", "Washington Capitals", "Pittsburgh Penguins",
-  "New Jersey Devils", "New York Islanders", "Buffalo Sabres", "Ottawa Senators", "Toronto Raptors 905",
+  "New Jersey Devils", "New York Islanders", "Buffalo Sabres", "Toronto Raptors 905",
 ];

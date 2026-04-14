@@ -4,7 +4,7 @@ import { mostVisitedCountriesHints } from './hints';
 export const mostVisitedCountries: GameList = {
   id: 'most-visited-countries',
   name: 'Most Visited Countries by Tourists',
-  description: 'Countries ranked by international tourist arrivals (2024)',
+  description: 'Countries ranked by international tourist arrivals (UNWTO, 2024)',
   topics: ['geography', 'world'],
   hints: mostVisitedCountriesHints,
   valueLabel: 'Annual Visitors',
