@@ -404,12 +404,32 @@ export function setupSocketServer(io: Server) {
       const party = parties.get(code);
       if (!party || party.hostId !== playerId) return;
 
-      if (settings.listId !== undefined) party.settings.listId = settings.listId;
-      if (settings.mode !== undefined) party.settings.mode = settings.mode;
-      if (settings.maxStrikes !== undefined) party.settings.maxStrikes = settings.maxStrikes;
-      if (settings.maxTurns !== undefined) party.settings.maxTurns = settings.maxTurns;
-      if (settings.hints !== undefined) party.settings.hints = settings.hints;
-      if (settings.isPublic !== undefined) party.isPublic = settings.isPublic;
+      if (settings.listId !== undefined) {
+        if (typeof settings.listId !== 'string' || !lists.find(c => c.id === settings.listId)) return;
+        party.settings.listId = settings.listId;
+      }
+      if (settings.mode !== undefined) {
+        if (settings.mode !== 'strikes' && settings.mode !== 'turns') return;
+        party.settings.mode = settings.mode;
+      }
+      if (settings.maxStrikes !== undefined) {
+        const n = Number(settings.maxStrikes);
+        if (!Number.isInteger(n) || n < 1 || n > 10) return;
+        party.settings.maxStrikes = n;
+      }
+      if (settings.maxTurns !== undefined) {
+        const n = Number(settings.maxTurns);
+        if (!Number.isInteger(n) || n < 1 || n > 100) return;
+        party.settings.maxTurns = n;
+      }
+      if (settings.hints !== undefined) {
+        if (typeof settings.hints !== 'boolean') return;
+        party.settings.hints = settings.hints;
+      }
+      if (settings.isPublic !== undefined) {
+        if (typeof settings.isPublic !== 'boolean') return;
+        party.isPublic = settings.isPublic;
+      }
 
       io.to(code).emit('party-updated', { party: serializeParty(party), game: null });
     });
