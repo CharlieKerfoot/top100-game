@@ -19,10 +19,20 @@
   let open = $state(false);
   let inputEl = $state<HTMLInputElement | null>(null);
 
+  const sorted = $derived([...hints].sort((a, b) => a.localeCompare(b)));
+
   const filtered = $derived.by(() => {
     const q = value.trim().toLowerCase();
     if (!q) return [];
-    return hints.filter((h) => h.toLowerCase().includes(q)).slice(0, 8);
+    // Prefix matches first, then substring matches — all alphabetical
+    const prefix: string[] = [];
+    const substring: string[] = [];
+    for (const h of sorted) {
+      const lower = h.toLowerCase();
+      if (lower.startsWith(q)) prefix.push(h);
+      else if (lower.includes(q)) substring.push(h);
+    }
+    return [...prefix, ...substring].slice(0, 8);
   });
 
   const showDropdown = $derived(

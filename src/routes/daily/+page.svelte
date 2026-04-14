@@ -16,6 +16,7 @@
   } from "$lib/daily";
   import { getListSize, getMaxScore } from "$lib/lists/index";
   import { SITE_URL, GAME_NAME, ogImageUrl } from "$lib/seo";
+  import { getAudioCtx, playGuessSound, playStrikeSound } from "$lib/sounds";
 
   const list = getDailyList();
   const listSize = getListSize(list);
@@ -128,163 +129,6 @@
   });
 
   // ── Audio ──
-  let audioCtx: AudioContext | null = null;
-  function getAudioCtx(): AudioContext | null {
-    try {
-      if (!audioCtx || audioCtx.state === "closed") {
-        audioCtx = new AudioContext();
-      }
-      if (audioCtx.state === "suspended") {
-        audioCtx.resume();
-      }
-      return audioCtx;
-    } catch {
-      return null;
-    }
-  }
-
-  function playGuessSound(rank: number, total: number) {
-    const maybeCtx = getAudioCtx();
-    if (!maybeCtx) return;
-    const ctx = maybeCtx;
-    const t = ctx.currentTime;
-    const intensity = (rank - 1) / Math.max(total - 1, 1);
-
-    // Impact knock: filtered noise burst
-    const knockLen = 0.04 + intensity * 0.06;
-    const knockBuf = ctx.createBuffer(1, ctx.sampleRate * knockLen, ctx.sampleRate);
-    const knockData = knockBuf.getChannelData(0);
-    for (let i = 0; i < knockData.length; i++) {
-      const env = Math.pow(1 - i / knockData.length, 2 + intensity * 4);
-      knockData[i] = (Math.random() * 2 - 1) * env;
-    }
-    const knock = ctx.createBufferSource();
-    knock.buffer = knockBuf;
-    const knockLP = ctx.createBiquadFilter();
-    knockLP.type = "lowpass";
-    knockLP.frequency.value = 800 + intensity * 2500;
-    const knockGain = ctx.createGain();
-    knockGain.gain.value = 0.08 + intensity * 0.14;
-    knock.connect(knockLP).connect(knockGain).connect(ctx.destination);
-    knock.start(t);
-
-    // Body tone: sine sweep down
-    const bodyFreq = 150 + intensity * 100;
-    const bodyEnd = 40 + intensity * 30;
-    const bodyDecay = 0.08 + intensity * 0.25;
-    const body = ctx.createOscillator();
-    body.type = "sine";
-    body.frequency.setValueAtTime(bodyFreq, t);
-    body.frequency.exponentialRampToValueAtTime(bodyEnd, t + bodyDecay);
-    const bodyGain = ctx.createGain();
-    bodyGain.gain.setValueAtTime(0.06 + intensity * 0.18, t);
-    bodyGain.gain.exponentialRampToValueAtTime(0.001, t + bodyDecay);
-    body.connect(bodyGain).connect(ctx.destination);
-    body.start(t);
-    body.stop(t + bodyDecay + 0.05);
-
-    // Warm resonance at mid-range
-    if (intensity > 0.25) {
-      const resMix = (intensity - 0.25) / 0.75;
-      const res = ctx.createOscillator();
-      res.type = "sine";
-      res.frequency.value = 110 + resMix * 55;
-      const resGain = ctx.createGain();
-      const resDecay = 0.15 + resMix * 0.4;
-      resGain.gain.setValueAtTime(0.04 + resMix * 0.08, t);
-      resGain.gain.exponentialRampToValueAtTime(0.001, t + resDecay);
-      const resLP = ctx.createBiquadFilter();
-      resLP.type = "lowpass";
-      resLP.frequency.value = 300 + resMix * 200;
-      res.connect(resLP).connect(resGain).connect(ctx.destination);
-      res.start(t);
-      res.stop(t + resDecay + 0.05);
-    }
-
-    // Sub bass at high ranks
-    if (intensity > 0.55) {
-      const subMix = (intensity - 0.55) / 0.45;
-      const sub = ctx.createOscillator();
-      sub.type = "sine";
-      sub.frequency.setValueAtTime(55, t);
-      sub.frequency.exponentialRampToValueAtTime(30, t + 0.3);
-      const subGain = ctx.createGain();
-      subGain.gain.setValueAtTime(0.12 * subMix, t);
-      subGain.gain.exponentialRampToValueAtTime(0.001, t + 0.25 + subMix * 0.2);
-      sub.connect(subGain).connect(ctx.destination);
-      sub.start(t);
-      sub.stop(t + 0.5);
-    }
-
-    // Double-hit thwack at top tier
-    if (intensity > 0.8) {
-      const thwMix = (intensity - 0.8) / 0.2;
-      const delay = 0.06;
-      const thw = ctx.createOscillator();
-      thw.type = "sine";
-      thw.frequency.setValueAtTime(200, t + delay);
-      thw.frequency.exponentialRampToValueAtTime(35, t + delay + 0.2);
-      const thwGain = ctx.createGain();
-      thwGain.gain.setValueAtTime(0.15 * thwMix, t + delay);
-      thwGain.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.25);
-      thw.connect(thwGain).connect(ctx.destination);
-      thw.start(t + delay);
-      thw.stop(t + delay + 0.3);
-
-      const crLen = 0.03;
-      const crBuf = ctx.createBuffer(1, ctx.sampleRate * crLen, ctx.sampleRate);
-      const crData = crBuf.getChannelData(0);
-      for (let i = 0; i < crData.length; i++) {
-        crData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / crData.length, 3);
-      }
-      const cr = ctx.createBufferSource();
-      cr.buffer = crBuf;
-      const crBP = ctx.createBiquadFilter();
-      crBP.type = "bandpass";
-      crBP.frequency.value = 1500;
-      crBP.Q.value = 1;
-      const crGain = ctx.createGain();
-      crGain.gain.value = 0.1 * thwMix;
-      cr.connect(crBP).connect(crGain).connect(ctx.destination);
-      cr.start(t + delay);
-    }
-  }
-
-  function playMissSound() {
-    const maybeCtx = getAudioCtx();
-    if (!maybeCtx) return;
-    const ctx = maybeCtx;
-    const t = ctx.currentTime;
-
-    // Hollow wooden tap
-    const knockLen = 0.03;
-    const knockBuf = ctx.createBuffer(1, ctx.sampleRate * knockLen, ctx.sampleRate);
-    const knockData = knockBuf.getChannelData(0);
-    for (let i = 0; i < knockData.length; i++) {
-      knockData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / knockData.length, 4);
-    }
-    const knock = ctx.createBufferSource();
-    knock.buffer = knockBuf;
-    const bp = ctx.createBiquadFilter();
-    bp.type = "bandpass";
-    bp.frequency.value = 400;
-    bp.Q.value = 2;
-    const g = ctx.createGain();
-    g.gain.value = 0.1;
-    knock.connect(bp).connect(g).connect(ctx.destination);
-    knock.start(t);
-
-    const osc = ctx.createOscillator();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(180, t);
-    osc.frequency.exponentialRampToValueAtTime(100, t + 0.08);
-    const oscGain = ctx.createGain();
-    oscGain.gain.setValueAtTime(0.05, t);
-    oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
-    osc.connect(oscGain).connect(ctx.destination);
-    osc.start(t);
-    osc.stop(t + 0.15);
-  }
 
   function handleGuess(value: string) {
     if (phase !== "playing" || debouncing) return;
@@ -303,7 +147,7 @@
       strikes++;
       guessHistory = [{ type: "strike", guess: value }, ...guessHistory];
       showFeedback("strike");
-      playMissSound();
+      playStrikeSound();
       if (strikes >= maxStrikes) {
         endGame();
       }
@@ -673,6 +517,11 @@
       max-width: 1400px;
       padding: 1.5rem 2rem;
     }
+
+    .app:has(.results) {
+      max-width: 800px;
+      padding: 1.5rem 2rem;
+    }
   }
 
   header {
@@ -873,9 +722,13 @@
 
   .dt-slot-name {
     flex: 1;
+    min-width: 0;
     font-weight: 500;
     color: var(--color-ink);
     animation: slideIn 0.2s ease-out;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .dt-slot-points {
@@ -1283,6 +1136,7 @@
     padding: 0;
     margin-bottom: 1rem;
     text-align: left;
+    overflow-x: hidden;
   }
 
   .all-answers-header {
