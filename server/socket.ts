@@ -609,6 +609,7 @@ export function setupSocketServer(io: Server) {
       if (!code) return;
       const party = parties.get(code);
       if (!party || !party.game || party.phase !== 'playing') return;
+      if (party.hostId !== playerId) return;
 
       party.phase = 'results';
       io.to(code).emit('game-over', { party: serializeParty(party), game: serializeGameState(party) });
