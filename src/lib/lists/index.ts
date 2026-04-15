@@ -84,6 +84,19 @@ import { mostConsumedBeverages } from './most-consumed-beverages';
 import { mostVisitedWikipedia } from './most-visited-wikipedia';
 import { highestPaidAthletes } from './highest-paid-athletes';
 import { mostCitedScientificPapers } from './most-cited-scientific-papers';
+import { akcPopularDogBreeds } from './akc-popular-dog-breeds';
+import { bestSellingToys } from './best-selling-toys';
+import { longestRunningBroadwayShows } from './longest-running-broadway-shows';
+import { mostVisitedMuseums } from './most-visited-museums';
+import { mostSpokenLanguages } from './most-spoken-languages';
+import { mostExpensivePaintings } from './most-expensive-paintings';
+import { bestSellingCandy } from './best-selling-candy';
+import { bestSellingCarsUsa } from './best-selling-cars-usa';
+import { mostPopularPodcasts } from './most-popular-podcasts';
+import { tallestBuildings } from './tallest-buildings';
+import { fastestAnimals } from './fastest-animals';
+import { bestDishesWorld } from './best-dishes-world';
+import { bestCuisinesWorld } from './best-cuisines-world';
 
 import type { GameList } from './types';
 
@@ -156,6 +169,19 @@ export const lists: GameList[] = [
   mostVisitedWikipedia,
   highestPaidAthletes,
   mostCitedScientificPapers,
+  akcPopularDogBreeds,
+  bestSellingToys,
+  longestRunningBroadwayShows,
+  mostVisitedMuseums,
+  mostSpokenLanguages,
+  mostExpensivePaintings,
+  bestSellingCandy,
+  bestSellingCarsUsa,
+  mostPopularPodcasts,
+  tallestBuildings,
+  fastestAnimals,
+  bestDishesWorld,
+  bestCuisinesWorld,
 ];
 
 /** Returns the effective topics for a list, including "new" if within the newUntil date. */
