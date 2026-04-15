@@ -1812,7 +1812,7 @@
           <h3>Strikes</h3>
           {#each mp.rankings as player}
             {@const playerStrikes = mp.guessHistory.filter(
-              (e) => e.isStrike && e.playerName === player.name,
+              (e) => e.isStrike && e.playerId === player.id,
             )}
             {#if playerStrikes.length > 0}
               <div class="player-strikes">
@@ -1863,15 +1863,15 @@
         </div>
       {/if}
 
-      <div class="lobby-actions">
+      <div class="results-actions">
         {#if mp.isHost}
-          <button class="start-btn" onclick={() => mp.backToLobby()}
+          <button class="results-lobby-btn" onclick={() => mp.backToLobby()}
             >Back to Lobby</button
           >
         {:else}
           <div class="waiting-msg">Waiting for host...</div>
         {/if}
-        <button class="leave-btn" onclick={() => mp.leaveParty()}
+        <button class="results-leave-btn" onclick={() => mp.leaveParty()}
           >Leave Party</button
         >
       </div>
@@ -1897,6 +1897,59 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .results-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .results-lobby-btn {
+    flex: 3;
+    padding: 0.7rem 1rem;
+    border: 2px solid var(--color-ink);
+    background: var(--color-ink);
+    color: var(--color-parchment);
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .results-lobby-btn:hover {
+    background: var(--color-cream);
+    color: var(--color-ink);
+  }
+
+  .results-leave-btn {
+    flex: 1;
+    padding: 0.7rem 0.5rem;
+    border: 1px solid var(--color-gold);
+    background: transparent;
+    color: #888;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: "Source Serif 4", Georgia, serif;
+    transition: all 0.2s;
+  }
+
+  .results-leave-btn:hover {
+    border-color: var(--color-crimson);
+    color: var(--color-crimson);
+  }
+
+  .results-actions .waiting-msg {
+    flex: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-style: italic;
   }
 
   .lobby-actions {

@@ -34,6 +34,7 @@ export interface GuessResult {
 
 export interface GuessHistoryEntry {
   guess: string;
+  playerId: string;
   playerName: string;
   isStrike: boolean;
   rank: number | null;

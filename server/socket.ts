@@ -25,6 +25,7 @@ interface GameSettings {
 
 interface GuessHistoryEntry {
   guess: string;
+  playerId: string;
   playerName: string;
   isStrike: boolean;
   rank: number | null;
@@ -520,7 +521,7 @@ export function setupSocketServer(io: Server) {
         game.guessedItems.set(foundIndex, player.name);
       }
 
-      game.guessHistory.push({ guess: safeGuess, playerName: player.name, isStrike: result.isStrike, rank: result.rank, value: result.value });
+      game.guessHistory.push({ guess: safeGuess, playerId: player.id, playerName: player.name, isStrike: result.isStrike, rank: result.rank, value: result.value });
       game.lastResult = result;
       game.showResult = true;
 
@@ -609,7 +610,9 @@ export function setupSocketServer(io: Server) {
       if (!code) return;
       const party = parties.get(code);
       if (!party || !party.game || party.phase !== 'playing') return;
-      if (party.hostId !== playerId) return;
+      // Allow host or the last-player-standing winner to end the game
+      const isWinner = party.game.winnerId === playerId;
+      if (party.hostId !== playerId && !isWinner) return;
 
       party.phase = 'results';
       io.to(code).emit('game-over', { party: serializeParty(party), game: serializeGameState(party) });
