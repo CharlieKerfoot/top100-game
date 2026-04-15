@@ -563,7 +563,9 @@
         <span class="header-mode"
           >{mp.mode === "strikes" ? "Strike" : "Turns"} Mode</span
         >
-        <span class="header-code">{mp.partyCode}</span>
+        <button class="header-code" class:copied onclick={copyCode}>
+          {copied ? "Copied!" : mp.partyCode}
+        </button>
       </div>
     {/if}
   </header>
@@ -2353,6 +2355,18 @@
     border: 1px solid rgba(139, 0, 0, 0.15);
     padding: 0.15rem 0.5rem;
     letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .header-code:hover {
+    background: rgba(139, 0, 0, 0.15);
+  }
+
+  .header-code.copied {
+    color: #2d7a2d;
+    border-color: rgba(45, 122, 45, 0.3);
+    background: rgba(45, 122, 45, 0.08);
   }
 
   /* ─── RULES MODAL ─── */
