@@ -359,9 +359,17 @@
 
   $effect(() => {
     if (mp.phase === "playing") {
+      const html = document.documentElement;
+      html.style.overflow = "hidden";
+      html.style.height = "100dvh";
       document.body.style.overflow = "hidden";
+      document.body.style.height = "100dvh";
+
       return () => {
+        html.style.overflow = "";
+        html.style.height = "";
         document.body.style.overflow = "";
+        document.body.style.height = "";
       };
     }
   });
