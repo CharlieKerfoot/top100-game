@@ -579,6 +579,7 @@ export function setupSocketServer(io: Server) {
           const highestOtherScore = otherScores.length > 0 ? Math.max(...otherScores) : 0;
           if (lastPlayer.score > highestOtherScore) {
             // Last player standing AND has the highest score — they win
+            game.winnerId = lastPlayer.id;
             io.to(code).emit('last-player-standing', {
               winnerId: lastPlayer.id,
               winnerName: lastPlayer.name,
