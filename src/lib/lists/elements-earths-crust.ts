@@ -13,6 +13,7 @@ export const elementsEarthsCrust: GameList = {
   name: "Most Abundant Elements in Earth's Crust",
   description: "Top 50 chemical elements by abundance in Earth's crust (ppm by mass)",
   topics: ['misc'],
+  difficulty: 3,
   size: 50,
   hints: elementsEarthsCrustHints,
   valueLabel: 'Abundance (ppm)',

@@ -6,6 +6,7 @@ export const popularFemaleNames: GameList = {
   name: 'Most Popular Female Names (USA)',
   description: 'Most common female first names in the United States (SSA all-time)',
   topics: ['entertainment', 'misc'],
+  difficulty: 1,
   hints: popularFemaleNamesHints,
   valueLabel: 'Total Births',
   items: [

@@ -9,6 +9,7 @@ export const longestRunningBroadwayShows: GameList = {
   name: 'Longest-Running Broadway Shows',
   description: 'Broadway shows ranked by total performances (Wikipedia)',
   topics: ['entertainment'],
+  difficulty: 2,
   hints: longestRunningBroadwayShowsHints,
   valueLabel: 'Performances',
   newUntil: '2026-05-14',
@@ -109,7 +110,7 @@ export const longestRunningBroadwayShows: GameList = {
     "In the Heights",
     "Amadeus",
     "Once",
-    "Cabaret",
+    "Cabaret (Revival)",
     "Memphis",
     "Mister Roberts",
     "Annie Get Your Gun",
@@ -136,4 +137,10 @@ export const longestRunningBroadwayShows: GameList = {
     "1,209", "1,208", "1,200", "1,184", "1,181",
     "1,168", "1,165", "1,165", "1,157", "1,147",
   ],
+  aliases: {
+    "Billy Elliot": "Billy Elliot the Musical",
+    "Matilda": "Matilda the Musical",
+    "Beautiful": "Beautiful: The Carole King Musical",
+    "Harry Potter": "Harry Potter and the Cursed Child",
+  },
 };

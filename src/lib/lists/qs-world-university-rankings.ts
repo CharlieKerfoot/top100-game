@@ -8,6 +8,7 @@ export const qsWorldUniversityRankings: GameList = {
   name: 'QS World University Rankings',
   description: 'Top 100 universities worldwide by QS score (QS World University Rankings 2026)',
   topics: ['education', 'misc'],
+  difficulty: 3,
   hints: qsWorldUniversityRankingsHints,
   valueLabel: 'QS Score',
   items: [

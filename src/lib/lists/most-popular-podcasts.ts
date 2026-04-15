@@ -9,6 +9,7 @@ export const mostPopularPodcasts: GameList = {
   name: 'Most Popular Podcasts in the US',
   description: 'Podcasts ranked by US listenership (Edison Research Q4 2025)',
   topics: ['entertainment', 'internet'],
+  difficulty: 2,
   hints: mostPopularPodcastsHints,
   valueLabel: 'Genre',
   size: 100,

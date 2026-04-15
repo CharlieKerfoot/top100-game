@@ -6,6 +6,7 @@ export const mostViewedYoutubeMusicVideos: GameList = {
   name: 'Most Viewed YouTube Music Videos',
   description: 'Music videos ranked by all-time YouTube view count (kworb.net / Wikipedia)',
   topics: ['music'],
+  difficulty: 2,
   hints: mostViewedYoutubeMusicVideosHints,
   valueLabel: 'Views',
   items: [

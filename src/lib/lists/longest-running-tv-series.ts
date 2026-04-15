@@ -12,6 +12,7 @@ export const longestRunningTvSeries: GameList = {
   name: 'Longest-Running TV Series by Episodes',
   description: 'TV shows ranked by total number of episodes — soap operas, game shows & more (Wikipedia)',
   topics: ['film & tv'],
+  difficulty: 2,
   size: 50,
   hints: longestRunningTvSeriesHints,
   valueLabel: 'Episodes',
@@ -120,4 +121,21 @@ export const longestRunningTvSeries: GameList = {
     '6,973 episodes',   // EastEnders
     '6,866 episodes',   // Play School
   ],
+  aliases: {
+    "Neighbours (AU)": "Neighbours",
+    "Home and Away (AU)": "Home and Away",
+    "Shortland Street (NZ)": "Shortland Street",
+    "Pobol y Cwm (UK/Wales)": "Pobol y Cwm",
+    "Gute Zeiten, schlechte Zeiten (DE)": "Gute Zeiten, schlechte Zeiten",
+    "Unter uns (DE)": "Unter uns",
+    "Familie (BE)": "Familie",
+    "Goede tijden, slechte tijden (NL)": "Goede tijden, slechte tijden",
+    "Les Guignols (FR)": "Les Guignols",
+    "Des chiffres et des lettres (FR)": "Des chiffres et des lettres",
+    "Striscia la notizia (IT)": "Striscia la notizia",
+    "Saber y ganar (ES)": "Saber y ganar",
+    "TV Slagalica (RS)": "TV Slagalica",
+    "Barátok közt (HU)": "Barátok közt",
+    "Bom Dia & Companhia (BR)": "Bom Dia & Companhia",
+  },
 };

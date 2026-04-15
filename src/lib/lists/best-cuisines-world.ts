@@ -9,6 +9,7 @@ export const bestCuisinesWorld: GameList = {
   name: 'Best Cuisines in the World',
   description: 'Cuisines ranked by TasteAtlas user ratings (25/26 Awards)',
   topics: ['food', 'geography'],
+  difficulty: 1,
   hints: bestCuisinesWorldHints,
   valueLabel: 'Region',
   newUntil: '2026-05-14',

@@ -6,6 +6,7 @@ export const mostFollowedTwitter: GameList = {
   name: 'Most Followed Twitter/X Accounts',
   description: 'Twitter/X accounts ranked by follower count (Wikipedia, 2025)',
   topics: ['internet'],
+  difficulty: 1,
   hints: mostFollowedTwitterHints,
   valueLabel: 'Followers',
   items: [

@@ -6,6 +6,7 @@ export const mostVisitedWebsites: GameList = {
   name: 'Most Visited Websites',
   description: 'Websites ranked by monthly traffic (Similarweb 2025)',
   topics: ['internet'],
+  difficulty: 1,
   hints: mostVisitedWebsitesHints,
   valueLabel: 'Monthly Visits',
   items: [
@@ -52,4 +53,8 @@ export const mostVisitedWebsites: GameList = {
     "170M", "165M", "160M", "155M", "150M",
     "145M", "140M", "135M", "130M", "125M",
   ],
+  aliases: {
+    "Twitter": "Twitter/X",
+    "X": "Twitter/X",
+  },
 };

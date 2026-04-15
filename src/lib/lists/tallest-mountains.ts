@@ -6,6 +6,7 @@ export const tallestMountains: GameList = {
   name: 'Tallest Mountains in the World',
   description: 'Mountain peaks ranked by elevation above sea level (Wikipedia / Survey data)',
   topics: ['geography'],
+  difficulty: 2,
   hints: tallestMountainsHints,
   valueLabel: 'Elevation',
   items: [
@@ -71,5 +72,6 @@ export const tallestMountains: GameList = {
     "The Ogre": "Baintha Brakk",
     "Gang Benchhen": "Kangpenqing",
     "Huang Guan Shan": "The Crown",
+    "Kanchenjunga": "Kangchenjunga",
   },
 };

@@ -10,6 +10,7 @@ export const mostCommonPasswords: GameList = {
   name: 'Most Common Passwords',
   description: 'The most frequently used passwords worldwide (NordPass 2024)',
   topics: ['internet'],
+  difficulty: 1,
   hints: mostCommonPasswordsHints,
   valueLabel: 'Frequency Rank',
   items: [
@@ -37,7 +38,7 @@ export const mostCommonPasswords: GameList = {
     "123321",        // #22
     "qwertyuiop",    // #23
     "00000000",      // #24
-    "Password",      // #25
+    "password123",   // #25 — replaced "Password" (normalized duplicate of #4 "password")
     "zag12wsx",      // #26 — keyboard pattern
     "1q2w3e4r",      // #27
     "superman",      // #28

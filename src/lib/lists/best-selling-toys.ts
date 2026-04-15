@@ -26,6 +26,7 @@ export const bestSellingToys: GameList = {
   name: 'Best Selling Toys & Board Games',
   description: 'Physical toys, games, and playsets ranked by all-time units sold',
   topics: ['entertainment', 'misc'],
+  difficulty: 2,
   hints: bestSellingToysHints,
   valueLabel: 'Units Sold',
   aliases: {

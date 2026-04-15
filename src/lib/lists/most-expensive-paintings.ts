@@ -9,6 +9,7 @@ export const mostExpensivePaintings: GameList = {
   name: 'Most Expensive Paintings Ever Sold',
   description: 'Paintings ranked by sale price — auction & private (Wikipedia)',
   topics: ['misc', 'business'],
+  difficulty: 3,
   hints: mostExpensivePaintingsHints,
   valueLabel: 'Sale Price',
   size: 50,
@@ -77,4 +78,8 @@ export const mostExpensivePaintings: GameList = {
     "$105.4M", "$110.5M", "$71.5M", "$110.7M", "$117.1M",
     "$100M", "$76.7M", "$95.4M", "$86.3M", "$49.3M",
   ],
+  aliases: {
+    "Haystacks": "Meules",
+    "Mont Sainte-Victoire": "La Montagne Sainte-Victoire",
+  },
 };

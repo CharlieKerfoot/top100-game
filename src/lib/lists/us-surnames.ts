@@ -8,6 +8,7 @@ export const usSurnames: GameList = {
   name: 'Most Common US Surnames',
   description: 'Top 100 most common last names in the United States (US Census 2010)',
   topics: ['entertainment', 'misc'],
+  difficulty: 3,
   hints: usSurnamesHints,
   valueLabel: 'People with surname',
   items: [

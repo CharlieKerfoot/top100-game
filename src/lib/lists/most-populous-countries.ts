@@ -6,6 +6,7 @@ export const mostPopulousCountries: GameList = {
   name: 'Most Populous Countries',
   description: 'Countries ranked by population (UN Population Division, 2024)',
   topics: ['geography'],
+  difficulty: 1,
   hints: mostPopulousCountriesHints,
   valueLabel: 'Population',
   items: [

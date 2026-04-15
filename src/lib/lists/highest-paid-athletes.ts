@@ -9,6 +9,7 @@ export const highestPaidAthletes: GameList = {
   name: 'Highest-Paid Athletes',
   description: 'Athletes ranked by annual earnings — salary, bonuses, and endorsements (Sportico 2025)',
   topics: ['sports', 'business'],
+  difficulty: 2,
   hints: highestPaidAthletesHints,
   valueLabel: 'Earnings',
   items: [

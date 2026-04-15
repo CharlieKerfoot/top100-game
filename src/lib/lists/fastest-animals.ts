@@ -8,6 +8,7 @@ export const fastestAnimals: GameList = {
   name: 'Fastest Animals in the World',
   description: 'Animals ranked by top recorded speed, mixing land, air, and sea (Wikipedia)',
   topics: ['misc'],
+  difficulty: 1,
   hints: fastestAnimalsHints,
   valueLabel: 'Top Speed',
   size: 50,

@@ -9,6 +9,7 @@ export const mostVisitedMuseums: GameList = {
   name: 'Most Visited Museums Worldwide',
   description: 'Museums ranked by annual visitors (Wikipedia / Art Newspaper 2024)',
   topics: ['misc', 'geography'],
+  difficulty: 3,
   hints: mostVisitedMuseumsHints,
   valueLabel: 'Annual Visitors',
   size: 50,
@@ -77,4 +78,15 @@ export const mostVisitedMuseums: GameList = {
     "2,100,000", "2,040,481", "1,974,773", "1,875,372", "1,874,994",
     "1,859,484", "1,840,000", "1,755,036", "1,694,000", "1,692,697",
   ],
+  aliases: {
+    "Palace Museum": "National Palace Museum",
+    "Shanghai Museum": "Shanghai Museum East",
+    "The Met": "Metropolitan Museum of Art",
+    "MoMA": "Museum of Modern Art",
+    "Uffizi": "Galleria degli Uffizi",
+    "Hermitage": "State Hermitage Museum",
+    "V&A": "Victoria and Albert Museum",
+    "Smithsonian": "Smithsonian Museum of American History",
+    "The Prado": "Prado Museum",
+  },
 };

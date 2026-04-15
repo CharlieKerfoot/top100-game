@@ -8,6 +8,7 @@ export const bestSellingCandy: GameList = {
   name: 'Best-Selling Candy & Chocolate in the US',
   description: 'Candy and chocolate products ranked by US sales and popularity',
   topics: ['food', 'business'],
+  difficulty: 1,
   hints: bestSellingCandyHints,
   valueLabel: 'Manufacturer',
   size: 100,

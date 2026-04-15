@@ -6,6 +6,7 @@ export const longestRivers: GameList = {
   name: 'Longest Rivers in the World',
   description: 'Top 100 rivers ranked by total length',
   topics: ['geography'],
+  difficulty: 2,
   hints: longestRiversHints,
   valueLabel: 'Length',
   items: [

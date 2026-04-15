@@ -6,6 +6,7 @@ export const nflCareerPpr: GameList = {
   name: 'NFL All-Time Career PPR Fantasy Points',
   description: 'NFL players ranked by all-time career PPR fantasy points (Pro Football Reference)',
   topics: ['sports'],
+  difficulty: 3,
   hints: nflCareerPprHints,
   valueLabel: 'PPR Points',
   items: [

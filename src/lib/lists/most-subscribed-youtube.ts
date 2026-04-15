@@ -6,6 +6,7 @@ export const mostSubscribedYoutube: GameList = {
   name: 'Most Subscribed YouTube Channels',
   description: 'YouTube channels ranked by subscriber count (2025)',
   topics: ['internet'],
+  difficulty: 1,
   hints: mostSubscribedYoutubeHints,
   valueLabel: 'Subscribers',
   items: [
@@ -52,4 +53,7 @@ export const mostSubscribedYoutube: GameList = {
     "48M", "47M", "47M", "47M", "46M",
     "46M", "46M", "45M", "45M", "45M",
   ],
+  aliases: {
+    "Luccas Neto": "LUCCAS NETO - LUCCAS TOON",
+  },
 };

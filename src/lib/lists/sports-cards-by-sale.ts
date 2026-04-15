@@ -10,6 +10,7 @@ export const sportsBySale: GameList = {
   name: 'Most Expensive Sports Cards Ever Sold',
   description: 'Top 100 sports cards ranked by highest confirmed sale price (Wikipedia / auction records)',
   topics: ['sports'],
+  difficulty: 3,
   hints: sportsBySaleHints,
   valueLabel: 'Sale Price',
   items: [

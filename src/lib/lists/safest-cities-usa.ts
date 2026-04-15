@@ -13,6 +13,7 @@ export const safestCitiesUsa: GameList = {
   name: 'Safest Cities in the US',
   description: 'US cities ranked by lowest total crime rate per 1,000 residents (NeighborhoodScout 2023 / FBI UCR 2021)',
   topics: ['geography', 'misc'],
+  difficulty: 3,
   hints: safestCitiesUsaHints,
   valueLabel: 'Crimes per 1K',
   items: [

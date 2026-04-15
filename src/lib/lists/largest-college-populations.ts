@@ -6,6 +6,7 @@ export const largestCollegePopulations: GameList = {
   name: 'Largest US Colleges by Enrollment',
   description: 'US colleges and universities ranked by total enrollment (NCES/IPEDS)',
   topics: ['education', 'misc'],
+  difficulty: 2,
   hints: largestCollegePopulationsHints,
   valueLabel: 'Students',
   items: [

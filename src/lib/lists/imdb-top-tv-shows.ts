@@ -6,6 +6,7 @@ export const imdbTopTvShows: GameList = {
   name: 'Highest-Rated IMDb TV Shows',
   description: 'Top 100 TV shows by IMDb user rating (IMDb datasets, April 2026)',
   topics: ['film & tv'],
+  difficulty: 2,
   hints: imdbTopTvShowsHints,
   valueLabel: 'IMDb Rating',
   items: [

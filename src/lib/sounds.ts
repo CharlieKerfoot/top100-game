@@ -121,6 +121,90 @@ export function playGuessSound(rank: number, total: number) {
   }
 }
 
+// ── Score reveal tick: single chip tick for count-up animation ──
+export function playCountTick(progress: number) {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const t = ctx.currentTime;
+
+  const master = ctx.createGain();
+  master.gain.value = 0.25;
+  master.connect(ctx.destination);
+
+  // Ascending pitch as count progresses
+  const freq = 600 + progress * 600;
+  const osc = ctx.createOscillator();
+  osc.type = "sine";
+  osc.frequency.value = freq;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.12, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+  osc.connect(g).connect(master);
+  osc.start(t);
+  osc.stop(t + 0.05);
+
+  // Click transient
+  const clickLen = 0.006;
+  const clickBuf = ctx.createBuffer(1, ctx.sampleRate * clickLen, ctx.sampleRate);
+  const clickData = clickBuf.getChannelData(0);
+  for (let j = 0; j < clickData.length; j++) {
+    clickData[j] = (Math.random() * 2 - 1) * Math.pow(1 - j / clickData.length, 4);
+  }
+  const click = ctx.createBufferSource();
+  click.buffer = clickBuf;
+  const clickGain = ctx.createGain();
+  clickGain.gain.value = 0.1;
+  const clickHP = ctx.createBiquadFilter();
+  clickHP.type = "highpass";
+  clickHP.frequency.value = 2000;
+  click.connect(clickHP).connect(clickGain).connect(master);
+  click.start(t);
+}
+
+// ── Celebration fanfare: plays after score count-up finishes ──
+export function playCelebrationSound() {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const t = ctx.currentTime;
+
+  const master = ctx.createGain();
+  master.gain.value = 0.3;
+  master.connect(ctx.destination);
+
+  // Rising major arpeggio: C5 E5 G5 C6
+  const notes = [523, 659, 784, 1047];
+  notes.forEach((freq, i) => {
+    const noteTime = t + i * 0.08;
+    const osc = ctx.createOscillator();
+    osc.type = i < 3 ? "sine" : "triangle";
+    osc.frequency.value = freq;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.12, noteTime);
+    g.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.4);
+    osc.connect(g).connect(master);
+    osc.start(noteTime);
+    osc.stop(noteTime + 0.45);
+  });
+
+  // Sparkle shimmer
+  const sparkleTime = t + notes.length * 0.08 + 0.05;
+  const sparkleLen = 0.08;
+  const sparkleBuf = ctx.createBuffer(1, ctx.sampleRate * sparkleLen, ctx.sampleRate);
+  const sparkleData = sparkleBuf.getChannelData(0);
+  for (let j = 0; j < sparkleData.length; j++) {
+    sparkleData[j] = (Math.random() * 2 - 1) * Math.pow(1 - j / sparkleData.length, 2);
+  }
+  const sparkle = ctx.createBufferSource();
+  sparkle.buffer = sparkleBuf;
+  const sparkleHP = ctx.createBiquadFilter();
+  sparkleHP.type = "highpass";
+  sparkleHP.frequency.value = 5000;
+  const sparkleGain = ctx.createGain();
+  sparkleGain.gain.value = 0.06;
+  sparkle.connect(sparkleHP).connect(sparkleGain).connect(master);
+  sparkle.start(sparkleTime);
+}
+
 // ── Strike sound: Trombone Wah Wah ──
 // Descending "wah wah wah wahhh" — four brassy notes stepping down,
 // last one slides and fades. Classic failure sound.

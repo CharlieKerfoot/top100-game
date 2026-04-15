@@ -6,6 +6,7 @@ export const longestChartingHot100: GameList = {
   name: 'Longest-Charting Songs on Billboard Hot 100',
   description: 'Songs ranked by total weeks on the Billboard Hot 100, all time (Wikipedia/Billboard)',
   topics: ['music'],
+  difficulty: 3,
   hints: longestChartingHot100Hints,
   valueLabel: 'Weeks on Chart',
   items: [
@@ -52,4 +53,7 @@ export const longestChartingHot100: GameList = {
     "29 weeks",  "29 weeks",  "28 weeks",  "28 weeks",  "28 weeks",
     "28 weeks",  "27 weeks",  "27 weeks",  "27 weeks",  "27 weeks",
   ],
+  aliases: {
+    "Levitating - Dua Lipa ft. DaBaby": "Levitating - Dua Lipa",
+  },
 };

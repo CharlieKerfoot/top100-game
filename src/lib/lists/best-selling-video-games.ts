@@ -6,6 +6,7 @@ export const bestSellingVideoGames: GameList = {
   name: 'Best Selling Video Games',
   description: 'Video games ranked by all-time units sold (Wikipedia)',
   topics: ['entertainment'],
+  difficulty: 1,
   hints: bestSellingVideoGamesHints,
   valueLabel: 'Copies Sold',
   items: [

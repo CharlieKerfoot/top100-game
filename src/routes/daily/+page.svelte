@@ -2,6 +2,7 @@
   import { goto } from "$app/navigation";
   import { tick } from "svelte";
   import Autocomplete from "$lib/Autocomplete.svelte";
+  import DailyResults from "$lib/DailyResults.svelte";
   import { normalizeGuess } from "$lib/normalize";
   import {
     getDailyList,
@@ -9,10 +10,7 @@
     getTodayKey,
     loadDailyStats,
     recordGame,
-    generateShareText,
-    generateShareGrid,
     type DailyStats,
-    type DayResult,
   } from "$lib/daily";
   import { getListSize, getMaxScore } from "$lib/lists/index";
   import { SITE_URL, GAME_NAME, ogImageUrl } from "$lib/seo";
@@ -55,9 +53,9 @@
   let score = $state(0);
   let strikes = $state(0);
   let guessValue = $state("");
-  let foundItems = $state<{ rank: number; name: string; points: number }[]>([]);
+  let foundItems = $state<{ rank: number; name: string; points: number; value?: string }[]>([]);
   type GuessEntry =
-    | { type: "hit"; rank: number; name: string; points: number; guess: string }
+    | { type: "hit"; rank: number; name: string; points: number; guess: string; value?: string }
     | { type: "strike"; guess: string };
   let guessHistory = $state<GuessEntry[]>([]);
   let guessedRanks = $state<number[]>([]);
@@ -67,7 +65,6 @@
   } | null>(null);
   let feedbackTimeout = $state<ReturnType<typeof setTimeout> | null>(null);
   let debouncing = $state(false);
-  let showAllAnswers = $state(false);
 
   // Server stats (after game over)
   let percentile = $state<number | undefined>(undefined);
@@ -75,12 +72,27 @@
   let playCount = $state<number | undefined>(undefined);
   let histogram = $state<number[]>([]);
 
-  // Share state
-  let shareStatus = $state<"idle" | "copied" | "fallback">("idle");
-  let shareText = $state("");
+  // Onboarding tooltip
+  const ONBOARDING_KEY = 'onboarding_seen';
+  let showOnboarding = $state(false);
 
-  // Countdown
-  let countdown = $state("");
+  $effect(() => {
+    if (typeof window === 'undefined') return;
+    if (phase !== 'playing') return;
+    if (previousResult) return;
+    try {
+      if (!window.localStorage.getItem(ONBOARDING_KEY)) {
+        showOnboarding = true;
+      }
+    } catch { /* localStorage blocked */ }
+  });
+
+  function dismissOnboarding() {
+    showOnboarding = false;
+    try {
+      window.localStorage.setItem(ONBOARDING_KEY, '1');
+    } catch { /* localStorage blocked */ }
+  }
 
   // Already-played check
   const initialStats = loadDailyStats();
@@ -92,9 +104,9 @@
     score = previousResult.score;
     guessedRanks = previousResult.guessedRanks;
     // Rebuild foundItems from guessedRanks
-    const restored: { rank: number; name: string; points: number }[] = [];
+    const restored: { rank: number; name: string; points: number; value?: string }[] = [];
     for (const rank of previousResult.guessedRanks) {
-      restored.push({ rank, name: list.items[rank - 1], points: rank });
+      restored.push({ rank, name: list.items[rank - 1], points: rank, value: list.values?.[rank - 1] });
     }
     restored.sort((a, b) => b.rank - a.rank);
     foundItems = restored;
@@ -131,6 +143,7 @@
 
   function handleGuess(value: string) {
     if (phase !== "playing" || debouncing) return;
+    if (showOnboarding) dismissOnboarding();
 
     // Debounce
     debouncing = true;
@@ -161,9 +174,9 @@
     const points = rank;
     score += points;
     guessedRanks = [...guessedRanks, rank];
-    foundItems = [...foundItems, { rank, name: match.original, points }];
+    foundItems = [...foundItems, { rank, name: match.original, points, value: list.values?.[match.index] }];
     guessHistory = [
-      { type: "hit", rank, name: match.original, points, guess: value },
+      { type: "hit", rank, name: match.original, points, guess: value, value: list.values?.[match.index] },
       ...guessHistory,
     ];
 
@@ -237,49 +250,9 @@
     }
   }
 
-  function handleShare() {
-    const text = generateShareText({
-      dayNumber,
-      listName: list.name,
-      score,
-      streak: stats.streak,
-      guessedRanks,
-      percentile,
-      listSize,
-    });
-    shareText = text;
+  // Whether this result was restored from localStorage (already played today)
+  const isRestored = $derived(!!previousResult && phase === "results");
 
-    navigator.clipboard.writeText(text).then(
-      () => {
-        shareStatus = "copied";
-      },
-      () => {
-        shareStatus = "fallback";
-      },
-    );
-  }
-
-  // Countdown timer
-  $effect(() => {
-    if (phase !== "results") return;
-    const update = () => {
-      const now = new Date();
-      const tomorrow = new Date(
-        now.getFullYear(), now.getMonth(), now.getDate() + 1,
-      );
-      const diff = tomorrow.getTime() - now.getTime();
-      const h = Math.floor(diff / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
-      countdown = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-    };
-    update();
-    const interval = setInterval(update, 1000);
-    return () => clearInterval(interval);
-  });
-
-  const maxHistogram = $derived(Math.max(...histogram, 1));
-  const gridText = $derived(generateShareGrid(guessedRanks, listSize));
 </script>
 
 <svelte:head>
@@ -325,6 +298,12 @@
           <span class="dt-score-label">pts</span>
         </div>
         <div class="dt-guess-area">
+          {#if showOnboarding}
+            <div class="onboarding-tooltip">
+              Rarer answers score more. #1 = 1pt, #97 = 97pts. Go obscure!
+              <button class="onboarding-dismiss" onclick={dismissOnboarding}>&times;</button>
+            </div>
+          {/if}
           <Autocomplete
             hints={availableHints}
             bind:value={guessValue}
@@ -349,6 +328,7 @@
                   <span class="dt-slot-rank">{i + 1}.</span>
                   {#if item}
                     <span class="dt-slot-name">{item.name}</span>
+                    {#if item.value}<span class="dt-slot-value">{item.value}</span>{/if}
                     <span class="dt-slot-points">+{item.points}</span>
                   {/if}
                 </div>
@@ -378,6 +358,12 @@
       </div>
 
       <div class="guess-area">
+        {#if showOnboarding}
+          <div class="onboarding-tooltip">
+            Rarer answers score more. #1 = 1pt, #97 = 97pts. Go obscure!
+            <button class="onboarding-dismiss" onclick={dismissOnboarding}>&times;</button>
+          </div>
+        {/if}
         <Autocomplete
           hints={availableHints}
           bind:value={guessValue}
@@ -395,6 +381,7 @@
               <div class="board-row">
                 <span class="rank">#{entry.rank}</span>
                 <span class="name">{entry.name}</span>
+                {#if entry.value}<span class="board-value">{entry.value}</span>{/if}
                 <span class="points">+{entry.points}</span>
               </div>
             {:else}
@@ -415,92 +402,21 @@
       {/if}
     </div>
   {:else}
-    <div class="results">
-      <div class="result-card">
-        <h3>Common Cents &middot; #{dayNumber}</h3>
-        <div class="final-score">{score}</div>
-        <div class="max-score">of {maxPossible.toLocaleString()} possible</div>
-        {#if percentile !== undefined}
-          <div class="percentile">Better than {percentile}% of players</div>
-        {/if}
-        {#if stats.streak > 0}
-          <div class="streak-line">&#128293; {stats.streak}-day streak</div>
-        {/if}
-      </div>
-
-      {#if histogram.length > 0 && histogram.some((v) => v > 0)}
-        <div class="histogram">
-          <h4>Score Distribution</h4>
-          <div class="histogram-bars">
-            {#each histogram as count, i}
-              <div class="histogram-bar-wrapper">
-                <div
-                  class="histogram-bar"
-                  style="height: {Math.max(
-                    (count / maxHistogram) * 100,
-                    count > 0 ? 4 : 0,
-                  )}%"
-                ></div>
-                <span class="histogram-label">{i * 500}</span>
-              </div>
-            {/each}
-          </div>
-        </div>
-      {/if}
-
-      <div class="share-grid-container">
-        <pre class="share-grid">{gridText}</pre>
-      </div>
-
-      <button class="share-btn" onclick={handleShare}>
-        {shareStatus === "copied" ? "Copied!" : "Share Result"}
-      </button>
-
-      {#if shareStatus === "fallback"}
-        <div class="share-fallback">
-          <p>Copy your result:</p>
-          <textarea readonly rows="12">{shareText}</textarea>
-        </div>
-      {/if}
-
-      <button
-        class="answers-toggle"
-        onclick={() => (showAllAnswers = !showAllAnswers)}
-      >
-        {showAllAnswers ? "Hide" : "Show"} All Answers
-      </button>
-
-      {#if showAllAnswers}
-        <div class="all-answers">
-          <div class="all-answers-header">
-            <span class="all-answers-title">{list.description}</span>
-            <span class="all-answers-count">{foundItems.length} of {listSize} found</span>
-          </div>
-          <div class="dt-slots" style="grid-template-columns: repeat({gridCols}, 1fr); grid-template-rows: repeat({gridRows}, auto)">
-            {#each Array(listSize) as _, i}
-              {@const item = guessedMap.get(i)}
-              <div class="dt-slot" class:filled={!!item} class:dt-slot-large={listSize <= 50} class:dt-slot-missed={!item}>
-                <span class="dt-slot-rank">{i + 1}.</span>
-                {#if item}
-                  <span class="dt-slot-name">{item.name}</span>
-                  <span class="dt-slot-points">+{item.points}</span>
-                {:else}
-                  <span class="dt-slot-name dt-slot-missed-name">{list.items[i]}</span>
-                {/if}
-              </div>
-            {/each}
-          </div>
-        </div>
-      {/if}
-
-      <button class="play-friends-btn" onclick={() => goto("/")}>
-        Play with Friends &rarr;
-      </button>
-
-      <div class="countdown">
-        Next daily in <span class="time">{countdown}</span>
-      </div>
-    </div>
+    <DailyResults
+      {score}
+      {maxPossible}
+      {percentile}
+      {avgScore}
+      {playCount}
+      {stats}
+      {histogram}
+      {list}
+      {dayNumber}
+      {listSize}
+      {guessedRanks}
+      {foundItems}
+      restored={isRestored}
+    />
   {/if}
 </div>
 
@@ -889,6 +805,14 @@
     flex: 1;
   }
 
+  .board-row .board-value {
+    color: #996633;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-right: 0.5rem;
+    white-space: nowrap;
+  }
+
   .board-row .points {
     color: #888;
     font-weight: 600;
@@ -922,254 +846,36 @@
     font-size: 0.8rem;
   }
 
-  /* ─── RESULTS ─── */
-  .results {
-    text-align: center;
+  /* ─── ONBOARDING TOOLTIP ─── */
+  .onboarding-tooltip {
+    background: var(--color-ink);
+    color: var(--color-parchment);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.82rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: tooltipFadeIn 0.3s ease-out;
   }
 
-  .result-card {
-    border: 2px solid var(--color-ink);
-    padding: 1.25rem;
-    margin-bottom: 1.25rem;
-  }
-
-  .result-card h3 {
-    font-family: "Playfair Display", Georgia, serif;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 0.75rem;
-  }
-
-  .final-score {
-    font-family: "Playfair Display", Georgia, serif;
-    font-size: 3rem;
-    font-weight: 900;
+  .onboarding-dismiss {
+    background: none;
+    border: none;
+    color: var(--color-parchment);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0 0.25rem;
+    opacity: 0.7;
     line-height: 1;
   }
 
-  .max-score {
-    font-size: 0.85rem;
-    color: #888;
-    margin-top: 0.25rem;
+  .onboarding-dismiss:hover {
+    opacity: 1;
   }
 
-  .percentile {
-    margin-top: 0.75rem;
-    padding: 0.5rem;
-    background: rgba(139, 0, 0, 0.06);
-    font-size: 0.9rem;
-    font-weight: 600;
-  }
-
-  .streak-line {
-    margin-top: 0.5rem;
-    font-size: 0.85rem;
-    color: #555;
-  }
-
-  /* ─── SHARE GRID ─── */
-  .share-grid-container {
-    margin-bottom: 1.25rem;
-  }
-
-  .share-grid {
-    font-size: 1rem;
-    line-height: 1.2;
-    letter-spacing: 0.05em;
-    margin: 0 auto;
-    display: inline-block;
-    text-align: left;
-  }
-
-  /* ─── HISTOGRAM ─── */
-  .histogram {
-    margin-bottom: 1.25rem;
-    border: 1px solid var(--color-gold);
-    padding: 1rem;
-    background: var(--color-cream);
-  }
-
-  .histogram h4 {
-    font-family: "Playfair Display", Georgia, serif;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 0.75rem;
-    color: #555;
-  }
-
-  .histogram-bars {
-    display: flex;
-    align-items: flex-end;
-    gap: 3px;
-    height: 80px;
-  }
-
-  .histogram-bar-wrapper {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100%;
-    justify-content: flex-end;
-  }
-
-  .histogram-bar {
-    width: 100%;
-    background: var(--color-crimson);
-    opacity: 0.7;
-    min-width: 0;
-  }
-
-  .histogram-label {
-    font-size: 0.55rem;
-    color: #999;
-    margin-top: 4px;
-  }
-
-  /* ─── BUTTONS ─── */
-  .share-btn {
-    display: block;
-    width: 100%;
-    padding: 0.85rem;
-    border: 2px solid var(--color-ink);
-    background: var(--color-ink);
-    color: var(--color-parchment);
-    font-family: "Playfair Display", Georgia, serif;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.5rem;
-  }
-
-  .share-btn:hover {
-    background: var(--color-cream);
-    color: var(--color-ink);
-  }
-
-  .share-btn:focus-visible {
-    outline: 2px solid var(--color-crimson);
-    outline-offset: 2px;
-  }
-
-  .play-friends-btn {
-    display: block;
-    width: 100%;
-    padding: 0.65rem;
-    border: 1px solid var(--color-gold);
-    background: transparent;
-    color: #777;
-    font-family: "Source Serif 4", Georgia, serif;
-    font-size: 0.9rem;
-    cursor: pointer;
-    margin-bottom: 1rem;
-  }
-
-  .play-friends-btn:hover {
-    border-color: var(--color-ink);
-    color: var(--color-ink);
-  }
-
-  /* ─── SHARE FALLBACK ─── */
-  .share-fallback {
-    margin-bottom: 1rem;
-  }
-
-  .share-fallback p {
-    font-size: 0.85rem;
-    color: #777;
-    margin-bottom: 0.5rem;
-  }
-
-  .share-fallback textarea {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--color-gold);
-    background: var(--color-cream);
-    font-family: monospace;
-    font-size: 0.8rem;
-    resize: none;
-    box-sizing: border-box;
-  }
-
-  /* ─── COUNTDOWN ─── */
-  .countdown {
-    text-align: center;
-    font-size: 0.85rem;
-    color: #888;
-  }
-
-  .countdown .time {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--color-ink);
-    font-family: "Courier New", monospace;
-  }
-
-  /* ─── ALL ANSWERS ─── */
-  .answers-toggle {
-    display: block;
-    width: 100%;
-    padding: 0.65rem;
-    border: 1px solid var(--color-gold);
-    background: transparent;
-    color: #777;
-    font-family: "Source Serif 4", Georgia, serif;
-    font-size: 0.9rem;
-    cursor: pointer;
-    margin-bottom: 0.75rem;
-    transition: all 0.2s;
-  }
-
-  .answers-toggle:hover {
-    border-color: var(--color-ink);
-    color: var(--color-ink);
-  }
-
-  .all-answers {
-    border: 1px solid var(--color-gold);
-    background: var(--color-cream);
-    padding: 0;
-    margin-bottom: 1rem;
-    text-align: left;
-    overflow-x: hidden;
-  }
-
-  .all-answers-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0.75rem;
-    border-bottom: 1px solid var(--color-gold);
-  }
-
-  .all-answers-title {
-    font-family: "Source Serif 4", "Source Serif Pro", Georgia, serif;
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--color-ink);
-  }
-
-  .all-answers-count {
-    font-size: 0.75rem;
-    color: #888;
-  }
-
-  .all-answers .dt-slots {
-    max-height: 60vh;
-    overflow-y: auto;
-  }
-
-  .dt-slot-missed {
-    opacity: 0.5;
-  }
-
-  .dt-slot-missed-name {
-    font-style: italic;
-    color: #999 !important;
-    font-weight: 400 !important;
+  @keyframes tooltipFadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 </style>

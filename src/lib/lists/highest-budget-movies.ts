@@ -6,6 +6,7 @@ export const highestBudgetMovies: GameList = {
   name: 'Movies with Highest Budget',
   description: 'Films ranked by production budget (The Numbers/Wikipedia)',
   topics: ['film & tv', 'business'],
+  difficulty: 2,
   hints: highestBudgetMoviesHints,
   valueLabel: 'Budget',
   items: [
@@ -52,4 +53,8 @@ export const highestBudgetMovies: GameList = {
     "$135M", "$130M", "$125M", "$115M", "$110M",
     "$103M", "$100M", "$100M", "$100M", "$100M",
   ],
+  aliases: {
+    "Ghost in the Shell (2017)": "Ghost in the Shell",
+    "Dark Phoenix": "X-Men: Dark Phoenix",
+  },
 };

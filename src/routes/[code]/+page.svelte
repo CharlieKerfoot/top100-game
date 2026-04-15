@@ -1189,6 +1189,8 @@
                       {#each getEffectiveTopics(cat) as topic}
                         <span class="card-tag" class:card-tag-new={topic === "new"}>{topic}</span>
                       {/each}
+                      {#if cat.difficulty === 1}<span class="card-tag card-tag-easy">Easy</span>{/if}
+                      {#if cat.difficulty === 3}<span class="card-tag card-tag-hard">Hard</span>{/if}
                     </div>
                   </div>
                 {/each}
@@ -1267,6 +1269,8 @@
                       {#each getEffectiveTopics(cat) as topic}
                         <span class="card-tag" class:card-tag-new={topic === "new"}>{topic}</span>
                       {/each}
+                      {#if cat.difficulty === 1}<span class="card-tag card-tag-easy">Easy</span>{/if}
+                      {#if cat.difficulty === 3}<span class="card-tag card-tag-hard">Hard</span>{/if}
                     </div>
                   </div>
                 {/each}
@@ -1866,6 +1870,7 @@
                   <span class="dt-slot-by">{item.playerName}</span>
                 {:else}
                   <span class="dt-slot-name dt-slot-missed-name">{mp.list.items[i]}</span>
+                  {#if mp.list.values?.[i]}<span class="dt-slot-value dt-slot-missed-value">{mp.list.values[i]}</span>{/if}
                 {/if}
               </div>
             {/each}
@@ -3155,6 +3160,15 @@
   .card-tag-new {
     background: rgba(184, 134, 11, 0.15);
     color: #8b6914;
+    font-weight: 700;
+  }
+  .card-tag-easy {
+    background: rgba(34, 139, 34, 0.1);
+    color: #2d6b2d;
+  }
+  .card-tag-hard {
+    background: rgba(139, 0, 0, 0.12);
+    color: var(--color-crimson);
     font-weight: 700;
   }
 
@@ -4765,5 +4779,9 @@
     font-style: italic;
     color: #999 !important;
     font-weight: 400 !important;
+  }
+
+  .dt-slot-missed-value {
+    color: #999 !important;
   }
 </style>

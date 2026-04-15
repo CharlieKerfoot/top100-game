@@ -6,6 +6,7 @@ export const mlbCareerWar: GameList = {
   name: 'MLB All-Time Career WAR Leaders',
   description: 'MLB players ranked by all-time career WAR (Baseball Reference bWAR)',
   topics: ['sports'],
+  difficulty: 3,
   hints: mlbCareerWarHints,
   valueLabel: 'Career WAR',
   items: [

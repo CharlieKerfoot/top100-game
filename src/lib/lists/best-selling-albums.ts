@@ -6,6 +6,7 @@ export const bestSellingAlbums: GameList = {
   name: 'Best-Selling Albums',
   description: 'Albums ranked by worldwide sales (Wikipedia / RIAA / IFPI)',
   topics: ['music'],
+  difficulty: 2,
   hints: bestSellingAlbumsHints,
   valueLabel: 'Sales',
   items: [

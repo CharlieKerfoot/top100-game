@@ -6,6 +6,7 @@ export const highestGrossingFranchises: GameList = {
   name: 'Highest-Grossing Film Franchises',
   description: 'Film franchises ranked by combined worldwide box office (Box Office Mojo / Wikipedia)',
   topics: ['film & tv', 'business'],
+  difficulty: 2,
   size: 50,
   hints: highestGrossingFranchisesHints,
   valueLabel: 'Box Office',
@@ -34,4 +35,12 @@ export const highestGrossingFranchises: GameList = {
     "$1.8B", "$1.8B", "$1.7B", "$1.9B", "$1.6B",
   ],
   newUntil: '2026-05-14',
+  aliases: {
+    "Hunger Games": "The Hunger Games",
+    "Fast and Furious": "Fast & Furious",
+    "Lord of the Rings": "Middle-earth",
+    "The Lord of the Rings": "Middle-earth",
+    "The Hobbit": "Middle-earth",
+    "Harry Potter": "Wizarding World",
+  },
 };

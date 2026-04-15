@@ -6,6 +6,7 @@ export const grammyAwards: GameList = {
   name: 'Most Awarded Artists (Grammys)',
   description: 'Artists ranked by total Grammy Awards won, all time through 2026 (Grammy.com)',
   topics: ['music'],
+  difficulty: 2,
   hints: grammyAwardsHints,
   valueLabel: 'Grammys Won',
   items: [

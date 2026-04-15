@@ -6,6 +6,7 @@ export const highestGrossingTvShows: GameList = {
   name: 'Highest-Grossing TV Franchises of All Time',
   description: 'TV franchises ranked by estimated total revenue including syndication, streaming, merchandise & advertising (Wikipedia, Forbes, industry reports)',
   topics: ['film & tv', 'business'],
+  difficulty: 2,
   hints: highestGrossingTvShowsHints,
   valueLabel: 'Revenue',
   items: [
@@ -52,4 +53,10 @@ export const highestGrossingTvShows: GameList = {
     "$90M", "$85M", "$80M", "$75M", "$70M",
     "$70M", "$65M", "$60M", "$55M", "$50M",
   ],
+  aliases: {
+    "Cheer": "Cheers",
+    "Law & Order: SVU": "Law & Order",
+    "Law & Order: Criminal Intent": "Law & Order",
+    "Law & Order: Special Victims Unit": "Law & Order",
+  },
 };

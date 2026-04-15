@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { page } from "$app/state";
   import { getMultiplayerState } from "$lib/multiplayer.svelte";
   import { getDailyList, loadDailyStats, getTodayKey } from "$lib/daily";
   import { lists } from "$lib/lists/index";
@@ -40,13 +41,28 @@
       .sort(),
   );
 
+  // Challenge deep link: /?challenge=list-id auto-opens party creation
+  const challengeListId = page.url.searchParams.get("challenge");
+  const challengeList = challengeListId
+    ? lists.find((l) => l.id === challengeListId)
+    : undefined;
+
   // Party form state
-  let view = $state<"home" | "party">("home");
+  let view = $state<"home" | "party">(challengeList ? "party" : "home");
   let playerName = $state("");
   let joinCode = $state("");
   let createPublic = $state(true);
   let showBrowse = $state(false);
   let partyTab = $state<"create" | "join">("create");
+
+  // When party is created via challenge link, auto-select the challenge list
+  let challengeApplied = $state(false);
+  $effect(() => {
+    if (challengeList && !challengeApplied && mp.phase === "lobby" && mp.isHost) {
+      mp.updateSettings({ listId: challengeList.id });
+      challengeApplied = true;
+    }
+  });
 
   function handleCreate() {
     if (!playerName.trim()) return;

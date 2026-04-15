@@ -8,6 +8,7 @@ export const highestGrossingAnimatedMovies: GameList = {
   name: 'Highest Grossing Animated Movies',
   description: 'Animated films ranked by all-time worldwide box office gross (Box Office Mojo)',
   topics: ['film & tv'],
+  difficulty: 1,
   hints: highestGrossingAnimatedMoviesHints,
   valueLabel: 'Box Office',
   size: 50,

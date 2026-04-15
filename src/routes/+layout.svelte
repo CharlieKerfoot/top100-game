@@ -8,6 +8,10 @@
 
   const mp = createMultiplayerState();
   setContext('mp', mp);
+
+  if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js');
+  }
 </script>
 
 <svelte:head>

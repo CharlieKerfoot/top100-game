@@ -6,6 +6,7 @@ export const companyValuation: GameList = {
   name: 'Most Valuable Companies',
   description: 'Companies ranked by market capitalization (companiesmarketcap.com, 2025)',
   topics: ['business'],
+  difficulty: 2,
   hints: companyValuationHints,
   valueLabel: 'Market Cap',
   items: [

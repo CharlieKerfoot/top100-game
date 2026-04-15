@@ -13,4 +13,6 @@ export interface GameList {
   newUntil?: string;
   /** Maps alternate accepted names to canonical item names. e.g. { "APhi": "Alpha Phi" } */
   aliases?: Record<string, string>;
+  /** Difficulty rating: 1 = easy (well-known topics), 2 = medium, 3 = hard (niche/obscure). */
+  difficulty?: 1 | 2 | 3;
 }

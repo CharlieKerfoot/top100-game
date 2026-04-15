@@ -9,6 +9,7 @@ export const bestSellingCarsUsa: GameList = {
   name: 'Best-Selling Vehicles in the USA (2024)',
   description: 'Vehicles ranked by 2024 US new sales (CarPro / GCBC)',
   topics: ['business', 'misc'],
+  difficulty: 2,
   hints: bestSellingCarsUsaHints,
   valueLabel: '2024 Sales',
   size: 50,
@@ -77,4 +78,13 @@ export const bestSellingCarsUsa: GameList = {
     "85,230", "82,610", "78,940", "76,320", "74,890",
     "72,540", "70,180", "68,950", "67,830", "66,470",
   ],
+  aliases: {
+    "Ford F-150": "Ford F-Series",
+    "Ford F-250": "Ford F-Series",
+    "Ford F-350": "Ford F-Series",
+    "Chevrolet Silverado 1500": "Chevrolet Silverado",
+    "Ram 1500": "Ram Pickup",
+    "Ram 2500": "Ram Pickup",
+    "GMC Sierra 1500": "GMC Sierra",
+  },
 };

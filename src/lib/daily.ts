@@ -119,6 +119,23 @@ export function recordGame(score: number, listId: string, guessCount: number, gu
   return stats;
 }
 
+// ── Share URL for OG image ──
+
+export function generateShareUrl(opts: {
+  listId: string;
+  score: number;
+  dayNumber: number;
+  percentile?: number;
+}): string {
+  const qs = new URLSearchParams({
+    list: opts.listId,
+    score: String(opts.score),
+    day: String(opts.dayNumber),
+  });
+  if (opts.percentile !== undefined) qs.set('percentile', String(opts.percentile));
+  return `https://commoncents.fun/api/og?${qs}`;
+}
+
 // ── Share text + grid ──
 
 export function generateShareGrid(guessedRanks: number[], listSize: number = 100): string {
@@ -165,6 +182,9 @@ export function generateShareText(opts: {
   if (opts.percentile !== undefined) {
     lines.push(`Better than ${opts.percentile}% of players`);
   }
+
+  lines.push('');
+  lines.push('commoncents.fun/daily');
 
   return lines.join('\n');
 }

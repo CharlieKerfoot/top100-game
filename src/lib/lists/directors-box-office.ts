@@ -6,6 +6,7 @@ export const directorsBoxOffice: GameList = {
   name: 'Directors by Total Box Office Gross',
   description: 'Directors ranked by cumulative worldwide box office, all films (The Numbers)',
   topics: ['film & tv', 'business'],
+  difficulty: 3,
   size: 99,
   hints: directorsBoxOfficeHints,
   valueLabel: 'Total Gross',
