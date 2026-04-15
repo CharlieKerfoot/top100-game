@@ -6,7 +6,7 @@ export const oscarNominations: GameList = {
   name: 'Movies with Most Oscar Nominations',
   description: 'Films ranked by total Academy Award nominations, all time (Oscars.org)',
   topics: ['film & tv'],
-  size: 99,
+  difficulty: 2,
   hints: oscarNominationsHints,
   valueLabel: 'Nominations',
   items: [
@@ -30,6 +30,7 @@ export const oscarNominations: GameList = {
     "Pulp Fiction", "Fargo", "The Shawshank Redemption", "The Pianist", "Black Panther",
     "Joker", "1917", "Little Women (2019)", "Ford v Ferrari", "Mank",
     "Judas and the Black Messiah", "The Power of the Dog", "Dune", "Killers of the Flower Moon",
+    "The Banshees of Inisherin",
   ],
   values: [
     "14", "14", "14", "13", "13",
@@ -52,5 +53,13 @@ export const oscarNominations: GameList = {
     "6", "7", "7", "7", "5",
     "7", "7", "4", "6", "4",
     "10", "6", "12", "10",
+    "9",
   ],
+  aliases: {
+    "The Silence of the Lambs": "Silence of the Lambs",
+    "Chicago (2002)": "Chicago",
+    "Benjamin Button": "The Curious Case of Benjamin Button",
+    "West Side Story": "West Side Story (1961)",
+    "A Star Is Born": "A Star Is Born (2018)",
+  },
 };

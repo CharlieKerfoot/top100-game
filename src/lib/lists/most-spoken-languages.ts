@@ -9,6 +9,7 @@ export const mostSpokenLanguages: GameList = {
   name: 'Most Spoken Languages by Native Speakers',
   description: 'Languages ranked by number of native speakers (Ethnologue 2026 via Wikipedia)',
   topics: ['misc', 'geography'],
+  difficulty: 1,
   hints: mostSpokenLanguagesHints,
   valueLabel: 'Native Speakers',
   size: 50,

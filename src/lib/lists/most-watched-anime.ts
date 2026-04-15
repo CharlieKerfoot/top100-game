@@ -5,6 +5,7 @@ export const mostWatchedAnime: GameList = {
   name: 'Most Watched Anime',
   description: 'Top 50 anime by global cultural popularity (curated from MAL, AniList & viewership data)',
   topics: ['entertainment'],
+  difficulty: 1,
   size: 50,
   newUntil: '2026-04-15',
   items: [
@@ -73,7 +74,7 @@ export const mostWatchedAnime: GameList = {
     "Spy x Family", "JoJo's Bizarre Adventure", "JoJo",
     "Chainsaw Man", "CSM", "Yu Yu Hakusho", "Inuyasha",
     "Erased", "Boku dake ga Inai Machi", "Vinland Saga",
-    "Seven Deadly Sins", "Nanatsu no Taizai", "Re Zero",
+    "The Seven Deadly Sins", "Nanatsu no Taizai", "Re Zero",
     "Haikyuu", "Black Clover", "Parasyte", "Kiseijuu",
     "Your Lie in April", "Shigatsu wa Kimi no Uso",
     "Gurren Lagann", "Tengen Toppa Gurren Lagann", "Yugioh",

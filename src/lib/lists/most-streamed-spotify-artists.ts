@@ -6,6 +6,7 @@ export const mostStreamedSpotifyArtists: GameList = {
   name: 'Most Streamed Artists on Spotify',
   description: 'All-time most streamed artists on Spotify',
   topics: ['music'],
+  difficulty: 2,
   hints: mostStreamedSpotifyArtistsHints,
   valueLabel: 'Total Streams',
   items: [

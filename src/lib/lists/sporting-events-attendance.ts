@@ -18,6 +18,7 @@ export const sportingEventsAttendance: GameList = {
   name: 'Most Attended Sporting Events',
   description: 'Single sporting events ranked by all-time attendance (Wikipedia / Guinness World Records)',
   topics: ['sports'],
+  difficulty: 2,
   size: 50,
   hints: sportingEventsAttendanceHints,
   valueLabel: 'Attendance',

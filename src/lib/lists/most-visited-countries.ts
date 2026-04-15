@@ -6,6 +6,7 @@ export const mostVisitedCountries: GameList = {
   name: 'Most Visited Countries by Tourists',
   description: 'Countries ranked by international tourist arrivals (UNWTO, 2024)',
   topics: ['geography'],
+  difficulty: 1,
   hints: mostVisitedCountriesHints,
   valueLabel: 'Annual Visitors',
   items: [

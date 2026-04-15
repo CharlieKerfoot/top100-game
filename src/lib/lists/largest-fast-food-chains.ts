@@ -8,6 +8,7 @@ export const largestFastFoodChains: GameList = {
   name: 'Largest Fast Food Chains',
   description: 'Top 50 restaurant chains by total worldwide locations',
   topics: ['business', 'food'],
+  difficulty: 1,
   hints: largestFastFoodChainsHints,
   valueLabel: 'Locations',
   size: 50,
@@ -35,4 +36,7 @@ export const largestFastFoodChains: GameList = {
     "2,267 locations", "2,200 locations", "2,180+ locations", "4,000 locations", "2,000+ locations",
     "1,946 locations", "1,926 locations", "1,850 locations", "1,800+ locations", "1,800+ locations",
   ],
+  aliases: {
+    "Sonic": "Sonic Drive-In",
+  },
 };

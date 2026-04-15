@@ -6,6 +6,7 @@ export const highestGrossingMovies: GameList = {
   name: 'Highest Grossing Movies',
   description: 'Films ranked by all-time worldwide box office gross (Box Office Mojo)',
   topics: ['film & tv'],
+  difficulty: 1,
   hints: highestGrossingMoviesHints,
   valueLabel: 'Box Office',
   items: [

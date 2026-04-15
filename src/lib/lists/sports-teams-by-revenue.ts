@@ -6,6 +6,7 @@ export const sportsTeamsByRevenue: GameList = {
   name: 'Most Valuable Sports Franchises',
   description: 'Sports franchises ranked by total value (Sportico 2025)',
   topics: ['sports', 'business'],
+  difficulty: 2,
   hints: sportsTeamsByRevenueHints,
   valueLabel: 'Valuation',
   items: [
@@ -52,4 +53,10 @@ export const sportsTeamsByRevenue: GameList = {
     "$2.3B", "$2.3B", "$2.2B", "$2.2B", "$2.1B",
     "$2.1B", "$2.0B", "$2.0B", "$2.0B", "$1.9B",
   ],
+  aliases: {
+    "Chiefs": "Kansas City Chiefs",
+    "Bulls": "Chicago Bulls",
+    "Lions": "Detroit Lions",
+    "Dolphins": "Miami Dolphins",
+  },
 };

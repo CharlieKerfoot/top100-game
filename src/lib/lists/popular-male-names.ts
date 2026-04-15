@@ -6,6 +6,7 @@ export const popularMaleNames: GameList = {
   name: 'Most Popular Male Names (USA)',
   description: 'Most common male first names in the United States (SSA all-time)',
   topics: ['entertainment', 'misc'],
+  difficulty: 1,
   hints: popularMaleNamesHints,
   valueLabel: 'Total Births',
   items: [

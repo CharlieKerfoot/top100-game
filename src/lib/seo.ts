@@ -6,10 +6,12 @@ export const DEFAULT_DESCRIPTION =
 export const KEYWORDS =
   'Common Cents game, top 100 game, top 100 quiz, ranking game, daily trivia game';
 
-export function ogImageUrl(params?: { list?: string; score?: number }): string {
+export function ogImageUrl(params?: { list?: string; score?: number; day?: number; percentile?: number }): string {
   const base = `${SITE_URL}/api/og`;
   if (!params?.list) return base;
   const qs = new URLSearchParams({ list: params.list });
   if (params.score !== undefined) qs.set('score', String(params.score));
+  if (params.day !== undefined) qs.set('day', String(params.day));
+  if (params.percentile !== undefined) qs.set('percentile', String(params.percentile));
   return `${base}?${qs}`;
 }

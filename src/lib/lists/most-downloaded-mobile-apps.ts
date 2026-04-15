@@ -8,6 +8,7 @@ export const mostDownloadedMobileApps: GameList = {
   name: 'Most Downloaded Mobile Apps',
   description: 'Mobile apps ranked by all-time cumulative downloads across iOS & Android (AppMagic, 2026)',
   topics: ['internet', 'entertainment'],
+  difficulty: 1,
   hints: mostDownloadedMobileAppsHints,
   valueLabel: 'All-Time Downloads',
   newUntil: '2025-08-01',
@@ -75,4 +76,7 @@ export const mostDownloadedMobileApps: GameList = {
     "500M+", "500M+", "500M+", "500M+", "500M+",
     "500M+", "500M+", "500M+", "500M+", "500M+",
   ],
+  aliases: {
+    "Amazon": "Amazon Shopping",
+  },
 };

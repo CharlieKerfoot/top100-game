@@ -6,6 +6,7 @@ export const mostTranslatedBooks: GameList = {
   name: 'Most Translated Books of All Time',
   description: 'Books ranked by number of languages translated into (Wikipedia)',
   topics: ['entertainment'],
+  difficulty: 3,
   hints: mostTranslatedBooksHints,
   valueLabel: 'Author',
   size: 50,

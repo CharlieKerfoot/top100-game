@@ -6,6 +6,7 @@ export const countriesByArea: GameList = {
   name: 'Countries by Area',
   description: 'Countries ranked by total area in km² (UN Statistics Division / CIA World Factbook)',
   topics: ['geography'],
+  difficulty: 1,
   hints: countriesByAreaHints,
   valueLabel: 'Total Area',
   items: [

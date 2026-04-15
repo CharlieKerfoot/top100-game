@@ -6,6 +6,7 @@ export const countriesByLifeExpectancy: GameList = {
   name: 'Countries by Life Expectancy',
   description: 'Countries ranked by life expectancy at birth (UN DESA 2023 estimates)',
   topics: ['geography'],
+  difficulty: 3,
   hints: countriesByLifeExpectancyHints,
   valueLabel: 'Life Expectancy',
   items: [

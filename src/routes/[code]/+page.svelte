@@ -359,9 +359,17 @@
 
   $effect(() => {
     if (mp.phase === "playing") {
+      const html = document.documentElement;
+      html.style.overflow = "hidden";
+      html.style.height = "100dvh";
       document.body.style.overflow = "hidden";
+      document.body.style.height = "100dvh";
+
       return () => {
+        html.style.overflow = "";
+        html.style.height = "";
         document.body.style.overflow = "";
+        document.body.style.height = "";
       };
     }
   });
@@ -555,7 +563,9 @@
         <span class="header-mode"
           >{mp.mode === "strikes" ? "Strike" : "Turns"} Mode</span
         >
-        <span class="header-code">{mp.partyCode}</span>
+        <button class="header-code" class:copied onclick={copyCode}>
+          {copied ? "Copied!" : mp.partyCode}
+        </button>
       </div>
     {/if}
   </header>
@@ -1179,6 +1189,8 @@
                       {#each getEffectiveTopics(cat) as topic}
                         <span class="card-tag" class:card-tag-new={topic === "new"}>{topic}</span>
                       {/each}
+                      {#if cat.difficulty === 1}<span class="card-tag card-tag-easy">Easy</span>{/if}
+                      {#if cat.difficulty === 3}<span class="card-tag card-tag-hard">Hard</span>{/if}
                     </div>
                   </div>
                 {/each}
@@ -1257,6 +1269,8 @@
                       {#each getEffectiveTopics(cat) as topic}
                         <span class="card-tag" class:card-tag-new={topic === "new"}>{topic}</span>
                       {/each}
+                      {#if cat.difficulty === 1}<span class="card-tag card-tag-easy">Easy</span>{/if}
+                      {#if cat.difficulty === 3}<span class="card-tag card-tag-hard">Hard</span>{/if}
                     </div>
                   </div>
                 {/each}
@@ -1856,6 +1870,7 @@
                   <span class="dt-slot-by">{item.playerName}</span>
                 {:else}
                   <span class="dt-slot-name dt-slot-missed-name">{mp.list.items[i]}</span>
+                  {#if mp.list.values?.[i]}<span class="dt-slot-value dt-slot-missed-value">{mp.list.values[i]}</span>{/if}
                 {/if}
               </div>
             {/each}
@@ -2345,6 +2360,18 @@
     border: 1px solid rgba(139, 0, 0, 0.15);
     padding: 0.15rem 0.5rem;
     letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .header-code:hover {
+    background: rgba(139, 0, 0, 0.15);
+  }
+
+  .header-code.copied {
+    color: #2d7a2d;
+    border-color: rgba(45, 122, 45, 0.3);
+    background: rgba(45, 122, 45, 0.08);
   }
 
   /* ─── RULES MODAL ─── */
@@ -3133,6 +3160,15 @@
   .card-tag-new {
     background: rgba(184, 134, 11, 0.15);
     color: #8b6914;
+    font-weight: 700;
+  }
+  .card-tag-easy {
+    background: rgba(34, 139, 34, 0.1);
+    color: #2d6b2d;
+  }
+  .card-tag-hard {
+    background: rgba(139, 0, 0, 0.12);
+    color: var(--color-crimson);
     font-weight: 700;
   }
 
@@ -4743,5 +4779,9 @@
     font-style: italic;
     color: #999 !important;
     font-weight: 400 !important;
+  }
+
+  .dt-slot-missed-value {
+    color: #999 !important;
   }
 </style>

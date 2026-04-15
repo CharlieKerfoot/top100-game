@@ -5,6 +5,7 @@ export const largestGreekOrganizations: GameList = {
   name: 'Largest Fraternities & Sororities',
   description: 'North American Greek letter organizations ranked by active chapters (NIC/NPC/NPHC)',
   topics: ['education'],
+  difficulty: 3,
   size: 126,
   newUntil: '2026-05-15',
   items: [

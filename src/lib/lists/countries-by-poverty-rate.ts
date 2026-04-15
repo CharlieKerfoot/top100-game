@@ -6,6 +6,7 @@ export const countriesByPovertyRate: GameList = {
   name: 'Countries by Poverty Rate (Highest)',
   description: 'Countries ranked by % of population below international poverty line ($2.15/day, World Bank)',
   topics: ['geography', 'business'],
+  difficulty: 3,
   hints: countriesByPovertyRateHints,
   valueLabel: 'Poverty Rate',
   items: [

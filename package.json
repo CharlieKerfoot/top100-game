@@ -13,7 +13,8 @@
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"test": "vitest run"
+		"test": "vitest run",
+		"validate": "bun scripts/validate-lists.ts"
 	},
 	"devDependencies": {
 		"@sveltejs/kit": "^2.57.0",
@@ -28,6 +29,7 @@
 		"@resvg/resvg-js": "^2.6.2",
 		"@sveltejs/adapter-node": "^5.5.4",
 		"concurrently": "^9.2.1",
+		"resend": "^6.12.0",
 		"satori": "^0.26.0",
 		"socket.io": "^4.8.3",
 		"socket.io-client": "^4.8.3",

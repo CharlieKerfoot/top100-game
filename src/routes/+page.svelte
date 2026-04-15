@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { page } from "$app/state";
   import { getMultiplayerState } from "$lib/multiplayer.svelte";
   import { getDailyList, loadDailyStats, getTodayKey } from "$lib/daily";
   import { lists } from "$lib/lists/index";
@@ -40,13 +41,28 @@
       .sort(),
   );
 
+  // Challenge deep link: /?challenge=list-id auto-opens party creation
+  const challengeListId = page.url.searchParams.get("challenge");
+  const challengeList = challengeListId
+    ? lists.find((l) => l.id === challengeListId)
+    : undefined;
+
   // Party form state
-  let view = $state<"home" | "party">("home");
+  let view = $state<"home" | "party">(challengeList ? "party" : "home");
   let playerName = $state("");
   let joinCode = $state("");
   let createPublic = $state(true);
   let showBrowse = $state(false);
   let partyTab = $state<"create" | "join">("create");
+
+  // When party is created via challenge link, auto-select the challenge list
+  let challengeApplied = $state(false);
+  $effect(() => {
+    if (challengeList && !challengeApplied && mp.phase === "lobby" && mp.isHost) {
+      mp.updateSettings({ listId: challengeList.id });
+      challengeApplied = true;
+    }
+  });
 
   function handleCreate() {
     if (!playerName.trim()) return;
@@ -78,6 +94,58 @@
       joinCode = letters;
     }
   }
+
+  // Contact form state
+  let showContact = $state(false);
+  let contactSubject = $state("");
+  let contactEmail = $state("");
+  let contactName = $state("");
+  let contactMessage = $state("");
+  let contactStatus = $state<"idle" | "sending" | "sent" | "error">("idle");
+  let contactError = $state("");
+
+  function openContact(subject: string) {
+    contactSubject = subject;
+    contactEmail = "";
+    contactName = "";
+    contactMessage = "";
+    contactStatus = "idle";
+    contactError = "";
+    showContact = true;
+  }
+
+  async function submitContact() {
+    if (
+      !contactName.trim() ||
+      !contactEmail.trim() ||
+      !contactSubject.trim() ||
+      !contactMessage.trim()
+    )
+      return;
+    contactStatus = "sending";
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: contactName.trim(),
+          email: contactEmail.trim(),
+          subject: contactSubject.trim(),
+          message: contactMessage.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        contactStatus = "sent";
+      } else {
+        contactStatus = "error";
+        contactError = data.error || "Something went wrong.";
+      }
+    } catch {
+      contactStatus = "error";
+      contactError = "Could not reach the server. Please try again.";
+    }
+  }
 </script>
 
 <svelte:head>
@@ -102,10 +170,6 @@
     <h1>Common Cents</h1>
     <p class="subtitle">The Top&nbsp;100 Ranking Game</p>
     <div class="header-rule"></div>
-    <p class="tagline">
-      Name things from a Top&nbsp;100 list. Harder answers score more.
-      Accumulate as many points as you can.
-    </p>
   </header>
 
   {#if mp.error}
@@ -229,6 +293,7 @@
           </div>
         </div>
       </section>
+
     </div>
   {:else}
     <div class="home home-party">
@@ -353,13 +418,106 @@
       {/if}
     </div>
   {/if}
+
+  <footer class="feedback-bar">
+    <button class="feedback-btn" onclick={() => openContact("List Suggestion")}>
+      Suggest a List
+    </button>
+    <button class="feedback-btn" onclick={() => openContact("Bug Report")}>
+      Report a Bug
+    </button>
+    <button class="feedback-btn" onclick={() => openContact("Feedback")}>
+      Send Feedback
+    </button>
+  </footer>
 </div>
+
+{#if showContact}
+  <div class="contact-overlay" onclick={() => (showContact = false)}>
+    <div class="contact-modal" onclick={(e) => e.stopPropagation()}>
+      {#if contactStatus === "sent"}
+        <div class="contact-success">
+          <div class="contact-success-icon">&#10003;</div>
+          <h3>Message Sent</h3>
+          <p>Thanks for reaching out! We'll get back to you soon.</p>
+          <button
+            class="contact-close-btn"
+            onclick={() => (showContact = false)}>Close</button
+          >
+        </div>
+      {:else}
+        <div class="contact-header">
+          <h3>{contactSubject}</h3>
+          <button class="contact-x" onclick={() => (showContact = false)}
+            >&times;</button
+          >
+        </div>
+        <form
+          class="contact-form"
+          onsubmit={(e) => {
+            e.preventDefault();
+            submitContact();
+          }}
+        >
+          <label>
+            <span>Name</span>
+            <input
+              type="text"
+              bind:value={contactName}
+              placeholder="Your name"
+              required
+            />
+          </label>
+          <label>
+            <span>Email</span>
+            <input
+              type="email"
+              bind:value={contactEmail}
+              placeholder="you@example.com"
+              required
+            />
+          </label>
+          <label>
+            <span>Subject</span>
+            <input type="text" bind:value={contactSubject} required />
+          </label>
+          <label>
+            <span>Message</span>
+            <textarea
+              bind:value={contactMessage}
+              rows="5"
+              placeholder="What's on your mind?"
+              required
+            ></textarea>
+          </label>
+          {#if contactStatus === "error"}
+            <p class="contact-error">{contactError}</p>
+          {/if}
+          <button
+            type="submit"
+            class="contact-submit"
+            disabled={contactStatus === "sending" ||
+              !contactName.trim() ||
+              !contactEmail.trim() ||
+              !contactMessage.trim()}
+          >
+            {contactStatus === "sending" ? "Sending..." : "Send Message"}
+          </button>
+        </form>
+      {/if}
+    </div>
+  </div>
+{/if}
 
 <style>
   .app {
     max-width: 720px;
     margin: 0 auto;
     padding: 1.5rem;
+    min-height: 100dvh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
   }
 
   @media (min-width: 900px) {
@@ -998,5 +1156,203 @@
     color: #666;
     letter-spacing: 0.05em;
     text-transform: uppercase;
+  }
+
+  /* ─── FEEDBACK BAR ─── */
+  .feedback-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: auto;
+    padding-top: 1.5rem;
+  }
+
+  .feedback-btn {
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--color-gold);
+    background: transparent;
+    color: #777;
+    font-size: 0.8rem;
+    font-family: "Source Serif 4", Georgia, serif;
+    text-decoration: none;
+    transition:
+      border-color 0.2s,
+      color 0.2s;
+  }
+
+  .feedback-btn:hover {
+    border-color: var(--color-ink);
+    color: var(--color-ink);
+  }
+
+  /* ─── CONTACT MODAL ─── */
+  .contact-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+  }
+
+  .contact-modal {
+    background: var(--color-cream);
+    border: 2px solid var(--color-ink);
+    width: 100%;
+    max-width: 440px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 1.5rem;
+  }
+
+  .contact-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--color-gold);
+    padding-bottom: 0.75rem;
+  }
+
+  .contact-header h3 {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .contact-x {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #888;
+    padding: 0;
+    line-height: 1;
+  }
+
+  .contact-x:hover {
+    color: var(--color-ink);
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .contact-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .contact-form label span {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #555;
+  }
+
+  .contact-form input,
+  .contact-form textarea {
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--color-gold);
+    background: white;
+    color: var(--color-ink);
+    font-size: 0.95rem;
+    font-family: "Source Serif 4", Georgia, serif;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .contact-form input:focus,
+  .contact-form textarea:focus {
+    border-color: var(--color-crimson);
+    box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.1);
+  }
+
+  .contact-form textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .contact-submit {
+    padding: 0.75rem;
+    border: 2px solid var(--color-ink);
+    background: var(--color-ink);
+    color: var(--color-parchment);
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+      background 0.2s,
+      color 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .contact-submit:hover:not(:disabled) {
+    background: var(--color-cream);
+    color: var(--color-ink);
+  }
+
+  .contact-submit:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .contact-error {
+    color: var(--color-crimson);
+    font-size: 0.85rem;
+    margin: 0;
+  }
+
+  .contact-success {
+    text-align: center;
+    padding: 1rem 0;
+  }
+
+  .contact-success-icon {
+    font-size: 2.5rem;
+    color: #2d7a2d;
+    margin-bottom: 0.5rem;
+  }
+
+  .contact-success h3 {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 1.3rem;
+    margin: 0 0 0.5rem;
+  }
+
+  .contact-success p {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0 0 1.25rem;
+  }
+
+  .contact-close-btn {
+    padding: 0.6rem 2rem;
+    border: 1px solid var(--color-gold);
+    background: transparent;
+    color: #555;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition:
+      border-color 0.2s,
+      color 0.2s;
+  }
+
+  .contact-close-btn:hover {
+    border-color: var(--color-ink);
+    color: var(--color-ink);
   }
 </style>

@@ -9,6 +9,7 @@ export const usnewsCollegeRankings: GameList = {
   name: 'US News College Rankings',
   description: 'US News & World Report Best National Universities (2026)',
   topics: ['education', 'misc'],
+  difficulty: 2,
   hints: usnewsCollegeRankingsHints,
   valueLabel: 'Rank',
   items: [

@@ -6,6 +6,7 @@ export const mostVisitedNationalParks: GameList = {
   name: 'Most Visited US National Parks',
   description: 'US National Parks ranked by annual recreation visitors (NPS, 2024)',
   topics: ['geography'],
+  difficulty: 2,
   hints: mostVisitedNationalParksHints,
   valueLabel: 'Annual Visitors',
   size: 50,

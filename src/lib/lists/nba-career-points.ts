@@ -6,6 +6,7 @@ export const nbaCareerPoints: GameList = {
   name: 'NBA All-Time Points Leaders',
   description: 'NBA players ranked by all-time career regular season points (Basketball Reference)',
   topics: ['sports'],
+  difficulty: 2,
   hints: nbaCareerPointsHints,
   valueLabel: 'Career Points',
   items: [

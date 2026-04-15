@@ -9,6 +9,7 @@ export const akcPopularDogBreeds: GameList = {
   name: 'Most Popular Dog Breeds (AKC)',
   description: 'Top 100 dog breeds by AKC registration statistics, 2024 rankings',
   topics: ['misc'],
+  difficulty: 2,
   hints: akcPopularDogBreedsHints,
   valueLabel: 'AKC Group',
   items: [

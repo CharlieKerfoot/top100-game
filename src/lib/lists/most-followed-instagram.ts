@@ -6,6 +6,7 @@ export const mostFollowedInstagram: GameList = {
   name: 'Most Followed Instagram Accounts',
   description: 'Instagram accounts ranked by follower count (Wikipedia, 2024)',
   topics: ['internet'],
+  difficulty: 1,
   hints: mostFollowedInstagramHints,
   valueLabel: 'Followers',
   items: [
