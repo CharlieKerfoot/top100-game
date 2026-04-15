@@ -184,14 +184,18 @@ export const lists: GameList[] = [
   bestCuisinesWorld,
 ];
 
-/** Returns the effective topics for a list, including "new" if within the newUntil date. */
+/** Returns the effective topics for a list, including "new" if within the newUntil date and "top 50" if size is 50. */
 export function getEffectiveTopics(list: GameList): string[] {
+  const topics = [...list.topics];
   const now = new Date();
   const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   if (list.newUntil && localDate <= list.newUntil) {
-    return ['new', ...list.topics];
+    topics.unshift('new');
   }
-  return list.topics;
+  if (list.size === 50) {
+    topics.push('top 50');
+  }
+  return topics;
 }
 
 /** Number of ranked items in a list (50 or 100). */
@@ -205,11 +209,11 @@ export function getMaxScore(list: GameList): number {
   return (n * (n + 1)) / 2;
 }
 
-/** Topics for the filter bar. Excludes meta-topics like "new". */
+/** Topics for the filter bar. Excludes meta-topics like "new" but includes "top 50". */
 export function getAllTopics(): string[] {
   const topicSet = new Set<string>();
   for (const list of lists) {
-    for (const topic of list.topics) {
+    for (const topic of getEffectiveTopics(list)) {
       topicSet.add(topic);
     }
   }
@@ -240,7 +244,7 @@ export function searchLists(query: string, activeTopic: string | null): GameList
   let filtered = lists;
 
   if (activeTopic) {
-    filtered = filtered.filter(c => c.topics.includes(activeTopic));
+    filtered = filtered.filter(c => getEffectiveTopics(c).includes(activeTopic));
   }
 
   if (query.trim()) {
@@ -248,7 +252,7 @@ export function searchLists(query: string, activeTopic: string | null): GameList
     filtered = filtered.filter(c =>
       c.name.toLowerCase().includes(q) ||
       c.description.toLowerCase().includes(q) ||
-      c.topics.some(t => t.includes(q))
+      getEffectiveTopics(c).some(t => t.includes(q))
     );
   }
 
