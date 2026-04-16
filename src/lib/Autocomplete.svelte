@@ -19,19 +19,22 @@
   let open = $state(false);
   let inputEl = $state<HTMLInputElement | null>(null);
 
-  const sorted = $derived([...hints].sort((a, b) => a.localeCompare(b)));
-
   const filtered = $derived.by(() => {
     const q = value.trim().toLowerCase();
     if (!q) return [];
-    // Prefix matches first, then substring matches — all alphabetical
     const prefix: string[] = [];
     const substring: string[] = [];
-    for (const h of sorted) {
+    for (const h of hints) {
       const lower = h.toLowerCase();
       if (lower.startsWith(q)) prefix.push(h);
       else if (lower.includes(q)) substring.push(h);
     }
+    // Within each bucket, sort by length (shorter = tighter match), then alphabetical.
+    // This is purely string-based — no knowledge of which hints are answers.
+    const byLengthThenAlpha = (a: string, b: string) =>
+      a.length - b.length || a.localeCompare(b);
+    prefix.sort(byLengthThenAlpha);
+    substring.sort(byLengthThenAlpha);
     return [...prefix, ...substring].slice(0, 8);
   });
 
