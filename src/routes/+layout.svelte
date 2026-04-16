@@ -10,7 +10,13 @@
   setContext('mp', mp);
 
   if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js');
+    if (import.meta.env.PROD) {
+      navigator.serviceWorker.register('/service-worker.js');
+    } else {
+      navigator.serviceWorker.getRegistrations().then((regs) => {
+        for (const reg of regs) reg.unregister();
+      });
+    }
   }
 </script>
 
