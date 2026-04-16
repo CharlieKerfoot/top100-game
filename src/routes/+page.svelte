@@ -592,6 +592,7 @@
 
   /* ─── HOME ─── */
   .home {
+    width: 100%;
     max-width: 380px;
     margin: 0 auto;
   }
@@ -602,12 +603,22 @@
     }
   }
 
+  .home.home-party {
+    width: min(100%, 380px);
+  }
+
+  @media (min-width: 600px) {
+    .home.home-party {
+      width: min(100%, 480px);
+    }
+  }
+
   @media (min-width: 900px) {
     .home {
       max-width: 100%;
     }
     .home.home-party {
-      max-width: 540px;
+      width: min(100%, 540px);
     }
   }
 
