@@ -26,3 +26,6 @@ vite.config.ts.timestamp-*
 cats.md
 BUG_REPORT.md
 docs/
+
+# Data persistence
+/data

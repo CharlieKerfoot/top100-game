@@ -69,6 +69,7 @@ interface Party {
   game: GameState | null;
   phase: 'lobby' | 'playing' | 'results';
   suggestions: Map<string, string>; // playerId -> listId
+  lastActivity: number;
 }
 
 // ── State ──────────────────────────────────────────────────
@@ -267,9 +268,49 @@ function removePlayerFromParty(playerId: string, io: Server) {
   });
 }
 
+function touchParty(party: Party) {
+  party.lastActivity = Date.now();
+}
+
+// ── Stale party cleanup ───────────────────────────────────
+
+const PARTY_TTL_MS = 30 * 60 * 1000; // 30 minutes
+const SWEEP_INTERVAL_MS = 5 * 60 * 1000; // every 5 minutes
+
+function sweepStaleParties(io: Server) {
+  const now = Date.now();
+  for (const [code, party] of parties) {
+    if (now - party.lastActivity < PARTY_TTL_MS) continue;
+
+    // Check if any player still has an active socket
+    const hasActiveSocket = [...party.players.keys()].some(
+      pid => playerToSocket.has(pid) && !disconnectTimers.has(pid)
+    );
+    if (hasActiveSocket) {
+      // Players are still connected — refresh and skip
+      touchParty(party);
+      continue;
+    }
+
+    // No active sockets and idle for 30+ minutes — clean up
+    for (const pid of party.players.keys()) {
+      playerParty.delete(pid);
+      playerToSocket.delete(pid);
+      const timer = disconnectTimers.get(pid);
+      if (timer) {
+        clearTimeout(timer);
+        disconnectTimers.delete(pid);
+      }
+    }
+    parties.delete(code);
+    console.log(`[sweep] removed stale party ${code} (idle ${Math.round((now - party.lastActivity) / 60000)}m)`);
+  }
+}
+
 // ── Public setup function ──────────────────────────────────
 
 export function setupSocketServer(io: Server) {
+  setInterval(() => sweepStaleParties(io), SWEEP_INTERVAL_MS);
   io.on('connection', (socket) => {
     console.log(`[+] ${socket.id}`);
 
@@ -292,6 +333,7 @@ export function setupSocketServer(io: Server) {
         const party = parties.get(code);
         if (party && party.players.has(playerId)) {
           socket.join(code);
+          touchParty(party);
           socket.emit('rejoin', {
             phase: party.phase,
             party: serializeParty(party),
@@ -326,6 +368,7 @@ export function setupSocketServer(io: Server) {
         settings: { listId: lists[0].id, mode: 'strikes', maxStrikes: 3, maxTurns: 10, hints: true },
         game: null, phase: 'lobby',
         suggestions: new Map(),
+        lastActivity: Date.now(),
       };
 
       parties.set(code, party);
@@ -357,6 +400,7 @@ export function setupSocketServer(io: Server) {
       party.players.set(playerId, player);
       playerParty.set(playerId, party.code);
       socket.join(party.code);
+      touchParty(party);
 
       if (isMidGame) {
         // Tell the joining player they're sitting out
@@ -458,6 +502,7 @@ export function setupSocketServer(io: Server) {
         winnerId: null,
       };
       party.phase = 'playing';
+      touchParty(party);
 
       io.to(code).emit('game-started', {
         party: serializeParty(party),
@@ -524,6 +569,7 @@ export function setupSocketServer(io: Server) {
       game.guessHistory.push({ guess: safeGuess, playerId: player.id, playerName: player.name, isStrike: result.isStrike, rank: result.rank, value: result.value });
       game.lastResult = result;
       game.showResult = true;
+      touchParty(party);
 
       io.to(code).emit('guess-result', {
         result,

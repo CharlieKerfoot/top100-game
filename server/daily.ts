@@ -1,3 +1,5 @@
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
+import { join } from 'path';
 import type { IncomingMessage, ServerResponse } from 'http';
 import { getDailyList, getTodayKey } from '../src/lib/daily.ts';
 import { getMaxScore } from '../src/lib/lists/index.ts';
@@ -8,10 +10,48 @@ interface DayStats {
   scores: number[];
 }
 
-const dailyStats = new Map<string, DayStats>();
+interface PersistedStats {
+  key: string;
+  stats: DayStats;
+}
+
+const DATA_DIR = process.env.DATA_DIR || './data';
+const STATS_FILE = join(DATA_DIR, 'daily-stats.json');
 const MAX_SCORES = 10000;
 
+const dailyStats = new Map<string, DayStats>();
+let loaded = false;
+
+function loadStats(): void {
+  if (loaded) return;
+  loaded = true;
+  try {
+    if (existsSync(STATS_FILE)) {
+      const raw = readFileSync(STATS_FILE, 'utf-8');
+      const persisted: PersistedStats = JSON.parse(raw);
+      if (persisted.key && persisted.stats) {
+        dailyStats.set(persisted.key, persisted.stats);
+      }
+    }
+  } catch {
+    // Corrupted or unreadable file — start fresh
+  }
+}
+
+function saveStats(key: string, stats: DayStats): void {
+  try {
+    if (!existsSync(DATA_DIR)) {
+      mkdirSync(DATA_DIR, { recursive: true });
+    }
+    const persisted: PersistedStats = { key, stats };
+    writeFileSync(STATS_FILE, JSON.stringify(persisted));
+  } catch {
+    // Non-fatal — stats will still work in-memory for this session
+  }
+}
+
 function getOrCreateToday(): DayStats {
+  loadStats();
   const key = getTodayKey();
   let stats = dailyStats.get(key);
   if (!stats) {
@@ -21,6 +61,7 @@ function getOrCreateToday(): DayStats {
     for (const k of dailyStats.keys()) {
       if (k !== key) dailyStats.delete(k);
     }
+    saveStats(key, stats);
   }
   return stats;
 }
@@ -89,6 +130,8 @@ export async function handleDailyRequest(req: IncomingMessage, res: ServerRespon
       );
       const avgScore = Math.round(stats.totalScore / stats.playCount);
 
+      saveStats(todayKey, stats);
+
       json(res, 200, { percentile, avgScore, playCount: stats.playCount });
     } catch {
       json(res, 400, { error: 'Invalid request body' });
@@ -98,9 +141,9 @@ export async function handleDailyRequest(req: IncomingMessage, res: ServerRespon
 
   if (url === '/api/daily/stats' && req.method === 'GET') {
     const todayKey = getTodayKey();
-    const stats = dailyStats.get(todayKey);
+    const stats = getOrCreateToday();
 
-    if (!stats || stats.playCount === 0) {
+    if (stats.playCount === 0) {
       json(res, 200, { date: todayKey, avgScore: 0, playCount: 0, scores: [] });
       return true;
     }
