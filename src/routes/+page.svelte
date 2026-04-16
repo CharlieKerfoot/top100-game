@@ -306,6 +306,7 @@
         <input
           id="playerName"
           type="text"
+          autocomplete="off"
           bind:value={playerName}
           placeholder="Enter your name..."
         />
