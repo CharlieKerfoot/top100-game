@@ -49,8 +49,6 @@
     restored = false,
   }: Props = $props();
 
-  const gridCols = listSize <= 50 ? 2 : 4;
-  const gridRows = Math.ceil(listSize / gridCols);
   const gridText = $derived(generateShareGrid(guessedRanks, listSize));
   const maxHistogram = $derived(Math.max(...histogram, 1));
   const userBucket = $derived(
@@ -272,7 +270,8 @@
         </div>
         <div
           class="dt-slots"
-          style="grid-template-columns: repeat({gridCols}, 1fr); grid-template-rows: repeat({gridRows}, auto)"
+          class:dt-slots-wide={listSize > 50}
+          style="--rows-1: {listSize}; --rows-2: {Math.ceil(listSize / 2)}; --rows-4: {Math.ceil(listSize / 4)}"
         >
           {#each Array(listSize) as _, i}
             {@const item = guessedMap.get(i)}
@@ -742,7 +741,23 @@
   .dt-slots {
     display: grid;
     grid-auto-flow: column;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(var(--rows-1), auto);
     gap: 0;
+  }
+
+  @media (min-width: 600px) {
+    .dt-slots {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(var(--rows-2), auto);
+    }
+  }
+
+  @media (min-width: 900px) {
+    .dt-slots.dt-slots-wide {
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(var(--rows-4), auto);
+    }
   }
 
   .dt-slot {
