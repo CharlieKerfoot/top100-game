@@ -68,6 +68,5 @@ export const mostConsumedBeveragesHints: string[] = [
   "Negroni", "Daiquiri", "Manhattan", "Cosmopolitan",
   "Pulque", "Chicha", "Kvass", "Amazake",
   "Milo", "Horlicks", "Ovaltine",
-  "Ensure", "Boost", "Pedialyte",
-  "Yakult", "Actimel",
+  "Ensure", "Boost", "Yakult", "Actimel",
 ];

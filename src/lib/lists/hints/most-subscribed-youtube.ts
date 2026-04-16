@@ -29,7 +29,7 @@ export const mostSubscribedYoutubeHints: string[] = [
   "Typical Gamer", "Tfue", "TimTheTatman", "DrDisRespect", "Shroud",
   "xQc", "Pokimane", "Valkyrae", "Ludwig", "CourageJD",
   "Lazarbeam", "Lachlan", "Fresh", "BajanCanadian", "JeromeASF",
-  "SSSniperWolf", "LazarBeam", "Kwebbelkop", "Jelly", "Slogoman",
+  "SSSniperWolf", "Kwebbelkop", "Jelly", "Slogoman",
   "Crainer", "iBallisticSquid", "TheDiamondMinecart", "Sky Does Minecraft", "AntVenom",
   "Mumbo Jumbo", "Grian", "Hermitcraft", "Sapnap", "Karl Jacobs",
   "Quackity", "TommyInnit", "Tubbo", "Ranboo", "Wilbur Soot",
@@ -104,9 +104,7 @@ export const mostSubscribedYoutubeHints: string[] = [
   "Linus Tech Tips", "MKBHD", "Unbox Therapy", "iJustine", "Austin Evans",
   "Dave Lee", "Mrwhosetheboss", "JerryRigEverything", "Lew Later", "ShortCircuit",
   "Techquickie", "Marques Brownlee", "Jonathan Morrison", "UrAvgConsumer",
-  "The Verge", "Wired", "Digital Foundry", "Hardware Unboxed",
-  "Gamers Nexus", "Bitwit", "JayzTwoCents", "Paul's Hardware",
-  "LinusTechTips", "TechLinked", "Android Authority",
+  "The Verge", "Wired", "Digital Foundry", "Hardware Unboxed", "Bitwit", "JayzTwoCents", "Paul's Hardware",
   "SuperSaf", "CNET", "Tom's Guide", "Arun Maini",
   "Technical Guruji", "Trakin Tech", "Geekyranjit",
 
@@ -121,7 +119,7 @@ export const mostSubscribedYoutubeHints: string[] = [
   "The Infographics Show", "Bright Side", "AsapSCIENCE",
   "SciShow", "PBS Space Time", "Science Asylum", "Domain of Science",
   "Mathologer", "Stand-up Maths", "Primer", "Lemmino",
-  "Johnny Harris", "Polymatter", "ColdFusion",
+  "Johnny Harris", "ColdFusion",
 
   // ===== BEAUTY & LIFESTYLE =====
   "James Charles", "NikkieTutorials", "Jeffree Star", "Tati Westbrook",
@@ -210,8 +208,7 @@ export const mostSubscribedYoutubeHints: string[] = [
   "Dennis Roady", "FouseyTube", "JoeySalads",
 
   // ===== VLOG CHANNELS =====
-  "Roman Atwood Vlogs", "Jesse Wellens", "fouseyTUBE",
-  "Tana Mongeau", "Trisha Paytas", "Gabbie Hanna",
+  "Roman Atwood Vlogs", "Jesse Wellens", "Tana Mongeau", "Trisha Paytas", "Gabbie Hanna",
   "Wengie", "Superwoman", "Bethany Mota",
   "Zoella", "PointlessBlog", "Joe Sugg", "KSI Clips",
   "Deji", "JJ Olatunji", "W2S", "Miniminter",

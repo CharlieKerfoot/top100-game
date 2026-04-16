@@ -44,18 +44,16 @@ export const highestPaidAthletesHints: string[] = [
   "Jayson Tatum", "Donovan Mitchell", "Shai Gilgeous-Alexander", "Victor Wembanyama", "Chet Holmgren",
   "Paolo Banchero", "Tyrese Haliburton", "De'Aaron Fox", "Jalen Brunson", "Julius Randle",
   "Bam Adebayo", "Tyler Herro", "Fred VanVleet", "Pascal Siakam", "OG Anunoby",
-  "Jalen Williams", "Alperen Sengun", "Evan Mobley", "Scottie Barnes", "Darius Garland",
-  "Jaren Jackson Jr.", "Desmond Bane", "Anfernee Simons", "Mikal Bridges", "Cameron Johnson",
+  "Jalen Williams", "Alperen Sengun", "Evan Mobley", "Scottie Barnes", "Jaren Jackson Jr.", "Desmond Bane", "Anfernee Simons", "Mikal Bridges", "Cameron Johnson",
   "Myles Turner", "Buddy Hield", "Terry Rozier", "LaMelo Ball", "Lonzo Ball",
   "Brandon Ingram", "Dejounte Murray", "Trey Murphy III", "Herb Jones", "CJ McCollum",
   "Khris Middleton", "Brook Lopez", "Bobby Portis", "Jrue Holiday", "Kristaps Porzingis",
   "Al Horford", "Derrick White", "Marcus Smart", "Robert Williams III", "Malcolm Brogdon",
   "Immanuel Quickley", "RJ Barrett", "Josh Hart", "Donte DiVincenzo", "Isaiah Hartenstein",
   "Nikola Vucevic", "Zach Collins", "Coby White", "Ayo Dosunmu", "Alex Caruso",
-  "Deandre Ayton", "Kevin Huerter", "Keegan Murray", "Domantas Sabonis", "Harrison Barnes",
+  "Deandre Ayton", "Kevin Huerter", "Keegan Murray", "Harrison Barnes",
   "Andrew Wiggins", "Jonathan Kuminga", "Moses Moody", "Gary Payton II", "Klay Thompson",
-  "Draymond Green", "Chris Duarte", "Bennedict Mathurin", "Aaron Nesmith", "Walker Kessler",
-  "Lauri Markkanen", "Jordan Clarkson", "Collin Sexton", "John Collins", "Clint Capela",
+  "Draymond Green", "Chris Duarte", "Bennedict Mathurin", "Aaron Nesmith", "Walker Kessler", "Jordan Clarkson", "Collin Sexton", "John Collins", "Clint Capela",
   "Bogdan Bogdanovic", "Nikola Jovic", "Jaime Jaquez Jr.", "Josh Giddey", "Luguentz Dort",
   "Jerami Grant", "Caris LeVert", "Keldon Johnson", "Tre Jones", "Jeremy Sochan",
   "Scoot Henderson", "Amen Thompson", "Ausar Thompson", "Gradey Dick", "Cam Thomas",
@@ -81,8 +79,7 @@ export const highestPaidAthletesHints: string[] = [
   // Current NFL
   "Tua Tagovailoa", "Jordan Love", "C.J. Stroud", "Bryce Young", "Anthony Richardson",
   "Brock Purdy", "Jared Goff", "Matthew Stafford", "Baker Mayfield", "Kyler Murray",
-  "Trevor Lawrence", "Kenny Pickett", "Daniel Jones", "Kirk Cousins", "Derek Carr",
-  "Jalen Hurts", "Caleb Williams", "Drake Maye", "Jayden Daniels", "Bo Nix",
+  "Trevor Lawrence", "Kenny Pickett", "Daniel Jones", "Kirk Cousins", "Derek Carr", "Caleb Williams", "Drake Maye", "Jayden Daniels", "Bo Nix",
   "Nick Bosa", "Micah Parsons", "T.J. Watt", "Myles Garrett", "Aaron Donald",
   "Derrick Henry", "Saquon Barkley", "Christian McCaffrey", "Jonathan Taylor", "Austin Ekeler",
   "Josh Jacobs", "Joe Mixon", "Tony Pollard", "Breece Hall", "Rhamondre Stevenson",
@@ -112,14 +109,12 @@ export const highestPaidAthletesHints: string[] = [
   "Raul", "Iker Casillas", "Gianluigi Buffon", "Carles Puyol", "Dani Alves",
   "Samuel Eto'o", "Didier Drogba", "Michael Ballack", "Kaka", "Zlatan Ibrahimovic",
   "Luis Suarez", "Edinson Cavani", "Angel Di Maria", "Giorgio Chiellini", "Leonardo Bonucci",
-  "Arjen Robben", "Franck Ribery", "Bastian Schweinsteiger", "Phillip Lahm", "Miroslav Klose",
-  "Thomas Muller", "David Villa", "Fernando Torres", "Cesc Fabregas", "Sergio Busquets",
+  "Arjen Robben", "Franck Ribery", "Bastian Schweinsteiger", "Phillip Lahm", "Miroslav Klose", "David Villa", "Fernando Torres", "Cesc Fabregas", "Sergio Busquets",
   "Mesut Ozil", "Toni Kroos", "Luka Modric", "Gareth Bale", "James Rodriguez",
   "Pierre-Emerick Aubameyang", "Alexis Sanchez", "Nani", "Robin van Persie", "Michael Owen",
   "Alan Shearer", "Eric Cantona", "Roy Keane", "Paul Scholes", "Ryan Giggs",
   "Rio Ferdinand", "John Terry", "Ashley Cole", "Sol Campbell", "Gary Neville",
-  "Peter Schmeichel", "Edwin van der Sar", "Petr Cech", "Oliver Kahn", "Manuel Neuer",
-  // Current soccer — Premier League
+  "Peter Schmeichel", "Edwin van der Sar", "Petr Cech", "Oliver Kahn", // Current soccer — Premier League
   "Virgil van Dijk", "Alisson", "Ederson", "Thibaut Courtois",
   "Son Heung-min", "Richarlison", "James Maddison", "Kai Havertz",
   "Gabriel Jesus", "Gabriel Martinelli", "William Saliba", "Ben White", "Leandro Trossard",
@@ -129,12 +124,10 @@ export const highestPaidAthletesHints: string[] = [
   "Jarrod Bowen", "Lucas Paqueta", "Mohammed Kudus", "Anthony Gordon", "Harvey Barnes",
   "Bruno Guimaraes", "Sandro Tonali", "Pedro Neto", "Brennan Johnson", "Micky van de Ven",
   "Destiny Udogie", "Yves Bissouma", "Dejan Kulusevski", "Josko Gvardiol", "Jeremy Doku",
-  "Julian Alvarez", "Mateo Kovacic", "Jack Grealish", "Erling Haaland",
-  // Current soccer — La Liga
+  "Julian Alvarez", "Mateo Kovacic", "Jack Grealish", // Current soccer — La Liga
   "Antoine Griezmann", "Alvaro Morata", "Jan Oblak",
   "Joao Felix", "Alexander Sorloth", "Ilkay Gundogan", "Gavi", "Ansu Fati",
   "Fermin Lopez", "Marc-Andre ter Stegen", "Lamine Yamal", "Pau Cubarsi",
-  "Jude Bellingham", "Vinicius Junior", "Rodrygo", "Arda Guler", "Thibaut Courtois",
   "Antonio Rudiger", "David Alaba", "Eder Militao", "Dani Carvajal",
   // Current soccer — Serie A
   "Dusan Vlahovic", "Victor Osimhen", "Khvicha Kvaratskhelia", "Rafael Leao",
@@ -142,24 +135,18 @@ export const highestPaidAthletesHints: string[] = [
   "Alessandro Bastoni", "Paulo Dybala", "Tammy Abraham", "Ciro Immobile",
   "Romelu Lukaku", "Federico Chiesa", "Ademola Lookman", "Gianluca Scamacca",
   // Current soccer — Bundesliga
-  "Serge Gnabry", "Harry Kane",
-  "Leroy Sane", "Florian Wirtz", "Jamal Musiala",
-  "Xavi Simons", "Dani Olmo", "Loïs Openda", "Christopher Nkunku",
+  "Xavi Simons", "Loïs Openda", "Christopher Nkunku",
   "Nico Schlotterbeck", "Jonathan Tah", "Gregor Kobel",
   // Current soccer — Ligue 1
-  "Ousmane Dembele", "Randal Kolo Muani", "Bradley Barcola",
   "Gianluigi Donnarumma", "Marquinhos", "Vitinha", "Warren Zaire-Emery",
   "Jonathan David", "Amine Gouiri", "Alexandre Lacazette",
   // Current soccer — Other leagues / international
   "Cristian Romero", "Emiliano Martinez", "Angel Correa", "Rodrigo De Paul",
   "Emi Buendia", "Thiago Almada", "Kaoru Mitoma", "Takefusa Kubo", "Daichi Kamada",
-  "Alphonso Davies", "Jonathan David", "Hwang Hee-chan", "Kim Min-jae",
-  "Moises Caicedo", "Pervis Estupinan", "Miguel Almiron",
-  "Riyad Mahrez", "Hakim Ziyech", "Achraf Hakimi",
-  // MLS
-  "Lionel Messi", "Lorenzo Insigne", "Xherdan Shaqiri", "Riqui Puig",
+  "Alphonso Davies", "Hwang Hee-chan", "Kim Min-jae", "Pervis Estupinan", "Miguel Almiron", "Hakim Ziyech", // MLS
+  "Lorenzo Insigne", "Xherdan Shaqiri", "Riqui Puig",
   "Hector Herrera", "Chicharito", "Carlos Vela", "Josef Martinez",
-  "Cucho Hernandez", "Lucho Acosta", "Thiago Almada", "Giorgos Giakoumakis",
+  "Cucho Hernandez", "Lucho Acosta", "Giorgos Giakoumakis",
 
   // ==================== TENNIS ====================
   // Legends & retired
@@ -211,10 +198,10 @@ export const highestPaidAthletesHints: string[] = [
   "Yu Darvish", "Chris Sale", "Max Fried", "Ranger Suarez", "Framber Valdez",
   "Yordan Alvarez", "Kyle Tucker", "Alex Bregman", "Jose Altuve", "Jeremy Pena",
   "Nolan Arenado", "Paul Goldschmidt", "Lars Nootbaar", "Ryan Helsley", "Jordan Walker",
-  "Cody Bellinger", "Ian Happ", "Nico Hoerner", "Dansby Swanson", "Christopher Morel",
+  "Cody Bellinger", "Ian Happ", "Nico Hoerner", "Christopher Morel",
   "Byron Buxton", "Carlos Rodon", "Royce Lewis", "Edouard Julien", "Pablo Lopez",
   "Emmanuel Clase", "Josh Naylor", "Steven Kwan", "Andres Gimenez", "Shane Bieber",
-  "Tyler Glasnow", "Mookie Betts", "Will Smith", "Gavin Lux", "James Outman",
+  "Tyler Glasnow", "Will Smith", "Gavin Lux", "James Outman",
   "Jackson Chourio", "Willy Adames", "Christian Yelich", "Devin Williams", "Freddy Peralta",
   "Masataka Yoshida", "Jarren Duran", "Triston Casas", "Tanner Houck", "Brayan Bello",
   "Anthony Volpe", "Gleyber Torres", "Giancarlo Stanton", "Nestor Cortes", "Luis Gil",
@@ -236,7 +223,6 @@ export const highestPaidAthletesHints: string[] = [
   "Russell Henley", "Denny McCarthy", "Davis Riley", "Chris Kirk", "Si Woo Kim",
   "Akshay Bhatia", "Emiliano Grillo", "Adam Scott", "Jason Day", "Adam Hadwin",
   "Corey Conners", "Mackenzie Hughes", "Nick Taylor", "Min Woo Lee", "Lucas Herbert",
-  "Joaquin Niemann", "Abraham Ancer", "Sebastian Munoz", "Mito Pereira", "Carlos Ortiz",
   "Nelly Korda", "Jin Young Ko", "Lydia Ko", "Lexi Thompson", "Brooke Henderson",
   "Danielle Kang", "Minjee Lee", "Sei Young Kim", "Inbee Park", "Hyo Joo Kim",
   "Celine Boutier", "Rose Zhang", "Lilia Vu", "Charley Hull", "Georgia Hall",
@@ -256,11 +242,10 @@ export const highestPaidAthletesHints: string[] = [
   "Dmitry Bivol", "Artur Beterbiev", "Josh Taylor", "Regis Prograis",
   "Teofimo Lopez", "Tank Davis", "Emanuel Navarrete", "Stephen Fulton",
   "Junto Nakatani", "Kazuto Ioka", "Roman Gonzalez", "Juan Francisco Estrada",
-  "Nonito Donaire", "Guillermo Rigondeaux", "Tyson Fury", "Daniel Dubois",
+  "Nonito Donaire", "Guillermo Rigondeaux", "Daniel Dubois",
   "Zhilei Zhang", "Filip Hrgovic", "Joe Joyce", "Dillian Whyte",
 
   // ==================== MMA / UFC ====================
-  "Conor McGregor", "Israel Adesanya", "Jon Jones", "Khabib Nurmagomedov",
   "Dustin Poirier", "Charles Oliveira", "Islam Makhachev", "Alex Pereira",
   "Sean O'Malley", "Leon Edwards", "Ilia Topuria", "Max Holloway",
   "Alexander Volkanovski", "Kamaru Usman", "Jorge Masvidal", "Nate Diaz",
@@ -304,12 +289,11 @@ export const highestPaidAthletesHints: string[] = [
   "Teemu Selanne", "Nicklas Lidstrom", "Chris Chelios", "Ray Bourque", "Brian Leetch",
   "Pavel Bure", "Dominik Hasek", "Roberto Luongo", "Henrik Lundqvist", "Carey Price",
   "Patrick Kane", "Jonathan Toews", "Duncan Keith", "Brent Seabrook", "Marian Hossa",
-  "Steven Stamkos", "Victor Hedman", "Andrei Vasilevskiy", "Brayden Point", "Nikita Kucherov",
-  "Connor Bedard", "Jack Hughes", "Nico Hischier", "Jesper Bratt", "Timo Meier",
+  "Steven Stamkos", "Victor Hedman", "Andrei Vasilevskiy", "Brayden Point", "Connor Bedard", "Jack Hughes", "Nico Hischier", "Jesper Bratt", "Timo Meier",
   "Matthew Tkachuk", "Aleksander Barkov", "Sam Reinhart", "Carter Verhaeghe", "Sergei Bobrovsky",
   "Quinn Hughes", "Elias Pettersson", "Brock Boeser", "Thatcher Demko", "J.T. Miller",
   "Mitch Marner", "William Nylander", "John Tavares", "Morgan Rielly", "Joseph Woll",
-  "Brad Marchand", "Charlie McAvoy", "David Pastrnak", "Jeremy Swayman", "Linus Ullmark",
+  "Brad Marchand", "Charlie McAvoy", "Jeremy Swayman", "Linus Ullmark",
   "Artemi Panarin", "Adam Fox", "Igor Shesterkin", "Chris Kreider", "Mika Zibanejad",
   "Kirill Kaprizov", "Matt Boldy", "Joel Eriksson Ek", "Brock Faber", "Filip Gustavsson",
   "Jason Robertson", "Roope Hintz", "Miro Heiskanen", "Jake Oettinger", "Wyatt Johnston",
@@ -317,7 +301,7 @@ export const highestPaidAthletesHints: string[] = [
   "Troy Terry", "Trevor Zegras", "Mason McTavish", "Leo Carlsson", "John Gibson",
   "Tim Stutzle", "Brady Tkachuk", "Drake Batherson", "Josh Norris", "Anton Forsberg",
   "Rasmus Dahlin", "Tage Thompson", "Alex Tuch", "Owen Power", "Ukko-Pekka Luukkonen",
-  "Moritz Seider", "Lucas Raymond", "Dylan Larkin", "Patrick Kane", "Alex DeBrincat",
+  "Moritz Seider", "Lucas Raymond", "Dylan Larkin", "Alex DeBrincat",
   "Seth Jones", "Zach Werenski", "Johnny Gaudreau", "Patrik Laine", "Elvis Merzlikins",
 
   // ==================== TRACK & FIELD / OLYMPICS ====================
@@ -350,7 +334,6 @@ export const highestPaidAthletesHints: string[] = [
   "Sun Yang", "Ning Zetao", "Kosuke Kitajima", "Daiya Seto",
 
   // ==================== GYMNASTICS ====================
-  "Simone Biles", "Nadia Comaneci", "Mary Lou Retton", "Olga Korbut", "Gabby Douglas",
   "Aly Raisman", "McKayla Maroney", "Jordyn Wieber", "Nastia Liukin", "Shawn Johnson",
   "Suni Lee", "Jade Carey", "Jordan Chiles", "Hezly Rivera", "MyKayla Skinner",
   "Kohei Uchimura", "Daiki Hashimoto", "Carlos Yulo", "Epke Zonderland",

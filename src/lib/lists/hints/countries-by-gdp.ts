@@ -46,4 +46,5 @@ export const countriesByGdpHints: string[] = [
   "Central African Republic", "Palestine", "Liberia", "Mauritania",
   "Moldova", "Eritrea", "Mongolia", "Jamaica",
   "Laos", "Sierra Leone", "Togo",
+  "Hong Kong",
 ];

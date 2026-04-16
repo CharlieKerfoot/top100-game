@@ -41,7 +41,7 @@ export const mostDownloadedMobileAppsHints: string[] = [
   "SnackVideo", "Moj Video", "Josh Video", "Zili", "Bigo Shorts",
   "Likee Lite", "Resso", "Triller", "Byte", "Clash",
   "Veoh", "Metacafe", "Rumble", "Odysee", "Bitchute",
-  "Kuaishou", "Bilibili", "iQiyi", "YouKu", "LeEco",
+  "Kuaishou", "Bilibili", "YouKu", "LeEco",
 
   // Music & audio (176–200)
   "Apple Music", "Amazon Music", "SoundCloud", "Deezer", "Tidal",
@@ -56,8 +56,7 @@ export const mostDownloadedMobileAppsHints: string[] = [
   "Cut the Rope", "Doodle Jump", "Jetpack Joyride", "Plants vs. Zombies",
   "Plants vs. Zombies 2", "Candy Crush Soda Saga", "Homescapes", "Township",
   "Fishdom", "Coin Master", "Hay Day", "Boom Beach",
-  "Clash Mini", "Brawl Stars", "Royal Match", "Gardenscapes",
-  "Block Blast", "Tiles Hop", "Geometry Dash Lite", "Helix Jump",
+  "Clash Mini", "Brawl Stars", "Royal Match", "Block Blast", "Tiles Hop", "Geometry Dash Lite", "Helix Jump",
   "Paper.io 2", "Hole.io", "Aquapark.io", "Snake.io",
   "Brain Out", "Brain Test", "Fun Race 3D", "Bridge Race",
   "Hunter Assassin", "Going Balls", "Stack Ball", "Color Road",
@@ -133,8 +132,6 @@ export const mostDownloadedMobileAppsHints: string[] = [
   "Subway App", "Dunkin'", "Chick-fil-A", "Taco Bell", "KFC",
 
   // Photo & creative (461–480)
-  "Lightroom Mobile", "Snapseed", "VSCO", "Facetune", "AirBrush",
-  "Meitu", "Snow", "FaceApp", "Remini", "Lensa",
-  "PicsArt", "PhotoGrid", "Layout from Instagram", "Unfold", "Canva",
-  "Adobe Photoshop Express", "Adobe Illustrator", "Pixlr", "Fotor", "Afterlight",
+  "Lightroom Mobile", "Snapseed", "Facetune", "AirBrush",
+  "Meitu", "Snow", "FaceApp", "Remini", "Lensa", "PhotoGrid", "Layout from Instagram", "Unfold", "Adobe Photoshop Express", "Adobe Illustrator", "Pixlr", "Fotor", "Afterlight",
 ];

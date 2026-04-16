@@ -46,4 +46,6 @@ export const countriesOlympicMedalsHints: string[] = [
   "Antigua and Barbuda", "Seychelles", "Andorra", "Dominica", "Marshall Islands",
   "Saint Kitts and Nevis", "Monaco", "San Marino", "Palau",
   "Tuvalu", "Nauru", "Vatican City",
+  "Trinidad & Tobago",
+  "Hong Kong",
 ];

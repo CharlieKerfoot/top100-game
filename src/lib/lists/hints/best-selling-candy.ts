@@ -40,9 +40,7 @@ export const bestSellingCandyHints: string[] = [
 
   // ==================== CHOCOLATE BARS ====================
   "Bounty", "Caramello", "Hershey's Special Dark",
-  "Hershey's Cookies 'n' Creme", "Hershey's Nuggets", "Krackel",
   "M&M's Caramel", "M&M's Crispy", "M&M's Pretzel",
-  "M&M's Peanut Butter", "M&M's Fudge Brownie",
   "Milky Way Midnight", "Milky Way Simply Caramel",
   "Nutrageous", "Reese's Big Cup", "Reese's Sticks",
   "Snickers Almond", "Snickers Crisper", "Symphony",
@@ -85,8 +83,7 @@ export const bestSellingCandyHints: string[] = [
   "Haribo Tangfastics", "Kinder Egg", "Kinder Chocolate",
   "Kinder Joy", "Knoppers", "Lion Bar", "Maltesers",
   "Milka", "Mon Chéri", "Quality Street",
-  "Raffaello", "Ritter Sport", "Smarties",
-  "Thorntons", "Toffifee", "Tony's Chocolonely",
+  "Raffaello", "Ritter Sport", "Thorntons", "Toffifee", "Tony's Chocolonely",
   "Violet Crumble",
 
   // ==================== UK / BRITISH ====================
@@ -132,7 +129,7 @@ export const bestSellingCandyHints: string[] = [
   // ==================== AUSTRALIAN / NZ ====================
   "Allen's Snakes Alive", "Cherry Ripe", "Fantales",
   "Freddo Frog", "FruChocs", "Minties",
-  "Pineapple Lumps", "TimTam", "Violet Crumble", "Wizz Fizz",
+  "Pineapple Lumps", "TimTam", "Wizz Fizz",
 
   // ==================== DISCONTINUED / CULT ====================
   "Bar None", "Bonkers", "Crispy Crunch",

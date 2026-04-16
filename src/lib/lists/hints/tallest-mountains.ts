@@ -28,14 +28,13 @@ export const tallestMountainsHints: string[] = [
   "Aconcagua", "Denali", "Mount Kilimanjaro", "Mount Elbrus", "Mount Vinson",
   "Puncak Jaya", "Mount Kosciuszko", "Mont Blanc", "Mount Logan",
   // Famous Himalayan and Karakoram peaks not in top 100
-  "Dhaulagiri III", "Dhaulagiri IV", "Dhaulagiri V", "Dhaulagiri VI",
-  "Annapurna IV", "Annapurna V", "Himlung Himal", "Kang Guru", "Peri Himal",
+  "Dhaulagiri III", "Dhaulagiri IV", "Dhaulagiri V", "Dhaulagiri VI", "Annapurna V", "Himlung Himal", "Kang Guru", "Peri Himal",
   "Baudha Himal", "Cheo Himal", "Dome Blanc", "Cho Polu", "Baruntse",
   "Mera Peak", "Island Peak", "Lobuche East", "Lobuche West", "Pokalde",
   "Chhukung Ri", "Kongma Tse", "Nirekha", "Kusum Kangkaru",
   "Ama Dablam", "Thamserku", "Kangtega", "Kusum Kangaru", "Kwangde Ri",
   "Taboche", "Tramserku", "Numbur", "Shorong Yul Lha", "Gauri Shankar",
-  "Melungtse", "Gaurishankar", "Parchamo", "Ramdung Go",
+  "Melungtse", "Parchamo", "Ramdung Go",
   "Pumori", "Lingtren", "Khumbutse", "Cho La Peak",
   "Dorje Lhakpa", "Phurbi Ghyachu", "Madiya",
   "Langtang Ri", "Gang Chhenpo", "Naya Kanga", "Paldor Peak",
@@ -48,8 +47,7 @@ export const tallestMountainsHints: string[] = [
   "Trisul", "Dunagiri", "Changabang", "Kalanka", "Hardeol",
   "Tirsuli", "Milam Glacier", "Rishi Pahar", "Devtoli",
   "Kedarnath Peak", "Kedar Dome", "Jogin I", "Jogin II", "Jogin III",
-  "Bhrigupanth", "Gangotri III", "Satopanth", "Kedardome",
-  "Shivling", "Meru Peak", "Thalay Sagar", "Bhagirathi I",
+  "Bhrigupanth", "Gangotri III", "Satopanth", "Shivling", "Meru Peak", "Thalay Sagar", "Bhagirathi I",
   "Bhagirathi II", "Bhagirathi III", "Sudarshan Parbat",
   "Srikanta", "Bandarpunch", "Jaonli", "Srikanth",
   "K3", "K4", "K5", "K6 East", "K7", "K7 West", "K8",
@@ -77,7 +75,7 @@ export const tallestMountainsHints: string[] = [
   // Tian Shan
   "Khan Tengri", "Pik Pobeda", "Mramornaya Stena",
   // Caucasus
-  "Mount Elbrus", "Dykh Tau", "Shkhara", "Koshtan Tau", "Janga",
+  "Dykh Tau", "Shkhara", "Koshtan Tau", "Janga",
   "Kazbek", "Mount Tetnuld", "Mount Ushba",
   // Americas
   "Ojos del Salado", "Monte Pissis", "Huascaran", "Llullaillaco",

@@ -28,7 +28,7 @@ export const mostTranslatedBooksHints: string[] = [
   "Journey to the Center of the Earth", "Around the World in Eighty Days", "The Hunchback of Notre-Dame", "Germinal", "Nana",
   "Faust", "The Sorrows of Young Werther", "Siddhartha", "Steppenwolf", "Narcissus and Goldmund",
   "Metamorphosis", "The Trial", "The Castle", "In the Penal Colony", "Amerika",
-  "Death in Venice", "Buddenbrooks", "The Magic Mountain", "Doctor Faustus", "Confessions of Felix Krull",
+  "Death in Venice", "The Magic Mountain", "Doctor Faustus", "Confessions of Felix Krull",
   "The Name of the Rose", "Foucault's Pendulum", "The Island of the Day Before", "Baudolino", "Numero Zero",
   "If on a winter's night a traveler", "Our Ancestors", "Baron in the Trees", "The Cloven Viscount", "The Nonexistent Knight",
   "Swann's Way", "In the Shadow of Young Girls in Flower", "The Guermantes Way", "Sodom and Gomorrah", "Time Regained",
@@ -53,7 +53,7 @@ export const mostTranslatedBooksHints: string[] = [
   "A Clockwork Orange", "Earthly Powers", "The Wanting Seed", "Honey for the Bears",
 
   // Contemporary fiction and non-fiction
-  "The Da Vinci Code", "Angels & Demons", "Inferno", "Digital Fortress", "The Lost Symbol",
+  "Angels & Demons", "Inferno", "Digital Fortress", "The Lost Symbol",
   "The Girl with the Dragon Tattoo", "The Girl Who Played with Fire", "The Girl Who Kicked the Hornet's Nest",
   "Gone Girl", "The Girl on the Train", "Big Little Lies", "Where the Crawdads Sing", "Little Fires Everywhere",
   "The Help", "The Secret Life of Bees", "Educated", "Becoming", "The Glass Castle",

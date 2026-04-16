@@ -64,13 +64,11 @@ export const mostVisitedMuseumsHints: string[] = [
   "Walker Art Gallery", "National Railway Museum",
   "Royal Armouries Museum", "Kelvingrove Art Gallery and Museum",
   "Burrell Collection", "National Galleries of Scotland",
-  "Imperial War Museum", "Churchill War Rooms",
-  "Tate Modern", "Design Museum",
+  "Imperial War Museum", "Churchill War Rooms", "Design Museum",
 
   // ==================== FRANCE ====================
   "Musée de l'Orangerie", "Musée Rodin", "Palais de Tokyo",
   "Musée Picasso", "Musée Carnavalet", "Musée de Cluny",
-  "Musée de l'Armée", "Musée des Arts et Métiers",
   "Musée du Quai Branly", "Musée Marmottan Monet",
   "Fondation Louis Vuitton", "Musée Guimet",
   "Château de Versailles", "Musée des Beaux-Arts de Lyon",

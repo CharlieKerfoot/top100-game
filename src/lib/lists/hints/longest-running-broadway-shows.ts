@@ -7,7 +7,7 @@ export const longestRunningBroadwayShowsHints: string[] = [
   "Hamilton", "42nd Street", "Grease", "Fiddler on the Roof", "Life with Father",
   "Tobacco Road", "Hello, Dolly!", "My Fair Lady", "Hairspray", "Mary Poppins",
   "Harry Potter and the Cursed Child", "Avenue Q", "Kinky Boots", "The Producers",
-  "Beautiful: The Carole King Musical", "Annie", "Cabaret", "Man of La Mancha",
+  "Beautiful: The Carole King Musical", "Annie", "Cabaret", "Cabaret (Revival)", "Man of La Mancha",
   "Rock of Ages", "Abie's Irish Rose", "Hadestown", "Oklahoma!", "Moulin Rouge!",
   "Smokey Joe's Cafe", "Pippin", "South Pacific", "The Magic Show", "Six",
   "Aida", "Gemini", "Deathtrap", "Harvey", "Dancin'", "La Cage aux Folles", "Hair",
@@ -35,11 +35,8 @@ export const longestRunningBroadwayShowsHints: string[] = [
   "Kiss Me Kate", "Where's Charley?", "Peter Pan", "The Boy Friend",
   "Plain and Fancy", "Silk Stockings", "Li'l Abner", "New Girl in Town",
   "Redhead", "Take Me Along", "Destry Rides Again", "Irma La Douce",
-  "Carnival!", "How to Succeed in Business Without Really Trying",
-  "A Funny Thing Happened on the Way to the Forum", "She Loves Me",
-  "110 in the Shade", "Sweet Charity", "Mame", "I Do! I Do!",
-
-  // ==================== CLASSIC PLAYS ====================
+  "Carnival!", "A Funny Thing Happened on the Way to the Forum", "She Loves Me",
+  "110 in the Shade", "Sweet Charity", // ==================== CLASSIC PLAYS ====================
   "Death of a Salesman", "A Streetcar Named Desire", "The Glass Menagerie",
   "Long Day's Journey into Night", "A View from the Bridge", "Waiting for Godot",
   "Cat on a Hot Tin Roof", "The Crucible", "All My Sons", "The Iceman Cometh",
@@ -84,13 +81,11 @@ export const longestRunningBroadwayShowsHints: string[] = [
   "Summer: The Donna Summer Musical", "Head Over Heels",
 
   // ==================== 2020s MUSICALS ====================
-  "Company", "Paradise Square", "Mr. Saturday Night", "Into the Woods",
-  "The Music Man", "American Buffalo", "KPOP", "Almost Famous",
   "Some Like It Hot", "Shucked", "New York, New York", "Here Lies Love",
   "Suffs", "The Notebook", "The Outsiders", "Hell's Kitchen", "Appropriate",
   "Boop! The Betty Boop Musical", "Dead Outlaw", "Buena Vista Social Club",
   "Back to the Future", "Lempicka", "Water for Elephants",
-  "The Great Gatsby", "Smash", "Gypsy", "Maybe Happy Ending",
+  "The Great Gatsby", "Smash", "Maybe Happy Ending",
 
   // ==================== NOTABLE PLAYS (MODERN ERA) ====================
   "Copenhagen", "The Invention of Love", "The Coast of Utopia", "Democracy",
@@ -102,9 +97,7 @@ export const longestRunningBroadwayShowsHints: string[] = [
   "The Ferryman", "Slave Play", "The Sound Inside", "To Kill a Mockingbird",
   "Leopoldstadt", "The Inheritance", "Sea Wall / A Life", "The Minutes",
   "Hangmen", "Take Me Out", "The Lehman Trilogy",
-  "Good Night, Oscar", "Stereophonic", "An Enemy of the People",
-  "The Notebook", "Purlie Victorious", "Prayer for the French Republic",
-  "The Outsiders", "Water for Elephants", "Swept Away",
+  "Good Night, Oscar", "Stereophonic", "An Enemy of the People", "Purlie Victorious", "Prayer for the French Republic", "Swept Away",
 
   // ==================== OFF-BROADWAY FAVORITES ====================
   "The Fantasticks", "Little Shop of Horrors", "Steel Magnolias",
@@ -121,41 +114,19 @@ export const longestRunningBroadwayShowsHints: string[] = [
 
   // ==================== WEST END / BRITISH IMPORTS ====================
   "Blood Brothers", "Aspects of Love", "Educating Rita", "Arcadia",
-  "Closer", "The Blue Room", "The Judas Kiss", "Art", "Copenhagen",
-  "The Seafarer", "Jerusalem", "Billy Elliot", "Matilda",
-  "The Woman in Black", "Les Misérables", "Miss Saigon",
-  "Joseph and the Amazing Technicolor Dreamcoat", "Jesus Christ Superstar",
-  "Evita", "The Mousetrap", "An Inspector Calls",
+  "Closer", "The Blue Room", "The Judas Kiss", "Art", "The Seafarer", "Jerusalem", "Billy Elliot", "Matilda",
+  "The Woman in Black", "Joseph and the Amazing Technicolor Dreamcoat", "Jesus Christ Superstar", "The Mousetrap", "An Inspector Calls",
   "The Play That Goes Wrong", "Life of Pi", "Operation Mincemeat",
-  "My Neighbor Totoro", "Cabaret",
-
-  // ==================== JUKEBOX / CATALOG MUSICALS ====================
-  "Mamma Mia!", "Jersey Boys", "Rock of Ages", "Beautiful",
-  "American Idiot", "Motown the Musical", "Ain't Too Proud",
-  "Tina: The Tina Turner Musical", "MJ the Musical", "The Cher Show",
-  "Head Over Heels", "& Juliet", "Girl from the North Country",
-  "Jagged Little Pill", "Moulin Rouge!", "Escape to Margaritaville",
-  "On Your Feet!", "Summer: The Donna Summer Musical",
-  "A Night with Janis Joplin", "Smokey Joe's Cafe",
-
-  // ==================== FAMILY / DISNEY SHOWS ====================
-  "The Lion King", "Aladdin", "Beauty and the Beast", "Frozen",
-  "The Little Mermaid", "Tarzan", "Mary Poppins", "Newsies",
-  "Shrek the Musical", "Charlie and the Chocolate Factory",
+  "My Neighbor Totoro", // ==================== JUKEBOX / CATALOG MUSICALS ====================
+  "Beautiful", "Girl from the North Country",
+  "On Your Feet!", "A Night with Janis Joplin", // ==================== FAMILY / DISNEY SHOWS ====================
+  "The Little Mermaid", "Tarzan", "Shrek the Musical", "Charlie and the Chocolate Factory",
   "Elf the Musical", "SpongeBob SquarePants: The Musical",
   "Tuck Everlasting", "Anastasia", "Mrs. Doubtfire",
 
   // ==================== REVIVALS ====================
-  "Sweeney Todd", "The Drowsy Chaperone", "South Pacific", "Finian's Rainbow",
-  "A Little Night Music", "How to Succeed in Business Without Really Trying",
-  "Porgy and Bess", "Annie", "Pippin", "The King and I",
-  "Hello, Dolly!", "My Fair Lady", "Funny Girl", "Into the Woods",
-  "Company", "Cabaret", "Cats", "West Side Story", "Caroline, or Change",
-  "Merrily We Roll Along", "Parade", "Sweeney Todd", "The Wiz",
-  "Once Upon a Mattress", "Gypsy", "Chicago",
-
-  // ==================== DANCE / SPECTACLE ====================
-  "Riverdance", "Lord of the Dance", "Stomp", "Blue Man Group",
-  "Tap Dance Kid", "Fosse", "Contact", "Burn the Floor",
+  "Merrily We Roll Along", "Parade", "Once Upon a Mattress", // ==================== DANCE / SPECTACLE ====================
+  "Riverdance", "Lord of the Dance", "Tap Dance Kid", "Burn the Floor",
   "Forever Tango", "Tango Argentino",
+  "Mister Roberts",
 ];

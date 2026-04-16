@@ -78,4 +78,5 @@ export const mostVisitedWebsitesHints: string[] = [
   "Sam's Club", "BJ's", "Aldi", "Lidl", "Tesco",
   "Sainsbury's", "Asda", "Morrisons", "Carrefour", "REWE",
   "Edeka", "Migros", "Coop",
+  "Twitter/X",
 ];

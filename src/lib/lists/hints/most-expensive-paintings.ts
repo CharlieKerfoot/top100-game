@@ -89,8 +89,7 @@ export const mostExpensivePaintingsHints: string[] = [
   "Anxiety", "The Girls on the Bridge",
 
   // ==================== MATISSE ====================
-  "The Dance", "Woman with a Hat", "Blue Nude",
-  "The Joy of Life", "Open Window at Collioure",
+  "The Dance", "Woman with a Hat", "The Joy of Life", "Open Window at Collioure",
   "The Piano Lesson", "Large Reclining Nude",
 
   // ==================== BANKSY ====================
@@ -100,9 +99,7 @@ export const mostExpensivePaintingsHints: string[] = [
 
   // ==================== CÉZANNE ====================
   "The Large Bathers", "Boy in a Red Waistcoat", "Mont Sainte-Victoire",
-  "Still Life with Apples", "Harlequin",
-
-  // ==================== SEURAT ====================
+  "Still Life with Apples", // ==================== SEURAT ====================
   "A Sunday on La Grande Jatte", "Bathers at Asnières",
   "The Circus", "Parade de cirque",
 
@@ -162,8 +159,7 @@ export const mostExpensivePaintingsHints: string[] = [
 
   // ==================== OTHER FAMOUS WORKS ====================
   "American Gothic", "Christina's World",
-  "Washington Crossing the Delaware", "The Birth of Venus",
-  "The Gleaners", "The Angelus", "Olympia",
+  "Washington Crossing the Delaware", "The Gleaners", "The Angelus", "Olympia",
   "A Bar at the Folies-Bergère", "Liberty Leading the People",
   "The Raft of the Medusa", "Oath of the Horatii", "The Death of Marat",
   "Napoleon Crossing the Alps", "Wanderer Above the Sea of Fog",
@@ -174,7 +170,6 @@ export const mostExpensivePaintingsHints: string[] = [
   "Girl Reading a Letter at an Open Window",
   "The Goldfinch", "Whistler's Mother", "Madame X",
   "Carnation, Lily, Lily, Rose", "Flaming June",
-  "Nighthawks", "Triple Self-Portrait", "Saying Grace",
   "The Problem We All Live With", "Whaam!", "Drowning Girl",
   "Target with Four Faces", "Three Flags",
   "Jimson Weed/White Flower No. 1", "I and the Village",
@@ -186,15 +181,7 @@ export const mostExpensivePaintingsHints: string[] = [
   "Blue Boy", "Pinkie",
 
   // ==================== ADDITIONAL WELL-KNOWN TITLES ====================
-  "The Persistence of Memory", "Starry Night", "Mona Lisa",
-  "The Last Supper", "Girl with a Pearl Earring", "The Scream",
-  "Water Lilies", "The Kiss", "Guernica", "American Gothic",
-  "The Birth of Venus", "Las Meninas", "The Night Watch",
-  "Campbell's Soup Cans", "The Great Wave off Kanagawa",
-  "Dogs Playing Poker", "A Friend in Need",
-  "The Treachery of Images", "The Son of Man",
-  "Saturn Devouring His Son", "Nighthawks",
-  "Black Square", "Composition with Red, Blue, and Yellow",
+  "Dogs Playing Poker", "A Friend in Need", "Black Square", "Composition with Red, Blue, and Yellow",
   "Broadway Boogie Woogie", "The Sleeping Gypsy",
   "The Dream", "The Old Man and the Sea",
   "Portrait of Madame Récamier", "Le Déjeuner sur l'herbe",

@@ -40,4 +40,8 @@ export const countriesColdestHints: string[] = [
   "Antigua and Barbuda", "Seychelles", "Andorra", "Dominica", "Marshall Islands",
   "Saint Kitts and Nevis", "Liechtenstein", "Monaco", "San Marino", "Palau",
   "Tuvalu", "Nauru", "Vatican City",
+  "Bosnia",
+  "Serbia",
+  "Kosovo",
+  "Lebanon",
 ];

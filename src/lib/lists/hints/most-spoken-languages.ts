@@ -28,7 +28,7 @@ export const mostSpokenLanguagesHints: string[] = [
   "Aramaic", "Gulf Arabic", "Hebrew", "Libyan Arabic",
   "Sudanese Arabic", "Tigrinya", "Tunisian Arabic", "Yemeni Arabic",
   "Iraqi Arabic", "Standard Arabic", "Classical Arabic",
-  "Syriac", "Maltese", "Ge'ez",
+  "Syriac", "Ge'ez",
 
   // ==================== SOUTH ASIAN ====================
   "Assamese", "Awadhi", "Balochi", "Chhattisgarhi", "Dogri",
@@ -70,8 +70,7 @@ export const mostSpokenLanguagesHints: string[] = [
 
   // ==================== PACIFIC / OCEANIC ====================
   "Fijian", "Maori", "Samoan", "Tahitian", "Tongan",
-  "Chamorro", "Marshallese", "Tok Pisin",
-  "Hawaiian", "Gilbertese",
+  "Chamorro", "Marshallese", "Tok Pisin", "Gilbertese",
 
   // ==================== SIGN LANGUAGES ====================
   "American Sign Language", "British Sign Language",
@@ -84,8 +83,7 @@ export const mostSpokenLanguagesHints: string[] = [
   "Interlingua", "Toki Pona", "Lojban", "Volapük",
 
   // ==================== COMMON ALTERNATE NAMES ====================
-  "Farsi", "Persian", "Filipino", "Mandarin", "Cantonese",
-  "Taiwanese", "Hokkien", "Punjabi", "Oriya", "Darija",
+  "Farsi", "Persian", "Filipino", "Mandarin", "Taiwanese", "Punjabi", "Oriya", "Darija",
   "Dari", "Kurdish", "Flemish", "Brazilian Portuguese",
   "Castilian", "Valencian", "Provençal", "Romansch",
   "Swiss German", "Low German", "High German",

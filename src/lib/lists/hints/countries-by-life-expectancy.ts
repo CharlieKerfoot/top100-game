@@ -39,6 +39,6 @@ export const countriesByLifeExpectancyHints: string[] = [
   "Sierra Leone", "Liberia", "Togo", "Benin", "Mauritania",
   "Madagascar", "Malawi", "Mozambique", "Zambia", "Angola",
   "Central African Republic", "Chad", "Equatorial Guinea",
-  "Sao Tome and Principe", "Libya", "San Marino", "Monaco",
+  "Sao Tome and Principe", "San Marino", "Monaco",
   "Liechtenstein", "Vatican City", "Ukraine", "Belarus",
 ];

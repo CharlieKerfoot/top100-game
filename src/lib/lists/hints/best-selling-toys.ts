@@ -77,8 +77,7 @@ export const bestSellingToysHints: string[] = [
   "Coup", "Love Letter", "Bang!", "Resistance", "Werewolf",
   "Balderdash", "Scattergories", "Outburst", "Headbandz", "Telestrations",
   "Wink", "Pit", "Sleeping Queens", "Bohnanza", "No Thanks!",
-  "Cluedo", "Game of Life", "Payday", "Hotel", "Pay Day",
-  "Mastermind", "Othello/Reversi", "Hex", "Blokus", "Quoridor",
+  "Cluedo", "Game of Life", "Payday", "Hotel", "Mastermind", "Othello/Reversi", "Hex", "Blokus", "Quoridor",
   "Settlers of Catan Jr.", "Hive", "Quarto", "Patchwork",
   "Just One", "Dixit", "Mysterium", "Betrayal at House on the Hill",
   "Pandemic: Reign of Cthulhu", "Arkham Horror",
@@ -161,4 +160,6 @@ export const bestSellingToysHints: string[] = [
   "Moon Sand", "Sand Art",
   "Light-Up Sneakers", "Light-Up Yo-Yo",
   "Snap Bracelets", "Shutter Shades",
+  "Nintendo Wii",
+  "Apples to Apples",
 ];
