@@ -1,5 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import { getDailyList, getTodayKey } from '../src/lib/daily.ts';
+import { getMaxScore } from '../src/lib/lists/index.ts';
 
 interface DayStats {
   totalScore: number;
@@ -62,8 +63,9 @@ export async function handleDailyRequest(req: IncomingMessage, res: ServerRespon
       }
 
       // Validate score range
-      if (typeof score !== 'number' || score < 0 || score > 5050) {
-        json(res, 400, { error: 'Score out of range (0-5050)' });
+      const maxScore = getMaxScore(dailyList);
+      if (typeof score !== 'number' || score < 0 || score > maxScore) {
+        json(res, 400, { error: `Score out of range (0-${maxScore})` });
         return true;
       }
 
@@ -103,10 +105,15 @@ export async function handleDailyRequest(req: IncomingMessage, res: ServerRespon
       return true;
     }
 
-    // Bucket scores into ranges for histogram (0-500, 500-1000, etc.)
-    const buckets = new Array(11).fill(0); // 0-500, 500-1000, ..., 4500-5000, 5000-5050
+    // Bucket scores into equal-width ranges based on the list's max score
+    // Use round bucket sizes (100 or 250) for clean labels
+    const dailyList = getDailyList();
+    const maxScore = getMaxScore(dailyList);
+    const bucketSize = maxScore <= 2000 ? 100 : 250;
+    const bucketCount = Math.ceil(maxScore / bucketSize);
+    const buckets = new Array(bucketCount).fill(0);
     for (const s of stats.scores) {
-      const idx = Math.min(Math.floor(s / 500), 10);
+      const idx = Math.min(Math.floor(s / bucketSize), bucketCount - 1);
       buckets[idx]++;
     }
 
@@ -115,6 +122,7 @@ export async function handleDailyRequest(req: IncomingMessage, res: ServerRespon
       avgScore: Math.round(stats.totalScore / stats.playCount),
       playCount: stats.playCount,
       scores: buckets,
+      bucketSize,
     });
     return true;
   }

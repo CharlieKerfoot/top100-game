@@ -184,7 +184,6 @@ export async function GET({ url }) {
   const list = listParam ? listMap.get(listParam) : undefined;
   const listName = list?.name;
   const score = scoreParam ? parseInt(scoreParam, 10) : undefined;
-  const validScore = score !== undefined && !isNaN(score) ? Math.max(0, Math.min(score, 5050)) : undefined;
   const day = dayParam ? parseInt(dayParam, 10) : undefined;
   const validDay = day !== undefined && !isNaN(day) && day > 0 ? day : undefined;
   const percentile = percentileParam ? parseInt(percentileParam, 10) : undefined;
@@ -192,6 +191,7 @@ export async function GET({ url }) {
 
   const listSize = list?.items.length ?? 100;
   const maxScore = (listSize * (listSize + 1)) / 2;
+  const validScore = score !== undefined && !isNaN(score) ? Math.max(0, Math.min(score, maxScore)) : undefined;
 
   const markup = buildMarkup({
     listName,
