@@ -71,6 +71,7 @@
   let avgScore = $state<number | undefined>(undefined);
   let playCount = $state<number | undefined>(undefined);
   let histogram = $state<number[]>([]);
+  let histogramBucketSize = $state(500);
 
   // Onboarding tooltip
   const ONBOARDING_KEY = 'onboarding_seen';
@@ -240,6 +241,7 @@
       if (res.ok) {
         const data = await res.json();
         histogram = data.scores ?? [];
+        if (data.bucketSize) histogramBucketSize = data.bucketSize;
         if (playCount === undefined) {
           playCount = data.playCount;
           avgScore = data.avgScore;
@@ -269,7 +271,7 @@
   <meta name="twitter:image" content={ogImageUrl({ list: list.id })} />
 </svelte:head>
 
-<div class="app" class:has-game={phase === "playing"}>
+<div class="app" class:has-game={phase === "playing"} class:has-results={phase === "results"}>
   <header>
     <a href="/" class="back-link">&larr; Home</a>
     <div class="category-header">
@@ -410,6 +412,7 @@
       {playCount}
       {stats}
       {histogram}
+      bucketSize={histogramBucketSize}
       {list}
       {dayNumber}
       {listSize}
@@ -433,9 +436,13 @@
       padding: 1.5rem 2rem;
     }
 
-    .app:has(.results) {
-      max-width: 800px;
-      padding: 1.5rem 2rem;
+    .app.has-results {
+      max-width: 1200px;
+      padding: 1.5rem 2.5rem 0;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
     }
   }
 

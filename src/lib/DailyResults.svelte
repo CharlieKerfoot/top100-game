@@ -1,6 +1,10 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { generateShareText, generateShareGrid, type DailyStats } from "$lib/daily";
+  import {
+    generateShareText,
+    generateShareGrid,
+    type DailyStats,
+  } from "$lib/daily";
   import { playCountTick, playCelebrationSound } from "$lib/sounds";
   import type { GameList } from "$lib/lists/types";
   import { SITE_URL, GAME_NAME, ogImageUrl } from "$lib/seo";
@@ -13,11 +17,17 @@
     playCount: number | undefined;
     stats: DailyStats;
     histogram: number[];
+    bucketSize: number;
     list: GameList;
     dayNumber: number;
     listSize: number;
     guessedRanks: number[];
-    foundItems: { rank: number; name: string; points: number; value?: string }[];
+    foundItems: {
+      rank: number;
+      name: string;
+      points: number;
+      value?: string;
+    }[];
     /** Whether this is a restored result (already played today) — skip celebration */
     restored?: boolean;
   }
@@ -30,6 +40,7 @@
     playCount,
     stats,
     histogram,
+    bucketSize,
     list,
     dayNumber,
     listSize,
@@ -42,6 +53,11 @@
   const gridRows = Math.ceil(listSize / gridCols);
   const gridText = $derived(generateShareGrid(guessedRanks, listSize));
   const maxHistogram = $derived(Math.max(...histogram, 1));
+  const userBucket = $derived(
+    bucketSize > 0
+      ? Math.min(Math.floor(score / bucketSize), histogram.length - 1)
+      : 0,
+  );
 
   // Build guessed map for all-answers grid
   const guessedMap = $derived(
@@ -75,24 +91,6 @@
   let shareText = $state("");
   let showAllAnswers = $state(false);
 
-  // Countdown
-  let countdown = $state("");
-
-  $effect(() => {
-    const update = () => {
-      const now = new Date();
-      const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-      const diff = tomorrow.getTime() - now.getTime();
-      const h = Math.floor(diff / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
-      countdown = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-    };
-    update();
-    const interval = setInterval(update, 1000);
-    return () => clearInterval(interval);
-  });
-
   // Score count-up animation
   $effect(() => {
     if (restored || score === 0) {
@@ -106,7 +104,10 @@
     const duration = Math.min(2500, Math.max(800, score * 2));
     const startTime = performance.now();
     let lastTickScore = 0;
-    const tickInterval = Math.max(30, Math.floor(2000 / Math.max(score / 50, 1)));
+    const tickInterval = Math.max(
+      30,
+      Math.floor(2000 / Math.max(score / 50, 1)),
+    );
 
     function animate(now: number) {
       const elapsed = now - startTime;
@@ -116,7 +117,10 @@
       displayScore = Math.round(eased * score);
 
       // Play tick sounds at intervals
-      if (displayScore - lastTickScore >= tickInterval || (progress === 1 && lastTickScore < score)) {
+      if (
+        displayScore - lastTickScore >= tickInterval ||
+        (progress === 1 && lastTickScore < score)
+      ) {
         playCountTick(progress);
         lastTickScore = displayScore;
       }
@@ -150,80 +154,107 @@
     shareText = text;
 
     navigator.clipboard.writeText(text).then(
-      () => { shareStatus = "copied"; },
-      () => { shareStatus = "fallback"; },
+      () => {
+        shareStatus = "copied";
+      },
+      () => {
+        shareStatus = "fallback";
+      },
     );
   }
 </script>
 
 <div class="results">
-  <!-- Score count-up -->
+  <!-- SCORE CARD -->
   <div class="result-card" class:card-enter={cardVisible && !restored}>
     <h3>Common Cents &middot; #{dayNumber}</h3>
-    <div class="final-score" class:counting={!celebrationDone}>
-      {displayScore.toLocaleString()}
-    </div>
-    <div class="max-score">of {maxPossible.toLocaleString()} possible</div>
-    {#if celebrationDone && percentile !== undefined}
-      <div class="percentile">Better than {percentile}% of players</div>
-    {/if}
-    {#if celebrationDone && stats.streak > 0}
-      <div class="streak-line" class:streak-pulse={stats.streak > 1 && !restored}>
-        &#128293; {stats.streak}-day streak
+    <div class="score-row">
+      <div class="final-score" class:counting={!celebrationDone}>
+        {displayScore.toLocaleString()}
       </div>
-    {/if}
+      <div class="score-meta">
+        <div class="max-score">of {maxPossible.toLocaleString()} possible</div>
+        {#if celebrationDone && percentile !== undefined}
+          <div class="percentile">Better than {percentile}% of players</div>
+        {/if}
+        {#if celebrationDone && stats.streak > 0}
+          <div
+            class="streak-line"
+            class:streak-pulse={stats.streak > 1 && !restored}
+          >
+            &#128293; {stats.streak}-day streak
+          </div>
+        {/if}
+      </div>
+    </div>
   </div>
 
-  <!-- Missed items reveal -->
-  {#if celebrationDone && missedItems.length > 0}
-    <div class="missed-section">
-      <h4>You missed the big ones</h4>
-      <div class="missed-items">
-        {#each missedItems as item}
-          <div class="missed-item">
-            <span class="missed-rank">#{item.rank}</span>
-            <span class="missed-name">{item.name}</span>
-            {#if item.value}<span class="missed-value">{item.value}</span>{/if}
-            <span class="missed-points">+{item.rank} pts</span>
-          </div>
-        {/each}
-      </div>
-    </div>
-  {/if}
-
-  {#if celebrationDone && histogram.length > 0 && histogram.some((v) => v > 0)}
-    <div class="histogram">
-      <h4>Score Distribution</h4>
-      <div class="histogram-bars">
-        {#each histogram as count, i}
-          <div class="histogram-bar-wrapper">
-            <div
-              class="histogram-bar"
-              style="height: {Math.max((count / maxHistogram) * 100, count > 0 ? 4 : 0)}%"
-            ></div>
-            <span class="histogram-label">{i * 500}</span>
-          </div>
-        {/each}
-      </div>
-    </div>
-  {/if}
-
   {#if celebrationDone}
-    <div class="share-grid-container">
-      <pre class="share-grid">{gridText}</pre>
+    <!-- BODY: two columns on desktop, stacked on mobile -->
+    <div class="results-body">
+      <div class="results-col results-col-left">
+        {#if missedItems.length > 0}
+          <div class="missed-section">
+            <h4>Some Notable Misses</h4>
+            <div class="missed-items">
+              {#each missedItems as item}
+                <div class="missed-item">
+                  <span class="missed-rank">#{item.rank}</span>
+                  <span class="missed-name">{item.name}</span>
+                  {#if item.value}<span class="missed-value">{item.value}</span
+                    >{/if}
+                  <span class="missed-points">+{item.rank} pts</span>
+                </div>
+              {/each}
+            </div>
+          </div>
+        {/if}
+      </div>
+
+      <div class="results-col results-col-right">
+        {#if histogram.length > 0 && histogram.some((v) => v > 0)}
+          {@const labelStep =
+            histogram.length > 14 ? 4 : histogram.length > 8 ? 2 : 1}
+          <div class="histogram">
+            <h4>Players' Scores</h4>
+            <div class="histogram-bars">
+              {#each histogram as count, i}
+                {@const isUser = i === userBucket}
+                <div class="histogram-bar-wrapper">
+                  <span
+                    class="histogram-count"
+                    class:histogram-count-user={isUser}
+                  >
+                    {count > 0 ? count : ""}
+                  </span>
+                  <div
+                    class="histogram-bar"
+                    class:histogram-bar-user={isUser}
+                    style="height: {Math.max(
+                      (count / maxHistogram) * 100,
+                      count > 0 ? 3 : 0,
+                    )}%"
+                  ></div>
+                </div>
+              {/each}
+            </div>
+            <div class="histogram-labels">
+              {#each histogram as _, i}
+                <div class="histogram-label-slot">
+                  {#if i % labelStep === 0}
+                    <span class="histogram-label"
+                      >{(i * bucketSize).toLocaleString()}</span
+                    >
+                  {/if}
+                </div>
+              {/each}
+            </div>
+          </div>
+        {/if}
+      </div>
     </div>
 
-    <button class="share-btn" onclick={handleShare}>
-      {shareStatus === "copied" ? "Copied!" : "Share Result"}
-    </button>
-
-    {#if shareStatus === "fallback"}
-      <div class="share-fallback">
-        <p>Copy your result:</p>
-        <textarea readonly rows="12">{shareText}</textarea>
-      </div>
-    {/if}
-
+    <!-- ALL ANSWERS: tight to the body above -->
     <button
       class="answers-toggle"
       onclick={() => (showAllAnswers = !showAllAnswers)}
@@ -235,20 +266,37 @@
       <div class="all-answers">
         <div class="all-answers-header">
           <span class="all-answers-title">{list.description}</span>
-          <span class="all-answers-count">{foundItems.length} of {listSize} found</span>
+          <span class="all-answers-count"
+            >{foundItems.length} of {listSize} found</span
+          >
         </div>
-        <div class="dt-slots" style="grid-template-columns: repeat({gridCols}, 1fr); grid-template-rows: repeat({gridRows}, auto)">
+        <div
+          class="dt-slots"
+          style="grid-template-columns: repeat({gridCols}, 1fr); grid-template-rows: repeat({gridRows}, auto)"
+        >
           {#each Array(listSize) as _, i}
             {@const item = guessedMap.get(i)}
-            <div class="dt-slot" class:filled={!!item} class:dt-slot-large={listSize <= 50} class:dt-slot-missed={!item}>
+            <div
+              class="dt-slot"
+              class:filled={!!item}
+              class:dt-slot-large={listSize <= 50}
+              class:dt-slot-missed={!item}
+            >
               <span class="dt-slot-rank">{i + 1}.</span>
               {#if item}
                 <span class="dt-slot-name">{item.name}</span>
-                {#if list.values?.[i]}<span class="dt-slot-value">{list.values[i]}</span>{/if}
+                {#if list.values?.[i]}<span class="dt-slot-value"
+                    >{list.values[i]}</span
+                  >{/if}
                 <span class="dt-slot-points">+{item.points}</span>
               {:else}
-                <span class="dt-slot-name dt-slot-missed-name">{list.items[i]}</span>
-                {#if list.values?.[i]}<span class="dt-slot-value dt-slot-missed-value">{list.values[i]}</span>{/if}
+                <span class="dt-slot-name dt-slot-missed-name"
+                  >{list.items[i]}</span
+                >
+                {#if list.values?.[i]}<span
+                    class="dt-slot-value dt-slot-missed-value"
+                    >{list.values[i]}</span
+                  >{/if}
               {/if}
             </div>
           {/each}
@@ -256,12 +304,25 @@
       </div>
     {/if}
 
-    <button class="challenge-btn" onclick={() => goto(`/?challenge=${list.id}`)}>
-      Challenge a Friend &rarr;
-    </button>
+    <!-- ACTION BUTTONS: pinned to bottom -->
+    <div class="action-buttons">
+      <button class="share-btn" onclick={handleShare}>
+        {shareStatus === "copied" ? "Copied!" : "Share Result"}
+      </button>
 
-    <div class="countdown">
-      Next daily in <span class="time">{countdown}</span>
+      {#if shareStatus === "fallback"}
+        <div class="share-fallback">
+          <p>Copy your result:</p>
+          <textarea readonly rows="12">{shareText}</textarea>
+        </div>
+      {/if}
+
+      <button
+        class="challenge-btn"
+        onclick={() => goto(`/?challenge=${list.id}`)}
+      >
+        Challenge a Friend &rarr;
+      </button>
     </div>
   {/if}
 </div>
@@ -269,8 +330,12 @@
 <style>
   .results {
     text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
 
+  /* ─── SCORE CARD ─── */
   .result-card {
     border: 2px solid var(--color-ink);
     padding: 1.25rem;
@@ -280,6 +345,12 @@
 
   .result-card.card-enter {
     animation: cardSlideUp 0.4s ease-out;
+  }
+
+  .score-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   @keyframes cardSlideUp {
@@ -312,6 +383,10 @@
     color: var(--color-crimson);
   }
 
+  .score-meta {
+    text-align: center;
+  }
+
   .max-score {
     font-size: 0.85rem;
     color: #888;
@@ -319,8 +394,8 @@
   }
 
   .percentile {
-    margin-top: 0.75rem;
-    padding: 0.5rem;
+    margin-top: 0.5rem;
+    padding: 0.35rem 0.75rem;
     background: rgba(139, 0, 0, 0.06);
     font-size: 0.9rem;
     font-weight: 600;
@@ -338,23 +413,63 @@
   }
 
   @keyframes streakPulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.15); }
-    100% { transform: scale(1); }
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.15);
+    }
+    100% {
+      transform: scale(1);
+    }
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* ─── TWO COLUMN BODY (desktop) ─── */
+  .results-body {
+    display: contents;
+  }
+
+  @media (min-width: 900px) {
+    .score-row {
+      flex-direction: row;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+
+    .score-meta {
+      text-align: left;
+    }
+
+    .results-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: stretch;
+    }
+
+    .results-col {
+      display: flex;
+      flex-direction: column;
+    }
   }
 
   /* ─── MISSED ITEMS ─── */
   .missed-section {
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.5rem;
     border: 1px solid var(--color-gold);
     background: var(--color-cream);
     padding: 0.75rem;
     animation: fadeIn 0.4s ease-out;
+    flex: 1;
   }
 
   .missed-section h4 {
@@ -411,26 +526,15 @@
     white-space: nowrap;
   }
 
-  /* ─── SHARE GRID ─── */
-  .share-grid-container {
-    margin-bottom: 1.25rem;
-  }
-
-  .share-grid {
-    font-size: 1rem;
-    line-height: 1.2;
-    letter-spacing: 0.05em;
-    margin: 0 auto;
-    display: inline-block;
-    text-align: left;
-  }
-
   /* ─── HISTOGRAM ─── */
   .histogram {
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.5rem;
     border: 1px solid var(--color-gold);
-    padding: 1rem;
+    padding: 1rem 0.75rem 0.5rem;
     background: var(--color-cream);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
 
   .histogram h4 {
@@ -438,15 +542,17 @@
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
     color: #555;
+    padding-left: 0.25rem;
   }
 
   .histogram-bars {
     display: flex;
     align-items: flex-end;
-    gap: 3px;
-    height: 80px;
+    gap: 2px;
+    flex: 1;
+    min-height: 120px;
   }
 
   .histogram-bar-wrapper {
@@ -456,22 +562,114 @@
     align-items: center;
     height: 100%;
     justify-content: flex-end;
+    min-width: 0;
+  }
+
+  .histogram-count {
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: var(--color-gold);
+    margin-bottom: 2px;
+    line-height: 1;
+  }
+
+  .histogram-count-user {
+    color: var(--color-crimson);
   }
 
   .histogram-bar {
     width: 100%;
+    background: var(--color-gold);
+    opacity: 0.8;
+    min-width: 0;
+    border-radius: 1px 1px 0 0;
+  }
+
+  .histogram-bar-user {
     background: var(--color-crimson);
-    opacity: 0.7;
+    opacity: 1;
+  }
+
+  .histogram-labels {
+    display: flex;
+    gap: 2px;
+    margin-top: 4px;
+    border-top: 1px solid #ddd;
+    padding-top: 4px;
+  }
+
+  .histogram-label-slot {
+    flex: 1;
+    text-align: center;
     min-width: 0;
   }
 
   .histogram-label {
     font-size: 0.55rem;
     color: #999;
-    margin-top: 4px;
   }
 
-  /* ─── BUTTONS ─── */
+  /* ─── ALL ANSWERS ─── */
+  .answers-toggle {
+    display: block;
+    width: 100%;
+    padding: 0.65rem;
+    border: 1px solid var(--color-gold);
+    background: transparent;
+    color: #777;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-bottom: auto;
+    transition: all 0.2s;
+  }
+
+  .answers-toggle:hover {
+    border-color: var(--color-ink);
+    color: var(--color-ink);
+  }
+
+  .all-answers {
+    border: 1px solid var(--color-gold);
+    background: var(--color-cream);
+    padding: 0;
+    margin-bottom: 0.75rem;
+    text-align: left;
+    overflow-x: hidden;
+  }
+
+  .all-answers-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--color-gold);
+  }
+
+  .all-answers-title {
+    font-family: "Source Serif 4", "Source Serif Pro", Georgia, serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  .all-answers-count {
+    font-size: 0.75rem;
+    color: #888;
+  }
+
+  .all-answers .dt-slots {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  /* ─── ACTION BUTTONS ─── */
+  .action-buttons {
+    margin-top: auto;
+    padding-top: 1rem;
+    padding-bottom: 1.5rem;
+  }
+
   .share-btn {
     display: block;
     width: 100%;
@@ -509,7 +707,6 @@
     font-size: 0.9rem;
     font-weight: 700;
     cursor: pointer;
-    margin-bottom: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.03em;
   }
@@ -521,7 +718,7 @@
 
   /* ─── SHARE FALLBACK ─── */
   .share-fallback {
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
   }
 
   .share-fallback p {
@@ -541,74 +738,7 @@
     box-sizing: border-box;
   }
 
-  /* ─── COUNTDOWN ─── */
-  .countdown {
-    text-align: center;
-    font-size: 0.85rem;
-    color: #888;
-  }
-
-  .countdown .time {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--color-ink);
-    font-family: "Courier New", monospace;
-  }
-
-  /* ─── ALL ANSWERS ─── */
-  .answers-toggle {
-    display: block;
-    width: 100%;
-    padding: 0.65rem;
-    border: 1px solid var(--color-gold);
-    background: transparent;
-    color: #777;
-    font-family: "Source Serif 4", Georgia, serif;
-    font-size: 0.9rem;
-    cursor: pointer;
-    margin-bottom: 0.75rem;
-    transition: all 0.2s;
-  }
-
-  .answers-toggle:hover {
-    border-color: var(--color-ink);
-    color: var(--color-ink);
-  }
-
-  .all-answers {
-    border: 1px solid var(--color-gold);
-    background: var(--color-cream);
-    padding: 0;
-    margin-bottom: 1rem;
-    text-align: left;
-    overflow-x: hidden;
-  }
-
-  .all-answers-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0.75rem;
-    border-bottom: 1px solid var(--color-gold);
-  }
-
-  .all-answers-title {
-    font-family: "Source Serif 4", "Source Serif Pro", Georgia, serif;
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--color-ink);
-  }
-
-  .all-answers-count {
-    font-size: 0.75rem;
-    color: #888;
-  }
-
-  .all-answers .dt-slots {
-    max-height: 60vh;
-    overflow-y: auto;
-  }
-
+  /* ─── ANSWER GRID ─── */
   .dt-slots {
     display: grid;
     grid-auto-flow: column;
