@@ -16,8 +16,8 @@
     avgScore: number | undefined;
     playCount: number | undefined;
     stats: DailyStats;
-    histogram: number[];
-    bucketSize: number;
+    edges: number[];
+    counts: number[];
     list: GameList;
     dayNumber: number;
     listSize: number;
@@ -39,8 +39,8 @@
     avgScore,
     playCount,
     stats,
-    histogram,
-    bucketSize,
+    edges,
+    counts,
     list,
     dayNumber,
     listSize,
@@ -50,12 +50,13 @@
   }: Props = $props();
 
   const gridText = $derived(generateShareGrid(guessedRanks, listSize));
-  const maxHistogram = $derived(Math.max(...histogram, 1));
-  const userBucket = $derived(
-    bucketSize > 0
-      ? Math.min(Math.floor(score / bucketSize), histogram.length - 1)
-      : 0,
-  );
+  const maxHistogram = $derived(Math.max(...counts, 1));
+  const userBucket = $derived.by(() => {
+    for (let i = edges.length - 1; i >= 0; i--) {
+      if (score >= edges[i]) return i;
+    }
+    return 0;
+  });
 
   // Build guessed map for all-answers grid
   const guessedMap = $derived(
@@ -210,13 +211,19 @@
       </div>
 
       <div class="results-col results-col-right">
-        {#if histogram.length > 0 && histogram.some((v) => v > 0)}
+        {#if counts.length > 0 && counts.some((v) => v > 0)}
           {@const labelStep =
-            histogram.length > 14 ? 4 : histogram.length > 8 ? 2 : 1}
+            counts.length > 24
+              ? 5
+              : counts.length > 14
+                ? 4
+                : counts.length > 8
+                  ? 2
+                  : 1}
           <div class="histogram">
             <h4>Players' Scores</h4>
             <div class="histogram-bars">
-              {#each histogram as count, i}
+              {#each counts as count, i}
                 {@const isUser = i === userBucket}
                 <div class="histogram-bar-wrapper">
                   <span
@@ -237,11 +244,15 @@
               {/each}
             </div>
             <div class="histogram-labels">
-              {#each histogram as _, i}
+              {#each counts as _, i}
                 <div class="histogram-label-slot">
-                  {#if i % labelStep === 0}
+                  {#if i === counts.length - 1}
                     <span class="histogram-label"
-                      >{(i * bucketSize).toLocaleString()}</span
+                      >{edges[i].toLocaleString()}+</span
+                    >
+                  {:else if i % labelStep === 0 && counts.length - 1 - i >= labelStep - 1}
+                    <span class="histogram-label"
+                      >{edges[i].toLocaleString()}</span
                     >
                   {/if}
                 </div>
@@ -271,7 +282,9 @@
         <div
           class="dt-slots"
           class:dt-slots-wide={listSize > 50}
-          style="--rows-1: {listSize}; --rows-2: {Math.ceil(listSize / 2)}; --rows-4: {Math.ceil(listSize / 4)}"
+          style="--rows-1: {listSize}; --rows-2: {Math.ceil(
+            listSize / 2,
+          )}; --rows-4: {Math.ceil(listSize / 4)}"
         >
           {#each Array(listSize) as _, i}
             {@const item = guessedMap.get(i)}
@@ -530,6 +543,7 @@
     margin-bottom: 0.5rem;
     border: 1px solid var(--color-gold);
     padding: 1rem 0.75rem 0.5rem;
+    padding-right: 1.5rem !important;
     background: var(--color-cream);
     flex: 1;
     display: flex;
@@ -550,8 +564,15 @@
     display: flex;
     align-items: flex-end;
     gap: 2px;
-    flex: 1;
-    min-height: 120px;
+    height: 140px;
+  }
+
+  @media (min-width: 900px) {
+    .histogram-bars {
+      flex: 1;
+      height: auto;
+      min-height: 160px;
+    }
   }
 
   .histogram-bar-wrapper {

@@ -70,8 +70,8 @@
   let percentile = $state<number | undefined>(undefined);
   let avgScore = $state<number | undefined>(undefined);
   let playCount = $state<number | undefined>(undefined);
-  let histogram = $state<number[]>([]);
-  let histogramBucketSize = $state(500);
+  let histogramEdges = $state<number[]>([]);
+  let histogramCounts = $state<number[]>([]);
 
   // Onboarding tooltip
   const ONBOARDING_KEY = 'onboarding_seen';
@@ -245,8 +245,8 @@
       const res = await fetch("/api/daily/stats");
       if (res.ok) {
         const data = await res.json();
-        histogram = data.scores ?? [];
-        if (data.bucketSize) histogramBucketSize = data.bucketSize;
+        histogramEdges = data.edges ?? [];
+        histogramCounts = data.counts ?? [];
         if (playCount === undefined) {
           playCount = data.playCount;
           avgScore = data.avgScore;
@@ -416,8 +416,8 @@
       {avgScore}
       {playCount}
       {stats}
-      {histogram}
-      bucketSize={histogramBucketSize}
+      edges={histogramEdges}
+      counts={histogramCounts}
       {list}
       {dayNumber}
       {listSize}

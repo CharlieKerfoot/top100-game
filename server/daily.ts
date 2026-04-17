@@ -144,28 +144,56 @@ export async function handleDailyRequest(req: IncomingMessage, res: ServerRespon
     const stats = getOrCreateToday();
 
     if (stats.playCount === 0) {
-      json(res, 200, { date: todayKey, avgScore: 0, playCount: 0, scores: [] });
+      json(res, 200, { date: todayKey, avgScore: 0, playCount: 0, edges: [], counts: [] });
       return true;
     }
 
-    // Bucket scores into equal-width ranges based on the list's max score
-    // Use round bucket sizes (100 or 250) for clean labels
+    // Variable-width buckets: dense at the low end where most players land,
+    // coarse at the high end where only completionists reach. The final bucket
+    // is an overflow bucket catching anything at or above its lower edge.
+    // `edges` is the lower bound of each bucket; edges.length === counts.length.
     const dailyList = getDailyList();
     const maxScore = getMaxScore(dailyList);
-    const bucketSize = maxScore <= 2000 ? 100 : 250;
-    const bucketCount = Math.ceil(maxScore / bucketSize);
-    const buckets = new Array(bucketCount).fill(0);
+    const edges = maxScore <= 1500
+      // Top-50 lists (max 1275, avg ~100-200). 30 buckets.
+      // Widths scale: 10 → 20 → 40 → 80 → 100. Last bucket = 1200+ (covers
+      // 1200-1275, i.e. near-perfect runs). Label-aligned for step=5:
+      //   0, 50, 100, 200, 400, 800, 1200+
+      ? [
+          0, 10, 20, 30, 40,
+          50, 60, 70, 80, 90,
+          100, 120, 140, 160, 180,
+          200, 240, 280, 320, 360,
+          400, 480, 560, 640, 720,
+          800, 900, 1000, 1100, 1200,
+        ]
+      // Top-100 lists (max 5050, avg ~400). 30 buckets.
+      // Widths scale: 20 → 50 → 100 → 200 → 500 → 1000. Last bucket = 5000+
+      // (covers 5000-5050). Label-aligned for step=5:
+      //   0, 100, 200, 500, 1000, 2000, 5000+
+      : [
+          0, 20, 40, 60, 80,
+          100, 120, 140, 160, 180,
+          200, 250, 300, 350, 400,
+          500, 600, 700, 800, 900,
+          1000, 1200, 1400, 1600, 1800,
+          2000, 2500, 3000, 4000, 5000,
+        ];
+    const counts = new Array(edges.length).fill(0);
     for (const s of stats.scores) {
-      const idx = Math.min(Math.floor(s / bucketSize), bucketCount - 1);
-      buckets[idx]++;
+      let idx = 0;
+      for (let i = edges.length - 1; i >= 0; i--) {
+        if (s >= edges[i]) { idx = i; break; }
+      }
+      counts[idx]++;
     }
 
     json(res, 200, {
       date: todayKey,
       avgScore: Math.round(stats.totalScore / stats.playCount),
       playCount: stats.playCount,
-      scores: buckets,
-      bucketSize,
+      edges,
+      counts,
     });
     return true;
   }
