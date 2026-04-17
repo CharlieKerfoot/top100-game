@@ -140,7 +140,27 @@
     return () => cancelAnimationFrame(frame);
   });
 
-  function handleShare() {
+  function canUseNativeShare(): boolean {
+    if (typeof navigator === "undefined") return false;
+    if (typeof navigator.share !== "function") return false;
+    // Touch-device heuristic: iOS, Android, Windows touchscreens get the
+    // native share sheet. Desktops (including macOS Safari, which does
+    // support navigator.share) stay on clipboard per product direction.
+    return navigator.maxTouchPoints > 0 || "ontouchstart" in window;
+  }
+
+  function copyToClipboard(text: string) {
+    navigator.clipboard.writeText(text).then(
+      () => {
+        shareStatus = "copied";
+      },
+      () => {
+        shareStatus = "fallback";
+      },
+    );
+  }
+
+  async function handleShare() {
     const text = generateShareText({
       dayNumber,
       listName: list.name,
@@ -152,14 +172,19 @@
     });
     shareText = text;
 
-    navigator.clipboard.writeText(text).then(
-      () => {
-        shareStatus = "copied";
-      },
-      () => {
-        shareStatus = "fallback";
-      },
-    );
+    if (canUseNativeShare()) {
+      try {
+        await navigator.share({ text });
+      } catch (err) {
+        // User cancelled — leave state idle. For real failures, fall back.
+        if ((err as Error)?.name !== "AbortError") {
+          copyToClipboard(text);
+        }
+      }
+      return;
+    }
+
+    copyToClipboard(text);
   }
 </script>
 
@@ -520,8 +545,12 @@
 
   .missed-name {
     flex: 1;
+    min-width: 0;
     text-align: left;
     font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .missed-value {
@@ -543,7 +572,6 @@
     margin-bottom: 0.5rem;
     border: 1px solid var(--color-gold);
     padding: 1rem 0.75rem 0.5rem;
-    padding-right: 1.5rem !important;
     background: var(--color-cream);
     flex: 1;
     display: flex;

@@ -159,9 +159,9 @@ export function generateShareText(opts: {
   const size = opts.listSize ?? 100;
   const maxScore = (size * (size + 1)) / 2;
   const lines: string[] = [
-    `Common Cents #${opts.dayNumber} ☀️`,
+    `Common Cents #${opts.dayNumber}`,
     opts.listName,
-    `Score: ${opts.score.toLocaleString()}/${maxScore.toLocaleString()}`,
+    `${opts.score.toLocaleString()}/${maxScore.toLocaleString()}`,
     '',
     generateShareGrid(opts.guessedRanks, size),
   ];

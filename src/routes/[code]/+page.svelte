@@ -516,7 +516,7 @@
 <div class="app">
   <header>
     <div class="title-row">
-      <div class="title-row-left">
+      <div class="title-row-left desktop-lobby-slot">
         {#if mp.phase === "lobby"}
           <button
             class="visibility-toggle"
@@ -547,7 +547,7 @@
           title="How to play">i</button
         >
       </div>
-      <div class="title-row-right">
+      <div class="title-row-right desktop-lobby-slot">
         {#if mp.phase === "lobby"}
           <div class="header-code-block">
             <span class="code-text">{mp.partyCode}</span>
@@ -569,6 +569,36 @@
       </div>
     {/if}
   </header>
+
+  {#if mp.phase === "lobby"}
+    <div class="mobile-lobby-controls">
+      <button
+        class="visibility-toggle"
+        class:is-public={mp.isPublic}
+        onclick={() =>
+          mp.isHost && mp.updateSettings({ isPublic: !mp.isPublic })}
+        class:readonly={!mp.isHost}
+        title={mp.isHost
+          ? mp.isPublic
+            ? "Switch to Private"
+            : "Switch to Public"
+          : ""}
+      >
+        <span class="visibility-label-text"
+          >{mp.isPublic ? "Public" : "Private"}</span
+        >
+        <span class="visibility-slider">
+          <span class="visibility-knob"></span>
+        </span>
+      </button>
+      <div class="header-code-block">
+        <span class="code-text">{mp.partyCode}</span>
+        <button class="copy-btn" class:copied onclick={copyCode}>
+          {copied ? "✓" : "Copy"}
+        </button>
+      </div>
+    </div>
+  {/if}
 
   {#if showRules}
     <div
@@ -1463,48 +1493,48 @@
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Desktop game action bar -->
-      <div class="game-action-bar">
-        {#if showHistory}
-          <div class="history-panel">
-            <div class="history-list">
-              {#each [...mp.guessHistory].reverse() as entry}
-                <div
-                  class="history-entry"
-                  class:history-hit={!entry.isStrike}
-                  class:history-miss={entry.isStrike}
-                >
-                  <span class="history-player">{entry.playerName}</span>
-                  <span class="history-guess">{entry.guess}</span>
-                  <span class="history-result">
-                    {#if entry.isStrike}✗{:else}#{entry.rank}{#if entry.value}&nbsp;({entry.value}){/if}{/if}
-                  </span>
-                </div>
-              {/each}
-              {#if mp.guessHistory.length === 0}
-                <p class="history-empty">No guesses yet</p>
-              {/if}
+        <!-- Desktop game action bar -->
+        <div class="game-action-bar">
+          {#if showHistory}
+            <div class="history-panel">
+              <div class="history-list">
+                {#each [...mp.guessHistory].reverse() as entry}
+                  <div
+                    class="history-entry"
+                    class:history-hit={!entry.isStrike}
+                    class:history-miss={entry.isStrike}
+                  >
+                    <span class="history-player">{entry.playerName}</span>
+                    <span class="history-guess">{entry.guess}</span>
+                    <span class="history-result">
+                      {#if entry.isStrike}✗{:else}#{entry.rank}{#if entry.value}&nbsp;({entry.value}){/if}{/if}
+                    </span>
+                  </div>
+                {/each}
+                {#if mp.guessHistory.length === 0}
+                  <p class="history-empty">No guesses yet</p>
+                {/if}
+              </div>
             </div>
-          </div>
-        {/if}
-        <button
-          class="game-action-btn"
-          onclick={() => (showHistory = !showHistory)}
-        >
-          {showHistory ? "Hide" : "Show"} All Guesses ({mp.guessHistory.length})
-        </button>
-        {#if mp.isHost}
+          {/if}
           <button
             class="game-action-btn"
-            onclick={() => (confirmAction = "end")}>End Game</button
+            onclick={() => (showHistory = !showHistory)}
           >
-        {/if}
-        <button
-          class="game-action-btn danger"
-          onclick={() => (confirmAction = "leave")}>Leave Game</button
-        >
+            {showHistory ? "Hide" : "Show"} All Guesses ({mp.guessHistory.length})
+          </button>
+          {#if mp.isHost}
+            <button
+              class="game-action-btn"
+              onclick={() => (confirmAction = "end")}>End Game</button
+            >
+          {/if}
+          <button
+            class="game-action-btn danger"
+            onclick={() => (confirmAction = "leave")}>Leave Game</button
+          >
+        </div>
       </div>
 
       <!-- Mobile: compact vertical layout -->
@@ -2120,6 +2150,7 @@
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
+    gap: 0.35rem;
   }
 
   .title-row-left {
@@ -2156,6 +2187,15 @@
     letter-spacing: 0.08em;
     color: var(--color-crimson);
     transition: background 0.2s;
+    min-width: 0;
+  }
+
+  @media (max-width: 480px) {
+    .visibility-toggle {
+      padding: 0.3rem 0.6rem;
+      gap: 0.5rem;
+      letter-spacing: 0.06em;
+    }
   }
 
   .visibility-toggle.readonly {
@@ -2213,6 +2253,44 @@
     padding: 0.3rem 0.75rem;
   }
 
+  @media (max-width: 480px) {
+    .header-code-block .code-text {
+      font-size: 0.85rem;
+      padding: 0.3rem 0.5rem;
+      letter-spacing: 0.05em;
+    }
+    .header-code-block .copy-btn {
+      padding: 0.3rem 0.5rem;
+    }
+  }
+
+  .mobile-lobby-controls {
+    display: none;
+  }
+
+  @media (max-width: 480px) {
+    .desktop-lobby-slot {
+      display: none;
+    }
+    .title-row {
+      grid-template-columns: 1fr;
+    }
+    .mobile-lobby-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .mobile-lobby-controls .header-code-block .code-text {
+      font-size: 0.8rem;
+      padding: 0.25rem 0.5rem;
+    }
+  }
+
   .header-code-block .copy-btn {
     font-size: 0.72rem;
     padding: 0.3rem 0.6rem;
@@ -2241,7 +2319,7 @@
 
   header h1 {
     font-family: "Playfair Display", Georgia, serif;
-    font-size: 2.4rem;
+    font-size: clamp(1.6rem, 6vw, 2.4rem);
     font-weight: 900;
     margin: 0;
     color: var(--color-ink);
@@ -2592,6 +2670,10 @@
     gap: 0.75rem;
   }
 
+  .preview-info .preview-detail {
+    min-width: 0;
+  }
+
   .preview-detail {
     display: flex;
     flex-direction: column;
@@ -2610,6 +2692,9 @@
   .preview-value {
     font-weight: 600;
     font-size: 0.95rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .midgame-notice {
@@ -3820,6 +3905,10 @@
   }
   .guessed-name {
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .guessed-value {
     color: #996633;
@@ -3831,6 +3920,7 @@
     color: #999;
     font-size: 0.8rem;
     font-style: italic;
+    white-space: nowrap;
   }
 
   /* Results */
@@ -3840,6 +3930,7 @@
 
   .results-row {
     display: flex;
+    flex-direction: column;
     gap: 0;
     margin-bottom: 1.5rem;
     border: 1px solid var(--color-gold);
@@ -3855,7 +3946,18 @@
   }
 
   .results-strikes {
-    border-left: 1px solid var(--color-gold);
+    border-top: 1px solid var(--color-gold);
+  }
+
+  @media (min-width: 600px) {
+    .results-row {
+      flex-direction: row;
+    }
+
+    .results-strikes {
+      border-top: none;
+      border-left: 1px solid var(--color-gold);
+    }
   }
 
   .results-rankings h3,
@@ -4364,6 +4466,12 @@
     animation: slideIn 0.5s ease-out;
   }
 
+  @media (max-width: 480px) {
+    .winner-banner {
+      padding: 1.25rem 1rem;
+    }
+  }
+
   .winner-banner.tie {
     border-color: #8b6914;
   }
@@ -4387,9 +4495,10 @@
   .ranking-row {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem 0.75rem;
     padding: 0.6rem 0.5rem;
     border-bottom: 1px solid #ede0c4;
+    flex-wrap: wrap;
   }
 
   .ranking-row.first {
@@ -4402,7 +4511,11 @@
   }
   .ranking-name {
     flex: 1;
+    min-width: 0;
     font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .ranking-score {
     font-weight: 700;
@@ -4412,6 +4525,8 @@
     font-size: 0.8rem;
     color: #888;
     font-style: italic;
+    flex-basis: 100%;
+    padding-left: 2.75rem;
   }
 
   /* ─── DESKTOP / MOBILE GAME TOGGLE ─── */

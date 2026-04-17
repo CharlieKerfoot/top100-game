@@ -929,21 +929,31 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
   }
 
   .pp-info {
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
+    min-width: 0;
+    flex: 1;
   }
 
   .pp-host {
     font-weight: 600;
     font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .pp-details {
     font-size: 0.8rem;
     color: #888;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .pp-actions {
