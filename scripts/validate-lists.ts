@@ -150,7 +150,40 @@ function validateList(list: GameList): Issue[] {
     });
   }
 
-  // ── 7. Aliases point to real items ──
+  // ── 7b. Values must be monotonic (direction auto-detected from endpoints) ──
+  if (values && values.length === items.length && values.length >= 2) {
+    const parse = (v: string): number => {
+      const m = v.replace(/,/g, '').match(/(-?\d+(?:\.\d+)?)\s*([KMBT])?/);
+      if (!m) return NaN;
+      const n = parseFloat(m[1]);
+      const unit = m[2] ?? '';
+      const mult = unit === 'K' ? 1e3 : unit === 'M' ? 1e6 : unit === 'B' ? 1e9 : unit === 'T' ? 1e12 : 1;
+      return n * mult;
+    };
+    const nums = values.map(parse);
+    const first = nums.find(Number.isFinite);
+    const last = [...nums].reverse().find(Number.isFinite);
+    if (first !== undefined && last !== undefined && first !== last) {
+      const ascending = first < last;
+      for (let i = 1; i < nums.length; i++) {
+        const prev = nums[i - 1];
+        const curr = nums[i];
+        if (!Number.isFinite(prev) || !Number.isFinite(curr)) continue;
+        const violates = ascending ? curr < prev : curr > prev;
+        if (violates) {
+          const op = ascending ? '>' : '<';
+          issues.push({
+            list: id,
+            rule: 'values-not-monotonic',
+            detail: `#${i} ${items[i - 1]} (${values[i - 1]}) ${op} #${i + 1} ${items[i]} (${values[i]})`,
+            severity: 'error',
+          });
+        }
+      }
+    }
+  }
+
+  // ── 8. Aliases point to real items ──
   for (const [alias, canonical] of Object.entries(aliases)) {
     const canonicalNorm = normalize(canonical);
     if (!normalizedItems.has(canonicalNorm)) {

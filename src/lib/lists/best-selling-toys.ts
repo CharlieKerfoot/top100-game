@@ -147,235 +147,47 @@ export const bestSellingToys: GameList = {
     'ker plunk': 'Ker-Plunk',
   },
   items: [
-    // ---- 1-10: verifiable blockbusters ----
-    "LEGO",                          // 1  - 800B+ pieces / world's largest toy company (Lego Group)
-    "Hot Wheels",                    // 2  - 9B+ die-cast cars since 1968 (Mattel)
-    "Barbie",                        // 3  - ~1B+ dolls since 1959 (Mattel)
-    "Play-Doh",                      // 4  - 3B+ cans since 1956 (Hasbro)
-    "Checkers",                      // 5  - 50B+ sets estimated; ancient game, universal manufacturing
-    "Chess",                         // 6  - billions worldwide over centuries; 3M+ sets/yr in US alone
-    "Monopoly",                      // 7  - 275M+ copies since 1935 (Hasbro/Parker Bros)
-    "Yo-Yo",                         // 8  - hundreds of millions; 2,500-year history (Yomega/Duncan/others)
-    "Rubik's Cube",                  // 9  - 350M+ since 1980 (Rubik's Brand Ltd)
-    "Scrabble",                      // 10 - 165M+ sets; sold in 120 countries (Hasbro/Mattel)
-
-    // ---- 11-20 ----
-    "Uno",                           // 11 - 150M+ copies since 1971 (Mattel)
-    "Slinky",                        // 12 - 300M+ since 1945 (Poof-Slinky/Alex Brands)
-    "Frisbee",                       // 13 - 200M+ discs; National Toy Hall of Fame inductee (Wham-O)
-    "Silly Putty",                   // 14 - 300M+ eggs since 1950 (Crayola)
-    "Trivial Pursuit",               // 15 - 100M+ since 1981 (Hasbro)
-    "Battleship",                    // 16 - 100M+ since 1931 (Hasbro/Milton Bradley)
-    "Etch A Sketch",                 // 17 - 100M+ since 1960 (Ohio Art/Spin Master)
-    "Mr. Potato Head",               // 18 - 100M+ since 1952 (Hasbro)
-    "Hula Hoop",                     // 19 - 25M in 4 months in 1958; hundreds of millions total (Wham-O)
-    "G.I. Joe",                      // 20 - ~400M+ figures since 1964 (Hasbro)
-
-    // ---- 21-30 ----
-    "Star Wars action figures",      // 21 - 300M+ in first 7 years (1978-85) alone (Kenner/Hasbro)
-    "Crayola Crayons",               // 22 - 100B+ crayons since 1903 (Binney & Smith/Crayola)
-    "Risk",                          // 23 - ~100M+ since 1957 (Hasbro/Parker Bros)
-    "Connect Four",                  // 24 - ~80M+ since 1974 (Hasbro/Milton Bradley)
-    "Candy Land",                    // 25 - 50M+ since 1949; ~1M sold/yr (Hasbro/Milton Bradley)
-    "Clue",                          // 26 - 150M+ since 1949 (Hasbro/Waddingtons)
-    "Operation",                     // 27 - ~70M+ since 1965 (Hasbro/Milton Bradley)
-    "Jenga",                         // 28 - 90M+ since 1983 (Hasbro/Leslie Scott)
-    "Twister",                       // 29 - ~60M+ since 1966 (Hasbro/Milton Bradley)
-    "Sorry!",                        // 30 - ~50M+ since 1929 US (Hasbro/Parker Bros)
-
-    // ---- 31-40 ----
-    "Transformers",                  // 31 - hundreds of millions of figures since 1984 (Hasbro/Takara)
-    "Cabbage Patch Kids",            // 32 - 130M+ since 1982 (Coleco/Mattel/Wicked Cool)
-    "He-Man",                        // 33 - ~70M+ figures 1981-1987 alone (Mattel)
-    "Barbie Dreamhouse",             // 34 - ~60M+ units since 1962 (Mattel)
-    "Tamagotchi",                    // 35 - 100M+ since 1996 (Bandai)
-    "Super Soaker",                  // 36 - 200M+ since 1990 (Larami/Hasbro)
-    "Nerf",                          // 37 - hundreds of millions of products since 1969 (Parker Bros/Hasbro)
-    "Tonka Trucks",                  // 38 - ~250M+ trucks since 1947 (Tonka/Hasbro)
-    "Tickle Me Elmo",                // 39 - 6M+ in 1996-1998 peak (Tyco/Fisher-Price/Mattel)
-    "Pokémon Trading Cards",         // 40 - 50.9B+ cards since 1996 (The Pokémon Company)
-
-    // ---- 41-50 ----
-    "My Little Pony",                // 41 - ~150M+ ponies since 1983 (Hasbro)
-    "Teenage Mutant Ninja Turtles",  // 42 - hundreds of millions of figures since 1987 (Playmates/Nickelodeon)
-    "Beanie Babies",                 // 43 - ~500M+ sold at peak 1993-1999 (Ty Inc.)
-    "Furby",                         // 44 - 40M+ in first 3 years 1998-2001 (Tiger Electronics/Hasbro)
-    "Fisher-Price Little People",    // 45 - ~250M+ since 1959 (Fisher-Price/Mattel)
-    "Lite-Brite",                    // 46 - ~50M+ since 1967 (Hasbro/Milton Bradley)
-    "Easy-Bake Oven",                // 47 - ~30M+ since 1963 (Hasbro/Kenner)
-    "Hungry Hungry Hippos",          // 48 - ~50M+ since 1978 (Hasbro/Milton Bradley)
-    "Boggle",                        // 49 - ~50M+ since 1972 (Hasbro)
-    "Pictionary",                    // 50 - 38M+ since 1985 (Mattel/Western Publishing)
-
-    // ---- 51-60 ----
-    "Chutes and Ladders",            // 51 - ~50M+ since 1943 US release (Hasbro/Milton Bradley)
-    "Guess Who?",                    // 52 - ~35M+ since 1979 (Hasbro/Milton Bradley)
-    "Trouble",                       // 53 - ~40M+ since 1965 (Hasbro/Milton Bradley)
-    "Mousetrap",                     // 54 - ~40M+ since 1963 (Hasbro/Milton Bradley)
-    "Lincoln Logs",                  // 55 - 100M+ sets since 1916 (Hasbro/K'Nex)
-    "Tinkertoy",                     // 56 - ~50M+ sets since 1914 (Hasbro/K'Nex)
-    "Erector Set",                   // 57 - ~30M+ since 1913 (Meccano/Hasbro)
-    "Pogo Stick",                    // 58 - tens of millions since 1919 (Flybar/SV3 and others)
-    "View-Master",                   // 59 - ~100M+ since 1939 (Fisher-Price/Mattel)
-    "Spirograph",                    // 60 - ~60M+ since 1965 (Hasbro/Kenner)
-
-    // ---- 61-70 ----
-    "Simon",                         // 61 - ~60M+ since 1978 (Hasbro/Milton Bradley)
-    "Magna Doodle",                  // 62 - ~40M+ since 1974 (Fisher-Price)
-    "Yahtzee",                       // 63 - ~50M+ since 1956 (Hasbro/Milton Bradley)
-    "Game Boy",                      // 64 - 118.7M units 1989-2003 (Nintendo)
-    "Nintendo DS",                   // 65 - 154M units 2004-2014 (Nintendo)
-    "Nintendo Wii",                  // 66 - 102M units 2006-2013 (Nintendo)
-    "Care Bears",                    // 67 - ~40M+ plush since 1982 (American Greetings/Basic Fun)
-    "Pound Puppies",                 // 68 - ~30M+ since 1984 (Tonka/Mattel/Basic Fun)
-    "Playmobil",                     // 69 - 3B+ figures since 1974 (Brandstätter Group)
-    "Thomas the Tank Engine",        // 70 - ~50M+ wooden trains since 1945 (HIT Entertainment/Mattel)
-
-    // ---- 71-80 ----
-    "American Girl Dolls",           // 71 - ~30M+ since 1986 (Pleasant Company/Mattel)
-    "Bratz Dolls",                   // 72 - 125M+ since 2001 (MGA Entertainment)
-    "K'Nex",                         // 73 - billions of pieces since 1993 (K'Nex Industries/Hasbro)
-    "Dungeons & Dragons",            // 74 - ~20M+ sets/players since 1974 (TSR/Wizards/Hasbro)
-    "Magic: The Gathering",          // 75 - ~35B+ cards since 1993 (Wizards of the Coast/Hasbro)
-    "Hacky Sack",                    // 76 - ~50M+ since 1972 (Wham-O)
-    "Stretch Armstrong",             // 77 - ~30M+ since 1976 (Kenner/Hasbro)
-    "Rock 'Em Sock 'Em Robots",      // 78 - ~25M+ since 1964 (Marx/Mattel)
-    "Perfection",                    // 79 - ~25M+ since 1973 (Hasbro/Milton Bradley)
-    "Ker-Plunk",                     // 80 - ~30M+ since 1967 (Hasbro/Mattel)
-
-    // ---- 81-90 ----
-    "Rainbow Loom",                  // 81 - ~30M+ kits since 2011 (Choon's Design)
-    "Fidget Spinner",                // 82 - ~200M+ in 2017 fad alone (various manufacturers)
-    "Catan",                         // 83 - 32M+ since 1995 (Catan Studio/Asmodee)
-    "Brio",                          // 84 - ~50M+ since 1884 (BRIO AB)
-    "Polly Pocket",                  // 85 - ~10M+ compacts since 1989 (Bluebird Toys/Mattel)
-    "Slip 'N Slide",                 // 86 - ~30M+ since 1961 (Wham-O)
-    "Baby Alive",                    // 87 - ~20M+ since 1973 (Kenner/Hasbro)
-    "Skip-Bo",                       // 88 - ~20M+ since 1967 (Mattel)
-    "Aggravation",                   // 89 - ~20M+ since 1962 (Hasbro/CO-5)
-    "Beyblades",                     // 90 - ~100M+ since 1999 (Tomy/Hasbro)
-
-    // ---- 91-100 ----
-    "Ticket to Ride",                // 91 - ~10M+ since 2004 (Days of Wonder/Asmodee)
-    "Pandemic",                      // 92 - ~10M+ since 2008 (Z-Man Games/Asmodee)
-    "Pogs",                          // 93 - ~1B+ caps in 1994-95 fad (World POG Federation)
-    "MagnaTiles",                    // 94 - ~20M+ since 1997 (Valtech)
-    "Apples to Apples",              // 95 - ~15M+ since 1999 (Mattel/Out of the Box Publishing)
-    "Snap Circuits",                 // 96 - ~10M+ since 2000 (Elenco Electronics)
-    "Bakugan",                       // 97 - ~100M+ since 2007 (Spin Master/Sega Toys)
-    "Phase 10",                      // 98 - ~50M+ since 1982 (Mattel/Fundex)
-    "Stratego",                      // 99 - ~20M+ since 1946 (Hasbro/Jumbo)
-    "Micro Machines",                // 100 - ~100M+ since 1983 (Galoob/Hasbro)
+    "LEGO", "Crayola Crayons", "Pokémon Trading Cards", "Checkers", "Magic: The Gathering",
+    "Hot Wheels", "Play-Doh", "Playmobil", "Barbie", "Pogs",
+    "Beanie Babies", "G.I. Joe", "Rubik's Cube", "Slinky", "Silly Putty",
+    "Star Wars action figures", "Monopoly", "Tonka Trucks", "Fisher-Price Little People", "Frisbee",
+    "Super Soaker", "Fidget Spinner", "Scrabble", "Nintendo DS", "Uno",
+    "Clue", "My Little Pony", "Cabbage Patch Kids", "Bratz Dolls", "Game Boy",
+    "Nintendo Wii", "Trivial Pursuit", "Battleship", "Etch A Sketch", "Mr. Potato Head",
+    "Risk", "Tamagotchi", "Lincoln Logs", "View-Master", "Beyblades",
+    "Bakugan", "Micro Machines", "Jenga", "Connect Four", "Operation",
+    "He-Man", "Twister", "Barbie Dreamhouse", "Spirograph", "Simon",
+    "Candy Land", "Sorry!", "Lite-Brite", "Hungry Hungry Hippos", "Boggle",
+    "Chutes and Ladders", "Tinkertoy", "Yahtzee", "Thomas the Tank Engine", "Hacky Sack",
+    "Brio", "Phase 10", "Furby", "Trouble", "Mousetrap",
+    "Magna Doodle", "Care Bears", "Pictionary", "Guess Who?", "Catan",
+    "Easy-Bake Oven", "Erector Set", "Pound Puppies", "American Girl Dolls", "Stretch Armstrong",
+    "Ker-Plunk", "Rainbow Loom", "Slip 'N Slide", "Rock 'Em Sock 'Em Robots", "Perfection",
+    "Dungeons & Dragons", "Baby Alive", "Skip-Bo", "Aggravation", "MagnaTiles",
+    "Stratego", "Apples to Apples", "Polly Pocket", "Ticket to Ride", "Pandemic",
+    "Snap Circuits", "Tickle Me Elmo", "Chess", "Yo-Yo", "Hula Hoop",
+    "Transformers", "Nerf", "Teenage Mutant Ninja Turtles", "Pogo Stick", "K'Nex",
   ],
   values: [
-    "800B+ pieces",           // 1  LEGO
-    "9B+ cars",               // 2  Hot Wheels
-    "~1B+ dolls",             // 3  Barbie
-    "3B+ cans",               // 4  Play-Doh
-    "50B+ sets est.",         // 5  Checkers
-    "billions",               // 6  Chess
-    "275M+",                  // 7  Monopoly
-    "hundreds of millions",   // 8  Yo-Yo
-    "350M+",                  // 9  Rubik's Cube
-    "165M+",                  // 10 Scrabble
-
-    "150M+",                  // 11 Uno
-    "300M+",                  // 12 Slinky
-    "200M+",                  // 13 Frisbee
-    "300M+ eggs",             // 14 Silly Putty
-    "100M+",                  // 15 Trivial Pursuit
-    "100M+",                  // 16 Battleship
-    "100M+",                  // 17 Etch A Sketch
-    "100M+",                  // 18 Mr. Potato Head
-    "hundreds of millions",   // 19 Hula Hoop
-    "400M+ figures",          // 20 G.I. Joe
-
-    "300M+ (1978-85)",        // 21 Star Wars
-    "100B+ crayons",          // 22 Crayola Crayons
-    "~100M+",                 // 23 Risk
-    "~80M+",                  // 24 Connect Four
-    "50M+",                   // 25 Candy Land
-    "150M+",                  // 26 Clue
-    "~70M+",                  // 27 Operation
-    "90M+",                   // 28 Jenga
-    "~60M+",                  // 29 Twister
-    "~50M+",                  // 30 Sorry!
-
-    "hundreds of millions",   // 31 Transformers
-    "130M+",                  // 32 Cabbage Patch Kids
-    "~70M+ (1981-87)",        // 33 He-Man
-    "~60M+",                  // 34 Barbie Dreamhouse
-    "100M+",                  // 35 Tamagotchi
-    "200M+",                  // 36 Super Soaker
-    "hundreds of millions",   // 37 Nerf
-    "~250M+",                 // 38 Tonka Trucks
-    "6M+ (1996-98 peak)",     // 39 Tickle Me Elmo
-    "50.9B+ cards",           // 40 Pokemon TCG
-
-    "~150M+",                 // 41 My Little Pony
-    "hundreds of millions",   // 42 TMNT
-    "~500M",                  // 43 Beanie Babies
-    "40M+ (1998-2001)",       // 44 Furby
-    "~250M+",                 // 45 Fisher-Price Little People
-    "~50M+",                  // 46 Lite-Brite
-    "~30M+",                  // 47 Easy-Bake Oven
-    "~50M+",                  // 48 Hungry Hungry Hippos
-    "~50M+",                  // 49 Boggle
-    "38M+",                   // 50 Pictionary
-
-    "~50M+",                  // 51 Chutes and Ladders
-    "~35M+",                  // 52 Guess Who?
-    "~40M+",                  // 53 Trouble
-    "~40M+",                  // 54 Mousetrap
-    "100M+ sets",             // 55 Lincoln Logs
-    "~50M+ sets",             // 56 Tinkertoy
-    "~30M+",                  // 57 Erector Set
-    "tens of millions",       // 58 Pogo Stick
-    "~100M+",                 // 59 View-Master
-    "~60M+",                  // 60 Spirograph
-
-    "~60M+",                  // 61 Simon
-    "~40M+",                  // 62 Magna Doodle
-    "~50M+",                  // 63 Yahtzee
-    "118.7M",                 // 64 Game Boy
-    "154M",                   // 65 Nintendo DS
-    "102M",                   // 66 Nintendo Wii
-    "~40M+",                  // 67 Care Bears
-    "~30M+",                  // 68 Pound Puppies
-    "3B+ figures",            // 69 Playmobil
-    "~50M+",                  // 70 Thomas the Tank Engine
-
-    "~30M+",                  // 71 American Girl Dolls
-    "125M+",                  // 72 Bratz Dolls
-    "billions of pieces",     // 73 K'Nex
-    "~20M+",                  // 74 Dungeons & Dragons
-    "~35B+ cards",            // 75 Magic: The Gathering
-    "~50M+",                  // 76 Hacky Sack
-    "~30M+",                  // 77 Stretch Armstrong
-    "~25M+",                  // 78 Rock 'Em Sock 'Em Robots
-    "~25M+",                  // 79 Perfection
-    "~30M+",                  // 80 Ker-Plunk
-
-    "~30M+ kits",             // 81 Rainbow Loom
-    "~200M (2017 fad)",       // 82 Fidget Spinner
-    "32M+",                   // 83 Catan
-    "~50M+",                  // 84 Brio
-    "~10M+",                  // 85 Polly Pocket
-    "~30M+",                  // 86 Slip 'N Slide
-    "~20M+",                  // 87 Baby Alive
-    "~20M+",                  // 88 Skip-Bo
-    "~20M+",                  // 89 Aggravation
-    "~100M+",                 // 90 Beyblades
-
-    "~10M+",                  // 91 Ticket to Ride
-    "~10M+",                  // 92 Pandemic
-    "~1B (1994-95 fad)",      // 93 Pogs
-    "~20M+",                  // 94 MagnaTiles
-    "~15M+",                  // 95 Apples to Apples
-    "~10M+",                  // 96 Snap Circuits
-    "~100M+",                 // 97 Bakugan
-    "~50M+",                  // 98 Phase 10
-    "~20M+",                  // 99 Stratego
-    "~100M+",                 // 100 Micro Machines
+    "800B+ pieces", "100B+ crayons", "50.9B+ cards", "50B+ sets est.", "~35B+ cards",
+    "9B+ cars", "3B+ cans", "3B+ figures", "~1B+ dolls", "~1B (1994-95 fad)",
+    "~500M", "400M+ figures", "350M+", "300M+", "300M+ eggs",
+    "300M+ (1978-85)", "275M+", "~250M+", "~250M+", "200M+",
+    "200M+", "~200M (2017 fad)", "165M+", "154M", "150M+",
+    "150M+", "~150M+", "130M+", "125M+", "118.7M",
+    "102M", "100M+", "100M+", "100M+", "100M+",
+    "~100M+", "100M+", "100M+ sets", "~100M+", "~100M+",
+    "~100M+", "~100M+", "90M+", "~80M+", "~70M+",
+    "~70M+ (1981-87)", "~60M+", "~60M+", "~60M+", "~60M+",
+    "50M+", "~50M+", "~50M+", "~50M+", "~50M+",
+    "~50M+", "~50M+ sets", "~50M+", "~50M+", "~50M+",
+    "~50M+", "~50M+", "40M+ (1998-2001)", "~40M+", "~40M+",
+    "~40M+", "~40M+", "38M+", "~35M+", "32M+",
+    "~30M+", "~30M+", "~30M+", "~30M+", "~30M+",
+    "~30M+", "~30M+ kits", "~30M+", "~25M+", "~25M+",
+    "~20M+", "~20M+", "~20M+", "~20M+", "~20M+",
+    "~20M+", "~15M+", "~10M+", "~10M+", "~10M+",
+    "~10M+", "6M+ (1996-98 peak)", "billions", "hundreds of millions", "hundreds of millions",
+    "hundreds of millions", "hundreds of millions", "hundreds of millions", "tens of millions", "billions of pieces",
   ],
 };

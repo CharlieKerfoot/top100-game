@@ -12,7 +12,7 @@ export const actorsBoxOffice: GameList = {
   items: [
     "Samuel L. Jackson", "Robert Downey Jr.", "Scarlett Johansson", "Zoe Saldana", "Chris Pratt",
     "Tom Hanks", "Chris Hemsworth", "Vin Diesel", "Bradley Cooper", "Chris Evans",
-    "Tom Cruise", "Chadwick Boseman", "Dwayne Johnson", "Karen Gillan", "Benedict Cumberbatch",
+    "Tom Cruise", "Dwayne Johnson", "Chadwick Boseman", "Karen Gillan", "Benedict Cumberbatch",
     "Don Cheadle", "Josh Brolin", "Elizabeth Olsen", "Cate Blanchett", "Tom Holland",
     "Dave Bautista", "Mark Ruffalo", "Paul Rudd", "Jeremy Renner", "Sebastian Stan",
     "Idris Elba", "Morgan Freeman", "Johnny Depp", "Gary Oldman", "Hugo Weaving",
@@ -34,7 +34,7 @@ export const actorsBoxOffice: GameList = {
   values: [
     "$27.7B", "$14.4B", "$14.3B", "$14.2B", "$12.6B",
     "$11.6B", "$11.5B", "$11.2B", "$11.2B", "$11.1B",
-    "$11.1B", "$10.2B", "$10.5B", "$10.2B", "$10.0B",
+    "$11.1B", "$10.5B", "$10.2B", "$10.2B", "$10.0B",
     "$9.8B", "$9.7B", "$9.6B", "$9.5B", "$9.4B",
     "$9.3B", "$9.2B", "$8.4B", "$8.3B", "$8.2B",
     "$8.1B", "$8.0B", "$7.9B", "$7.8B", "$7.7B",

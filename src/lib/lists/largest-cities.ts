@@ -11,7 +11,7 @@ export const largestCities: GameList = {
   valueLabel: 'Metro Population',
   items: [
     "Tokyo", "Delhi", "Shanghai", "Dhaka", "Cairo",
-    "Beijing", "Mumbai", "Mexico City", "Osaka", "São Paulo",
+    "São Paulo", "Mexico City", "Beijing", "Mumbai", "Osaka",
     "Chongqing", "Karachi", "Istanbul", "Kinshasa", "Lagos",
     "Buenos Aires", "Kolkata", "Manila", "Guangzhou", "Tianjin",
     "Lahore", "Bangalore", "Rio de Janeiro", "Shenzhen", "Moscow",
@@ -29,11 +29,11 @@ export const largestCities: GameList = {
     "New York City", "Chittagong", "Changsha", "Addis Ababa", "Nairobi",
     "Taipei", "Los Angeles", "Chicago", "Abidjan", "Monterrey",
     "Casablanca", "Wuhan", "Jaipur", "Berlin", "Cape Town",
-    "Kabul", "Kunming", "Changchun", "Medellín", "Brasília"
+    "Kabul", "Kunming", "Changchun", "Medellín", "Brasília",
   ],
   values: [
     "37.4M", "32.9M", "29.2M", "23.9M", "22.6M",
-    "21.5M", "21.3M", "21.8M", "19.1M", "22.4M",
+    "22.4M", "21.8M", "21.5M", "21.3M", "19.1M",
     "18.4M", "18.3M", "17.4M", "17.1M", "15.9M",
     "15.5M", "15.1M", "14.9M", "14.5M", "14.0M",
     "13.5M", "13.2M", "13.0M", "12.8M", "12.7M",

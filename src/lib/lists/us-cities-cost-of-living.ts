@@ -10,7 +10,7 @@ export const usCitiesCostOfLiving: GameList = {
   hints: usCitiesCostOfLivingHints,
   valueLabel: 'COL Index',
   items: [
-    "Manhattan", "San Francisco", "Honolulu", "Brooklyn", "San Jose",
+    "Manhattan", "San Francisco", "Brooklyn", "Honolulu", "San Jose",
     "Orange County (CA)", "Washington DC", "Los Angeles", "Seattle", "Boston",
     "San Diego", "Stamford (CT)", "Queens (NY)", "Oakland", "Portland (OR)",
     "Denver", "Miami", "Sacramento", "Hartford", "Austin",
@@ -32,7 +32,7 @@ export const usCitiesCostOfLiving: GameList = {
     "Kalamazoo", "Harlingen", "Jonesboro", "Decatur", "Danville",
   ],
   values: [
-    "228", "180", "170", "172", "165",
+    "228", "180", "172", "170", "165",
     "160", "152", "150", "148", "147",
     "145", "142", "140", "138", "135",
     "130", "128", "125", "123", "120",
