@@ -239,7 +239,6 @@ export const ufcFighters: UFCFighter[] = [
   { name: "Matheus Nicolau", wins: 8, losses: 4, sigStrikes: 578, takedowns: 18, fights: 12, finishes: 3 },
   { name: "Amir Albazi", wins: 8, losses: 2, sigStrikes: 454, takedowns: 26, fights: 10, finishes: 5 },
   // Women's Strawweight
-  { name: "Weili Zhang", wins: 13, losses: 3, sigStrikes: 1177, takedowns: 35, fights: 16, finishes: 8 },
   { name: "Yan Xiaonan", wins: 8, losses: 4, sigStrikes: 779, takedowns: 13, fights: 12, finishes: 3 },
   { name: "Mackenzie Dern", wins: 7, losses: 5, sigStrikes: 423, takedowns: 23, fights: 12, finishes: 6 },
   { name: "Claudia Gadelha", wins: 7, losses: 6, sigStrikes: 738, takedowns: 43, fights: 13, finishes: 3 },

@@ -1,5 +1,5 @@
 import type { GameList } from './types';
-import { nbaCareerPointsHints } from './hints';
+import { nbaPlayersHints } from './hints/nba-players';
 
 export const nbaCareerPoints: GameList = {
   id: 'nba-career-points',
@@ -7,7 +7,7 @@ export const nbaCareerPoints: GameList = {
   description: 'NBA players ranked by all-time career regular season points (Basketball Reference)',
   topics: ['sports'],
   difficulty: 2,
-  hints: nbaCareerPointsHints,
+  hints: nbaPlayersHints,
   valueLabel: 'Career Points',
   items: [
     "LeBron James", "Kareem Abdul-Jabbar", "Karl Malone", "Kobe Bryant", "Kevin Durant",

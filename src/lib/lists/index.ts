@@ -30,8 +30,17 @@ import { forbesBillionaires } from './forbes-billionaires';
 import { mostVisitedCountries } from './most-visited-countries';
 import { sportsTeamsByRevenue } from './sports-teams-by-revenue';
 import { nbaCareerPoints } from './nba-career-points';
+import { nbaCareerMinutes } from './nba-career-minutes';
 import { mlbCareerWar } from './mlb-career-war';
+import { mlbBattersWar } from './mlb-batters-war';
+import { mlbPitchersWar } from './mlb-pitchers-war';
+import { mlbCareerHomeRuns } from './mlb-career-home-runs';
+import { mlbPitchersStrikeouts } from './mlb-pitchers-strikeouts';
 import { nflCareerPpr } from './nfl-career-ppr';
+import { nflCareerPassingYards } from './nfl-career-passing-yards';
+import { nflCareerRushingYards } from './nfl-career-rushing-yards';
+import { nflCareerReceivingYards } from './nfl-career-receiving-yards';
+import { nflCareerTouchdowns } from './nfl-career-touchdowns';
 import { highestGrossingTvShows } from './highest-grossing-tv-shows';
 import { companyValuation } from './company-valuation';
 import { usnewsCollegeRankings } from './usnews-college-rankings';
@@ -97,6 +106,27 @@ import { tallestBuildings } from './tallest-buildings';
 import { fastestAnimals } from './fastest-animals';
 import { bestDishesWorld } from './best-dishes-world';
 import { bestCuisinesWorld } from './best-cuisines-world';
+import { mostPopularMedications } from './most-popular-medications';
+import { mostCommonJobs } from './most-common-jobs';
+import { mostPopularSubreddits } from './most-popular-subreddits';
+import { mostCommonPhobias } from './most-common-phobias';
+import { mostDangerousJobs } from './most-dangerous-jobs';
+import { highestPayingMajors } from './highest-paying-majors';
+import { ufcCareerWins } from './ufc-career-wins';
+import { ufcCareerLosses } from './ufc-career-losses';
+import { ufcCareerSigStrikes } from './ufc-career-sig-strikes';
+import { ufcCareerTakedowns } from './ufc-career-takedowns';
+import { ufcCareerFights } from './ufc-career-fights';
+import { ufcCareerFinishes } from './ufc-career-finishes';
+import { nhlCareerPoints } from './nhl-career-points';
+import { nhlCareerGoals } from './nhl-career-goals';
+import { stadiumCapacity } from './stadium-capacity';
+import { f1CareerPodiums } from './f1-career-podiums';
+import { pgaTourWins } from './pga-tour-wins';
+import { tennisCareerTitles } from './tennis-career-titles';
+import { marchMadnessWins } from './march-madness-wins';
+import { cfbCareerWins } from './cfb-career-wins';
+import { cfbNflDrafts } from './cfb-nfl-drafts';
 
 import type { GameList } from './types';
 
@@ -115,8 +145,17 @@ export const lists: GameList[] = [
   mostVisitedCountries,
   sportsTeamsByRevenue,
   nbaCareerPoints,
+  nbaCareerMinutes,
   mlbCareerWar,
+  mlbBattersWar,
+  mlbPitchersWar,
+  mlbCareerHomeRuns,
+  mlbPitchersStrikeouts,
   nflCareerPpr,
+  nflCareerPassingYards,
+  nflCareerRushingYards,
+  nflCareerReceivingYards,
+  nflCareerTouchdowns,
   highestGrossingTvShows,
   companyValuation,
   usnewsCollegeRankings,
@@ -182,6 +221,27 @@ export const lists: GameList[] = [
   fastestAnimals,
   bestDishesWorld,
   bestCuisinesWorld,
+  mostPopularMedications,
+  mostCommonJobs,
+  mostPopularSubreddits,
+  mostCommonPhobias,
+  mostDangerousJobs,
+  highestPayingMajors,
+  ufcCareerWins,
+  ufcCareerLosses,
+  ufcCareerSigStrikes,
+  ufcCareerTakedowns,
+  ufcCareerFights,
+  ufcCareerFinishes,
+  nhlCareerPoints,
+  nhlCareerGoals,
+  stadiumCapacity,
+  f1CareerPodiums,
+  pgaTourWins,
+  tennisCareerTitles,
+  marchMadnessWins,
+  cfbCareerWins,
+  cfbNflDrafts,
 ];
 
 /** Returns the effective topics for a list, including "new" if within the newUntil date and "top 50" if size is 50. */

@@ -4,7 +4,7 @@ export const GAME_TAGLINE = 'The Top 100 Ranking Game';
 export const DEFAULT_DESCRIPTION =
   'Name things from a Top 100 list. Harder answers score more. Play the daily challenge or compete with friends.';
 export const KEYWORDS =
-  'Common Cents game, top 100 game, top 100 quiz, ranking game, daily trivia game';
+  'Common Cents game, top 100 game, top 100 quiz, ranking game, daily trivia game, Common Cents';
 
 export function ogImageUrl(params?: { list?: string; score?: number; day?: number; percentile?: number }): string {
   const base = `${SITE_URL}/api/og`;

@@ -1,5 +1,5 @@
 import type { GameList } from './types';
-import { nflCareerPprHints } from './hints/nfl-career-ppr';
+import { nflPlayersHints } from './hints/nfl-players';
 
 export const nflCareerPpr: GameList = {
   id: 'nfl-career-ppr',
@@ -7,7 +7,7 @@ export const nflCareerPpr: GameList = {
   description: 'NFL players ranked by all-time career PPR fantasy points (Pro Football Reference)',
   topics: ['sports'],
   difficulty: 3,
-  hints: nflCareerPprHints,
+  hints: nflPlayersHints,
   valueLabel: 'PPR Points',
   items: [
     'Tom Brady', 'Drew Brees', 'Aaron Rodgers', 'Jerry Rice', 'Peyton Manning',

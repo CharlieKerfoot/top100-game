@@ -1,5 +1,5 @@
 import type { GameList } from './types';
-import { mlbCareerWarHints } from './hints';
+import { mlbPlayersHints } from './hints/mlb-players';
 
 export const mlbCareerWar: GameList = {
   id: 'mlb-career-war',
@@ -7,7 +7,7 @@ export const mlbCareerWar: GameList = {
   description: 'MLB players ranked by all-time career WAR (Baseball Reference bWAR)',
   topics: ['sports'],
   difficulty: 3,
-  hints: mlbCareerWarHints,
+  hints: mlbPlayersHints,
   valueLabel: 'Career WAR',
   items: [
     "Babe Ruth", "Walter Johnson", "Cy Young", "Barry Bonds", "Willie Mays",
