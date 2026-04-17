@@ -14,6 +14,7 @@
  */
 
 import { lists } from '../src/lib/lists/index.ts';
+import { dailySchedule } from '../src/lib/lists/daily-schedule.ts';
 import type { GameList } from '../src/lib/lists/types.ts';
 
 // ── Normalize (mirrors src/lib/normalize.ts) ──
@@ -205,6 +206,48 @@ const allIssues: Issue[] = [];
 
 for (const list of lists) {
   allIssues.push(...validateList(list));
+}
+
+// ── Daily schedule integrity ──
+
+const scheduleSet = new Set(dailySchedule);
+const listIds = new Set(lists.map(l => l.id));
+
+if (scheduleSet.size !== dailySchedule.length) {
+  const seen = new Set<string>();
+  const dupes: string[] = [];
+  for (const id of dailySchedule) {
+    if (seen.has(id)) dupes.push(id);
+    seen.add(id);
+  }
+  allIssues.push({
+    list: '(schedule)',
+    rule: 'duplicate-schedule-id',
+    detail: `daily-schedule.ts has duplicates: ${[...new Set(dupes)].join(', ')}`,
+    severity: 'error',
+  });
+}
+
+for (const id of dailySchedule) {
+  if (!listIds.has(id)) {
+    allIssues.push({
+      list: '(schedule)',
+      rule: 'schedule-unknown-list',
+      detail: `daily-schedule.ts references unknown list id "${id}"`,
+      severity: 'error',
+    });
+  }
+}
+
+for (const id of listIds) {
+  if (!scheduleSet.has(id)) {
+    allIssues.push({
+      list: '(schedule)',
+      rule: 'list-missing-from-schedule',
+      detail: `"${id}" is in lists/ but not in daily-schedule.ts — run: bun run scripts/gen-schedule.ts --append`,
+      severity: 'error',
+    });
+  }
 }
 
 const errors = allIssues.filter(i => i.severity === 'error');

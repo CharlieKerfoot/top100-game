@@ -66,3 +66,21 @@ No two hints should normalize to the same string. Check for duplicates caused by
 
 ### Aliases point to real items
 Every value in the `aliases` object must normalize-match to an actual item in `items`. An alias pointing to a non-existent item silently fails.
+
+## Daily schedule — FROZEN
+
+The daily game's list order is defined by `src/lib/lists/daily-schedule.ts`. It is an append-only array of list ids. Day N's list is `dailySchedule[N - 1]`.
+
+**Invariants (never violate):**
+- Never reorder entries. Never rename. Never delete. Players who played day N played the list at index N-1, and that must never change across deploys — the server's daily stats, users' localStorage history, and streak counters all assume stability.
+- A list appears in the schedule at most once. No list ever repeats as a daily.
+- Every id in `src/lib/lists/index.ts` must appear in the schedule exactly once. Every id in the schedule must resolve to a real list. `bun run scripts/validate-lists.ts` enforces this and fails the build if violated.
+
+**When adding a new list, run this workflow:**
+1. Create the list file under `src/lib/lists/` and register it in `src/lib/lists/index.ts`.
+2. `bun run scripts/gen-schedule.ts` — preview which ids will be appended.
+3. `bun run scripts/gen-schedule.ts --append` — append the new ids to `daily-schedule.ts`. Existing entries are untouched.
+4. `bun run scripts/validate-lists.ts` — confirm 0 errors (schedule integrity + per-list rules).
+5. Commit `index.ts`, the new list file(s), **and** `daily-schedule.ts` together in the same commit. Splitting them will fail validation on the intermediate commit.
+
+**Do not** edit `daily-schedule.ts` by hand to reorder. If you genuinely need a specific list on a specific future day (launch event, holiday tie-in, etc.), discuss first — the correct move is usually to append in a way that lands it on the target day, not to rewrite history.

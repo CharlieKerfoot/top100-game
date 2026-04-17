@@ -97,7 +97,12 @@
 
   // Already-played check
   const initialStats = loadDailyStats();
-  const previousResult = initialStats.history[todayKey];
+  const rawPrevious = initialStats.history[todayKey];
+  // Ignore stored results for a different list than today's (e.g. if the daily
+  // schedule changed under the user after they played). Without this guard,
+  // ranks from the old list would be applied to the new list's items.
+  const previousResult =
+    rawPrevious && rawPrevious.listId === list.id ? rawPrevious : undefined;
   let stats = $state<DailyStats>(initialStats);
 
   if (previousResult) {
