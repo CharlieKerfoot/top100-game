@@ -307,7 +307,7 @@
         <div class="dt-guess-area">
           {#if showOnboarding}
             <div class="onboarding-tooltip">
-              Rarer answers score more. #1 = 1pt, #97 = 97pts. Go obscure!
+              Rarer answers score more. #1 = 1pt, #{listSize} = {listSize}pts. Go obscure!
               <button class="onboarding-dismiss" onclick={dismissOnboarding}>&times;</button>
             </div>
           {/if}
@@ -367,7 +367,7 @@
       <div class="guess-area">
         {#if showOnboarding}
           <div class="onboarding-tooltip">
-            Rarer answers score more. #1 = 1pt, #97 = 97pts. Go obscure!
+            Rarer answers score more. #1 = 1pt, #{listSize} = {listSize}pts. Go obscure!
             <button class="onboarding-dismiss" onclick={dismissOnboarding}>&times;</button>
           </div>
         {/if}
