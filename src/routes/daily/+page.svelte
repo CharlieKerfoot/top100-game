@@ -10,6 +10,10 @@
     getTodayKey,
     loadDailyStats,
     recordGame,
+    loadInProgress,
+    saveInProgress,
+    clearInProgress,
+    updateResultPercentile,
     type DailyStats,
   } from "$lib/daily";
   import { getListSize, getMaxScore } from "$lib/lists/index";
@@ -109,6 +113,7 @@
     phase = "results";
     score = previousResult.score;
     guessedRanks = previousResult.guessedRanks;
+    percentile = previousResult.percentile;
     // Rebuild foundItems from guessedRanks
     const restored: { rank: number; name: string; points: number; value?: string }[] = [];
     for (const rank of previousResult.guessedRanks) {
@@ -117,6 +122,24 @@
     restored.sort((a, b) => b.rank - a.rank);
     foundItems = restored;
     fetchServerStats();
+  } else {
+    // Restore mid-game state if it matches today's list
+    const inProgress = loadInProgress();
+    if (inProgress && inProgress.dateKey === todayKey && inProgress.listId === list.id) {
+      score = inProgress.score;
+      strikes = inProgress.strikes;
+      guessedRanks = inProgress.guessedRanks;
+      guessHistory = inProgress.guessHistory;
+      foundItems = inProgress.guessedRanks.map((rank) => ({
+        rank,
+        name: list.items[rank - 1],
+        points: rank,
+        value: list.values?.[rank - 1],
+      }));
+    } else if (inProgress) {
+      // Stale in-progress (different day or list) — discard
+      clearInProgress();
+    }
   }
 
   const maxStrikes = 3;
@@ -168,6 +191,8 @@
       playStrikeSound();
       if (strikes >= maxStrikes) {
         endGame();
+      } else {
+        persistInProgress();
       }
       return;
     }
@@ -189,6 +214,7 @@
     showFeedback(rank >= 50 ? "gold" : "gray", rank);
     playGuessSound(rank, listSize);
     scrollToSlot(rank);
+    persistInProgress();
   }
 
   async function scrollToSlot(rank: number) {
@@ -205,6 +231,17 @@
     }, 800);
   }
 
+  function persistInProgress() {
+    saveInProgress({
+      dateKey: todayKey,
+      listId: list.id,
+      score,
+      strikes,
+      guessedRanks,
+      guessHistory,
+    });
+  }
+
   function endGame() {
     phase = "results";
     const updatedStats = recordGame(
@@ -214,6 +251,7 @@
       guessedRanks,
     );
     stats = updatedStats;
+    clearInProgress();
     submitScore();
   }
 
@@ -233,6 +271,9 @@
         percentile = data.percentile;
         avgScore = data.avgScore;
         playCount = data.playCount;
+        if (typeof percentile === "number") {
+          updateResultPercentile(todayKey, percentile);
+        }
       }
     } catch {
       // Server unavailable, that's fine

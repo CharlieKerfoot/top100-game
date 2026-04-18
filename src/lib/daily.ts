@@ -42,6 +42,21 @@ export interface DayResult {
   listId: string;
   guessCount: number;
   guessedRanks: number[];
+  /** Percentile returned by the server on first submission. Preserved across
+   * reloads so the "Better than X%" line stays visible on the results screen. */
+  percentile?: number;
+}
+
+export interface InProgressGame {
+  dateKey: string;
+  listId: string;
+  score: number;
+  strikes: number;
+  guessedRanks: number[];
+  guessHistory: Array<
+    | { type: 'hit'; rank: number; name: string; points: number; guess: string; value?: string }
+    | { type: 'strike'; guess: string }
+  >;
 }
 
 export interface DailyStats {
@@ -53,6 +68,7 @@ export interface DailyStats {
 }
 
 const STORAGE_KEY = 'daily_stats';
+const IN_PROGRESS_KEY = 'daily_inprogress';
 
 function defaultStats(): DailyStats {
   return {
@@ -84,6 +100,45 @@ export function loadDailyStats(): DailyStats {
 export function saveDailyStats(stats: DailyStats): void {
   if (!isBrowser()) return;
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+}
+
+export function loadInProgress(): InProgressGame | null {
+  if (!isBrowser()) return null;
+  try {
+    const raw = window.localStorage.getItem(IN_PROGRESS_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as InProgressGame;
+  } catch {
+    window.localStorage.removeItem(IN_PROGRESS_KEY);
+    return null;
+  }
+}
+
+export function saveInProgress(game: InProgressGame): void {
+  if (!isBrowser()) return;
+  try {
+    window.localStorage.setItem(IN_PROGRESS_KEY, JSON.stringify(game));
+  } catch {
+    /* quota exceeded or storage blocked */
+  }
+}
+
+export function clearInProgress(): void {
+  if (!isBrowser()) return;
+  try {
+    window.localStorage.removeItem(IN_PROGRESS_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+export function updateResultPercentile(dateKey: string, percentile: number): void {
+  if (!isBrowser()) return;
+  const stats = loadDailyStats();
+  const entry = stats.history[dateKey];
+  if (!entry) return;
+  entry.percentile = percentile;
+  saveDailyStats(stats);
 }
 
 export function recordGame(score: number, listId: string, guessCount: number, guessedRanks: number[]): DailyStats {
