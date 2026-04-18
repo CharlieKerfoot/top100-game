@@ -184,7 +184,7 @@ export async function handleDailyRequest(req: IncomingMessage, res: ServerRespon
     const stats = dailyStats.get(listId) ?? emptyStats();
     const list = listById.get(listId);
 
-    if (stats.playCount === 0 || !list) {
+    if (!list) {
       json(res, 200, { listId, avgScore: 0, playCount: 0, edges: [], counts: [] });
       return true;
     }
@@ -230,7 +230,7 @@ export async function handleDailyRequest(req: IncomingMessage, res: ServerRespon
 
     json(res, 200, {
       listId,
-      avgScore: Math.round(stats.totalScore / stats.playCount),
+      avgScore: stats.playCount > 0 ? Math.round(stats.totalScore / stats.playCount) : 0,
       playCount: stats.playCount,
       edges,
       counts,

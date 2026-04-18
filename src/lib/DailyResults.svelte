@@ -50,13 +50,22 @@
   }: Props = $props();
 
   const gridText = $derived(generateShareGrid(guessedRanks, listSize));
-  const maxHistogram = $derived(Math.max(...counts, 1));
   const userBucket = $derived.by(() => {
     for (let i = edges.length - 1; i >= 0; i--) {
       if (score >= edges[i]) return i;
     }
     return 0;
   });
+  // Ensure the user's own score is always visible as a bar, even if the server
+  // hasn't registered their submission yet (e.g. reload after a data wipe, or
+  // first-ever play on a new list before stats are persisted).
+  const displayCounts = $derived.by(() => {
+    if (counts.length === 0) return counts;
+    const out = counts.slice();
+    if (out[userBucket] === 0) out[userBucket] = 1;
+    return out;
+  });
+  const maxHistogram = $derived(Math.max(...displayCounts, 1));
 
   // Build guessed map for all-answers grid
   const guessedMap = $derived(
@@ -236,19 +245,19 @@
       </div>
 
       <div class="results-col results-col-right">
-        {#if counts.length > 0 && counts.some((v) => v > 0)}
+        {#if edges.length > 0}
           {@const labelStep =
-            counts.length > 24
+            displayCounts.length > 24
               ? 5
-              : counts.length > 14
+              : displayCounts.length > 14
                 ? 4
-                : counts.length > 8
+                : displayCounts.length > 8
                   ? 2
                   : 1}
           <div class="histogram">
             <h4>Players' Scores</h4>
             <div class="histogram-bars">
-              {#each counts as count, i}
+              {#each displayCounts as count, i}
                 {@const isUser = i === userBucket}
                 <div class="histogram-bar-wrapper">
                   <span
@@ -269,13 +278,13 @@
               {/each}
             </div>
             <div class="histogram-labels">
-              {#each counts as _, i}
+              {#each displayCounts as _, i}
                 <div class="histogram-label-slot">
-                  {#if i === counts.length - 1}
+                  {#if i === displayCounts.length - 1}
                     <span class="histogram-label"
                       >{edges[i].toLocaleString()}+</span
                     >
-                  {:else if i % labelStep === 0 && counts.length - 1 - i >= labelStep - 1}
+                  {:else if i % labelStep === 0 && displayCounts.length - 1 - i >= labelStep - 1}
                     <span class="histogram-label"
                       >{edges[i].toLocaleString()}</span
                     >
