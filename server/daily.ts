@@ -1,8 +1,11 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import type { IncomingMessage, ServerResponse } from 'http';
-import { getDailyList, getTodayKey } from '../src/lib/daily.ts';
-import { getMaxScore } from '../src/lib/lists/index.ts';
+import { getDailyList } from '../src/lib/daily.ts';
+import { dailySchedule } from '../src/lib/lists/daily-schedule.ts';
+import { lists, getMaxScore } from '../src/lib/lists/index.ts';
+
+const listById = new Map(lists.map((l) => [l.id, l]));
 
 interface DayStats {
   totalScore: number;
@@ -10,15 +13,22 @@ interface DayStats {
   scores: number[];
 }
 
-interface PersistedStats {
-  key: string;
-  stats: DayStats;
+interface PersistedStatsV2 {
+  version: 2;
+  byListId: Record<string, DayStats>;
 }
 
 const DATA_DIR = process.env.DATA_DIR || './data';
 const STATS_FILE = join(DATA_DIR, 'daily-stats.json');
 const MAX_SCORES = 10000;
+// Keep stats for the most recent N distinct lists. Across all timezones a
+// given real-world "day" covers at most 2 scheduled lists, so 60 buffers
+// ~30 days of history while bounding disk size.
+const MAX_RETAINED_LISTS = 60;
 
+const validListIds = new Set(dailySchedule);
+
+// listId -> DayStats. Insertion order is preserved and used for eviction.
 const dailyStats = new Map<string, DayStats>();
 let loaded = false;
 
@@ -26,44 +36,59 @@ function loadStats(): void {
   if (loaded) return;
   loaded = true;
   try {
-    if (existsSync(STATS_FILE)) {
-      const raw = readFileSync(STATS_FILE, 'utf-8');
-      const persisted: PersistedStats = JSON.parse(raw);
-      if (persisted.key && persisted.stats) {
-        dailyStats.set(persisted.key, persisted.stats);
+    if (!existsSync(STATS_FILE)) return;
+    const raw = readFileSync(STATS_FILE, 'utf-8');
+    const parsed = JSON.parse(raw);
+    if (parsed && parsed.version === 2 && parsed.byListId) {
+      for (const [listId, stats] of Object.entries(parsed.byListId)) {
+        if (validListIds.has(listId)) {
+          dailyStats.set(listId, stats as DayStats);
+        }
       }
     }
+    // Legacy v1 shape ({ key, stats } keyed by date) is intentionally
+    // discarded — the date key no longer maps to a listId cleanly across
+    // timezones, and the old file predates multi-day retention.
   } catch {
-    // Corrupted or unreadable file — start fresh
+    // Corrupted or unreadable — start fresh
   }
 }
 
-function saveStats(key: string, stats: DayStats): void {
+function persistAll(): void {
   try {
     if (!existsSync(DATA_DIR)) {
       mkdirSync(DATA_DIR, { recursive: true });
     }
-    const persisted: PersistedStats = { key, stats };
+    const byListId: Record<string, DayStats> = {};
+    for (const [listId, stats] of dailyStats) {
+      byListId[listId] = stats;
+    }
+    const persisted: PersistedStatsV2 = { version: 2, byListId };
     writeFileSync(STATS_FILE, JSON.stringify(persisted));
   } catch {
     // Non-fatal — stats will still work in-memory for this session
   }
 }
 
-function getOrCreateToday(): DayStats {
+function getOrCreate(listId: string): DayStats {
   loadStats();
-  const key = getTodayKey();
-  let stats = dailyStats.get(key);
+  let stats = dailyStats.get(listId);
   if (!stats) {
     stats = { totalScore: 0, playCount: 0, scores: [] };
-    dailyStats.set(key, stats);
-    // Evict old entries — keep only today
-    for (const k of dailyStats.keys()) {
-      if (k !== key) dailyStats.delete(k);
+    dailyStats.set(listId, stats);
+    // Evict oldest entries beyond retention window (Map preserves insertion order)
+    while (dailyStats.size > MAX_RETAINED_LISTS) {
+      const oldest = dailyStats.keys().next().value;
+      if (oldest === undefined) break;
+      dailyStats.delete(oldest);
     }
-    saveStats(key, stats);
   }
   return stats;
+}
+
+function emptyStats(): DayStats {
+  loadStats();
+  return { totalScore: 0, playCount: 0, scores: [] };
 }
 
 function readBody(req: IncomingMessage): Promise<string> {
@@ -80,37 +105,44 @@ function json(res: ServerResponse, status: number, body: unknown) {
   res.end(JSON.stringify(body));
 }
 
+function parseListIdFromQuery(url: string): string | null {
+  const qIndex = url.indexOf('?');
+  if (qIndex === -1) return null;
+  const params = new URLSearchParams(url.slice(qIndex + 1));
+  return params.get('list');
+}
+
 export async function handleDailyRequest(req: IncomingMessage, res: ServerResponse): Promise<boolean> {
   const url = req.url ?? '';
+  const path = url.split('?')[0];
 
-  if (url === '/api/daily/score' && req.method === 'POST') {
+  if (path === '/api/daily/score' && req.method === 'POST') {
     try {
       const raw = await readBody(req);
       const body = JSON.parse(raw);
-      const { date, listId, score } = body;
+      const { listId, score } = body;
 
-      // Validate date matches today
-      const todayKey = getTodayKey();
-      if (date !== todayKey) {
-        json(res, 400, { error: 'Date does not match today' });
+      // Validate listId is a real scheduled daily. This is the only gate — we
+      // no longer require the client's date to match the server's date,
+      // because clients legitimately cross midnight at their own timezone.
+      if (typeof listId !== 'string' || !validListIds.has(listId)) {
+        json(res, 400, { error: 'Unknown list id' });
         return true;
       }
 
-      // Validate list matches today's daily
-      const dailyList = getDailyList();
-      if (listId !== dailyList.id) {
-        json(res, 400, { error: 'List does not match today\'s daily' });
+      const list = listById.get(listId);
+      if (!list) {
+        json(res, 400, { error: 'Unknown list id' });
         return true;
       }
 
-      // Validate score range
-      const maxScore = getMaxScore(dailyList);
-      if (typeof score !== 'number' || score < 0 || score > maxScore) {
+      const maxScore = getMaxScore(list);
+      if (typeof score !== 'number' || !Number.isFinite(score) || score < 0 || score > maxScore) {
         json(res, 400, { error: `Score out of range (0-${maxScore})` });
         return true;
       }
 
-      const stats = getOrCreateToday();
+      const stats = getOrCreate(listId);
 
       stats.totalScore += score;
       stats.playCount++;
@@ -130,7 +162,7 @@ export async function handleDailyRequest(req: IncomingMessage, res: ServerRespon
       );
       const avgScore = Math.round(stats.totalScore / stats.playCount);
 
-      saveStats(todayKey, stats);
+      persistAll();
 
       json(res, 200, { percentile, avgScore, playCount: stats.playCount });
     } catch {
@@ -139,12 +171,21 @@ export async function handleDailyRequest(req: IncomingMessage, res: ServerRespon
     return true;
   }
 
-  if (url === '/api/daily/stats' && req.method === 'GET') {
-    const todayKey = getTodayKey();
-    const stats = getOrCreateToday();
+  if (path === '/api/daily/stats' && req.method === 'GET') {
+    // Client sends ?list=<id> to request stats for the list it's currently
+    // playing. Fall back to the server's own daily for back-compat (older
+    // clients that haven't shipped the query param yet).
+    let listId = parseListIdFromQuery(url);
+    if (!listId || !validListIds.has(listId)) {
+      listId = getDailyList().id;
+    }
 
-    if (stats.playCount === 0) {
-      json(res, 200, { date: todayKey, avgScore: 0, playCount: 0, edges: [], counts: [] });
+    loadStats();
+    const stats = dailyStats.get(listId) ?? emptyStats();
+    const list = listById.get(listId);
+
+    if (stats.playCount === 0 || !list) {
+      json(res, 200, { listId, avgScore: 0, playCount: 0, edges: [], counts: [] });
       return true;
     }
 
@@ -152,8 +193,7 @@ export async function handleDailyRequest(req: IncomingMessage, res: ServerRespon
     // coarse at the high end where only completionists reach. The final bucket
     // is an overflow bucket catching anything at or above its lower edge.
     // `edges` is the lower bound of each bucket; edges.length === counts.length.
-    const dailyList = getDailyList();
-    const maxScore = getMaxScore(dailyList);
+    const maxScore = getMaxScore(list);
     const edges = maxScore <= 1500
       // Top-50 lists (max 1275, avg ~100-200). 30 buckets.
       // Widths scale: 10 → 20 → 40 → 80 → 100. Last bucket = 1200+ (covers
@@ -189,7 +229,7 @@ export async function handleDailyRequest(req: IncomingMessage, res: ServerRespon
     }
 
     json(res, 200, {
-      date: todayKey,
+      listId,
       avgScore: Math.round(stats.totalScore / stats.playCount),
       playCount: stats.playCount,
       edges,
