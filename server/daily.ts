@@ -143,11 +143,6 @@ export async function handleDailyRequest(req: IncomingMessage, res: ServerRespon
     const todayKey = getTodayKey();
     const stats = getOrCreateToday();
 
-    if (stats.playCount === 0) {
-      json(res, 200, { date: todayKey, avgScore: 0, playCount: 0, edges: [], counts: [] });
-      return true;
-    }
-
     // Variable-width buckets: dense at the low end where most players land,
     // coarse at the high end where only completionists reach. The final bucket
     // is an overflow bucket catching anything at or above its lower edge.
@@ -190,7 +185,7 @@ export async function handleDailyRequest(req: IncomingMessage, res: ServerRespon
 
     json(res, 200, {
       date: todayKey,
-      avgScore: Math.round(stats.totalScore / stats.playCount),
+      avgScore: stats.playCount > 0 ? Math.round(stats.totalScore / stats.playCount) : 0,
       playCount: stats.playCount,
       edges,
       counts,
