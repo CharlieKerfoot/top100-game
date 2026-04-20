@@ -261,7 +261,6 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          date: todayKey,
           listId: list.id,
           score,
         }),
@@ -283,7 +282,7 @@
 
   async function fetchServerStats() {
     try {
-      const res = await fetch("/api/daily/stats");
+      const res = await fetch(`/api/daily/stats?listId=${encodeURIComponent(list.id)}`);
       if (res.ok) {
         const data = await res.json();
         histogramEdges = data.edges ?? [];

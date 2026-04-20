@@ -1,67 +1,109 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, renameSync } from 'fs';
 import { join } from 'path';
 import type { IncomingMessage, ServerResponse } from 'http';
-import { getDailyList, getTodayKey } from '../src/lib/daily.ts';
-import { getMaxScore } from '../src/lib/lists/index.ts';
+import { lists, getMaxScore } from '../src/lib/lists/index.ts';
 
-interface DayStats {
+interface ListStats {
   totalScore: number;
   playCount: number;
   scores: number[];
 }
 
-interface PersistedStats {
-  key: string;
-  stats: DayStats;
+interface PersistedV2 {
+  version: 2;
+  byListId: Record<string, ListStats>;
 }
 
 const DATA_DIR = process.env.DATA_DIR || './data';
 const STATS_FILE = join(DATA_DIR, 'daily-stats.json');
 const MAX_SCORES = 10000;
 
-const dailyStats = new Map<string, DayStats>();
+const listById = new Map(lists.map((l) => [l.id, l]));
+const statsByListId = new Map<string, ListStats>();
 let loaded = false;
+
+function backupCorruptFile(reason: string): void {
+  try {
+    if (!existsSync(STATS_FILE)) return;
+    const ts = new Date().toISOString().replace(/[:.]/g, '-');
+    const target = join(DATA_DIR, `daily-stats.corrupt-${ts}.json`);
+    renameSync(STATS_FILE, target);
+    // eslint-disable-next-line no-console
+    console.warn(`[daily] Backed up unreadable stats file to ${target} (reason: ${reason})`);
+  } catch {
+    // Best effort; don't crash the server
+  }
+}
 
 function loadStats(): void {
   if (loaded) return;
   loaded = true;
+  if (!existsSync(STATS_FILE)) return;
+
+  let raw: string;
   try {
-    if (existsSync(STATS_FILE)) {
-      const raw = readFileSync(STATS_FILE, 'utf-8');
-      const persisted: PersistedStats = JSON.parse(raw);
-      if (persisted.key && persisted.stats) {
-        dailyStats.set(persisted.key, persisted.stats);
+    raw = readFileSync(STATS_FILE, 'utf-8');
+  } catch {
+    return;
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    backupCorruptFile('invalid JSON');
+    return;
+  }
+
+  if (
+    parsed &&
+    typeof parsed === 'object' &&
+    (parsed as PersistedV2).version === 2 &&
+    (parsed as PersistedV2).byListId &&
+    typeof (parsed as PersistedV2).byListId === 'object'
+  ) {
+    for (const [listId, stats] of Object.entries((parsed as PersistedV2).byListId)) {
+      if (
+        stats &&
+        typeof stats.totalScore === 'number' &&
+        typeof stats.playCount === 'number' &&
+        Array.isArray(stats.scores)
+      ) {
+        statsByListId.set(listId, {
+          totalScore: stats.totalScore,
+          playCount: stats.playCount,
+          scores: stats.scores.filter((s) => typeof s === 'number'),
+        });
       }
     }
-  } catch {
-    // Corrupted or unreadable file — start fresh
+    return;
   }
+
+  // Unknown schema — preserve it, don't overwrite.
+  backupCorruptFile('unknown schema');
 }
 
-function saveStats(key: string, stats: DayStats): void {
+function saveStats(): void {
   try {
     if (!existsSync(DATA_DIR)) {
       mkdirSync(DATA_DIR, { recursive: true });
     }
-    const persisted: PersistedStats = { key, stats };
+    const persisted: PersistedV2 = {
+      version: 2,
+      byListId: Object.fromEntries(statsByListId),
+    };
     writeFileSync(STATS_FILE, JSON.stringify(persisted));
   } catch {
     // Non-fatal — stats will still work in-memory for this session
   }
 }
 
-function getOrCreateToday(): DayStats {
+function getOrCreateStats(listId: string): ListStats {
   loadStats();
-  const key = getTodayKey();
-  let stats = dailyStats.get(key);
+  let stats = statsByListId.get(listId);
   if (!stats) {
     stats = { totalScore: 0, playCount: 0, scores: [] };
-    dailyStats.set(key, stats);
-    // Evict old entries — keep only today
-    for (const k of dailyStats.keys()) {
-      if (k !== key) dailyStats.delete(k);
-    }
-    saveStats(key, stats);
+    statsByListId.set(listId, stats);
   }
   return stats;
 }
@@ -80,6 +122,38 @@ function json(res: ServerResponse, status: number, body: unknown) {
   res.end(JSON.stringify(body));
 }
 
+function histogramEdgesFor(maxScore: number): number[] {
+  return maxScore <= 1500
+    ? [
+        0, 10, 20, 30, 40,
+        50, 60, 70, 80, 90,
+        100, 120, 140, 160, 180,
+        200, 240, 280, 320, 360,
+        400, 480, 560, 640, 720,
+        800, 900, 1000, 1100, 1200,
+      ]
+    : [
+        0, 20, 40, 60, 80,
+        100, 120, 140, 160, 180,
+        200, 250, 300, 350, 400,
+        500, 600, 700, 800, 900,
+        1000, 1200, 1400, 1600, 1800,
+        2000, 2500, 3000, 4000, 5000,
+      ];
+}
+
+function computeCounts(scores: number[], edges: number[]): number[] {
+  const counts = new Array(edges.length).fill(0);
+  for (const s of scores) {
+    let idx = 0;
+    for (let i = edges.length - 1; i >= 0; i--) {
+      if (s >= edges[i]) { idx = i; break; }
+    }
+    counts[idx]++;
+  }
+  return counts;
+}
+
 export async function handleDailyRequest(req: IncomingMessage, res: ServerResponse): Promise<boolean> {
   const url = req.url ?? '';
 
@@ -87,50 +161,45 @@ export async function handleDailyRequest(req: IncomingMessage, res: ServerRespon
     try {
       const raw = await readBody(req);
       const body = JSON.parse(raw);
-      const { date, listId, score } = body;
+      const { listId, score } = body;
 
-      // Validate date matches today
-      const todayKey = getTodayKey();
-      if (date !== todayKey) {
-        json(res, 400, { error: 'Date does not match today' });
+      if (typeof listId !== 'string') {
+        json(res, 400, { error: 'Missing listId' });
+        return true;
+      }
+      const list = listById.get(listId);
+      if (!list) {
+        json(res, 400, { error: `Unknown listId: ${listId}` });
         return true;
       }
 
-      // Validate list matches today's daily
-      const dailyList = getDailyList();
-      if (listId !== dailyList.id) {
-        json(res, 400, { error: 'List does not match today\'s daily' });
+      const maxScore = getMaxScore(list);
+      if (typeof score !== 'number' || !Number.isFinite(score)) {
+        json(res, 400, { error: 'Score must be a number' });
         return true;
       }
+      const clamped = Math.max(0, Math.min(maxScore, Math.floor(score)));
 
-      // Validate score range
-      const maxScore = getMaxScore(dailyList);
-      if (typeof score !== 'number' || score < 0 || score > maxScore) {
-        json(res, 400, { error: `Score out of range (0-${maxScore})` });
-        return true;
-      }
-
-      const stats = getOrCreateToday();
-
-      stats.totalScore += score;
+      const stats = getOrCreateStats(listId);
+      stats.totalScore += clamped;
       stats.playCount++;
 
       // Reservoir sampling beyond MAX_SCORES
       if (stats.scores.length < MAX_SCORES) {
-        stats.scores.push(score);
+        stats.scores.push(clamped);
       } else {
         const idx = Math.floor(Math.random() * stats.playCount);
         if (idx < MAX_SCORES) {
-          stats.scores[idx] = score;
+          stats.scores[idx] = clamped;
         }
       }
 
-      const percentile = Math.round(
-        stats.scores.filter(s => s < score).length / stats.scores.length * 100
-      );
+      const percentile = stats.scores.length > 0
+        ? Math.round(stats.scores.filter((s) => s < clamped).length / stats.scores.length * 100)
+        : 0;
       const avgScore = Math.round(stats.totalScore / stats.playCount);
 
-      saveStats(todayKey, stats);
+      saveStats();
 
       json(res, 200, { percentile, avgScore, playCount: stats.playCount });
     } catch {
@@ -139,52 +208,29 @@ export async function handleDailyRequest(req: IncomingMessage, res: ServerRespon
     return true;
   }
 
-  if (url === '/api/daily/stats' && req.method === 'GET') {
-    const todayKey = getTodayKey();
-    const stats = getOrCreateToday();
+  if (url.startsWith('/api/daily/stats') && req.method === 'GET') {
+    const query = url.includes('?') ? url.slice(url.indexOf('?') + 1) : '';
+    const params = new URLSearchParams(query);
+    const listId = params.get('listId');
 
-    // Variable-width buckets: dense at the low end where most players land,
-    // coarse at the high end where only completionists reach. The final bucket
-    // is an overflow bucket catching anything at or above its lower edge.
-    // `edges` is the lower bound of each bucket; edges.length === counts.length.
-    const dailyList = getDailyList();
-    const maxScore = getMaxScore(dailyList);
-    const edges = maxScore <= 1500
-      // Top-50 lists (max 1275, avg ~100-200). 30 buckets.
-      // Widths scale: 10 → 20 → 40 → 80 → 100. Last bucket = 1200+ (covers
-      // 1200-1275, i.e. near-perfect runs). Label-aligned for step=5:
-      //   0, 50, 100, 200, 400, 800, 1200+
-      ? [
-          0, 10, 20, 30, 40,
-          50, 60, 70, 80, 90,
-          100, 120, 140, 160, 180,
-          200, 240, 280, 320, 360,
-          400, 480, 560, 640, 720,
-          800, 900, 1000, 1100, 1200,
-        ]
-      // Top-100 lists (max 5050, avg ~400). 30 buckets.
-      // Widths scale: 20 → 50 → 100 → 200 → 500 → 1000. Last bucket = 5000+
-      // (covers 5000-5050). Label-aligned for step=5:
-      //   0, 100, 200, 500, 1000, 2000, 5000+
-      : [
-          0, 20, 40, 60, 80,
-          100, 120, 140, 160, 180,
-          200, 250, 300, 350, 400,
-          500, 600, 700, 800, 900,
-          1000, 1200, 1400, 1600, 1800,
-          2000, 2500, 3000, 4000, 5000,
-        ];
-    const counts = new Array(edges.length).fill(0);
-    for (const s of stats.scores) {
-      let idx = 0;
-      for (let i = edges.length - 1; i >= 0; i--) {
-        if (s >= edges[i]) { idx = i; break; }
-      }
-      counts[idx]++;
+    if (!listId) {
+      json(res, 400, { error: 'Missing listId query param' });
+      return true;
+    }
+    const list = listById.get(listId);
+    if (!list) {
+      json(res, 400, { error: `Unknown listId: ${listId}` });
+      return true;
     }
 
+    loadStats();
+    const stats = statsByListId.get(listId) ?? { totalScore: 0, playCount: 0, scores: [] };
+    const maxScore = getMaxScore(list);
+    const edges = histogramEdgesFor(maxScore);
+    const counts = computeCounts(stats.scores, edges);
+
     json(res, 200, {
-      date: todayKey,
+      listId,
       avgScore: stats.playCount > 0 ? Math.round(stats.totalScore / stats.playCount) : 0,
       playCount: stats.playCount,
       edges,
