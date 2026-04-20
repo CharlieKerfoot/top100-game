@@ -347,6 +347,7 @@
     font-size: 1.8rem;
     font-weight: 900;
     line-height: 1;
+    font-variant-numeric: tabular-nums;
   }
 
   .dt-score-label {
@@ -442,6 +443,7 @@
     min-width: 1.8rem;
     font-size: 0.78rem;
     color: var(--color-gold);
+    font-variant-numeric: tabular-nums;
   }
 
   .dt-slot.filled .dt-slot-rank {
@@ -464,6 +466,7 @@
     font-size: 0.72rem;
     font-weight: 600;
     white-space: nowrap;
+    font-variant-numeric: tabular-nums;
   }
 
   /* ═══════════════════════════════════════════
@@ -498,6 +501,7 @@
     font-weight: 900;
     line-height: 1;
     margin-bottom: 10px;
+    font-variant-numeric: tabular-nums;
   }
 
   .score-display .label {

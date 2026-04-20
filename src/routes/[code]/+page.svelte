@@ -1976,7 +1976,7 @@
     font-size: 0.85rem;
     cursor: pointer;
     font-family: "Source Serif 4", Georgia, serif;
-    transition: all 0.2s;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
   }
 
   .results-leave-btn:hover {
@@ -2343,7 +2343,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
     flex-shrink: 0;
   }
 
@@ -2773,7 +2773,7 @@
     font-size: 0.8rem;
     cursor: pointer;
     font-family: "Source Serif 4", Georgia, serif;
-    transition: all 0.2s;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
   }
 
   .copy-btn:hover {
@@ -3145,7 +3145,7 @@
     font-size: 0.9rem;
     cursor: pointer;
     font-family: "Source Serif 4", Georgia, serif;
-    transition: all 0.2s;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
   }
 
   .leave-btn:hover {
@@ -3169,7 +3169,7 @@
     font-family: "Source Serif 4", Georgia, serif;
     font-size: 0.8rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
     text-transform: capitalize;
   }
 
@@ -3191,7 +3191,7 @@
     border: 1px solid var(--color-gold);
     background: var(--color-cream);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
   }
 
   .category-card:hover {
@@ -3379,7 +3379,7 @@
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -3428,7 +3428,7 @@
     color: var(--color-ink);
     font-size: 1.25rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3499,7 +3499,7 @@
     border: 1px solid var(--color-gold);
     padding: 0.65rem;
     text-align: center;
-    transition: all 0.3s;
+    transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
     position: relative;
   }
 
@@ -3527,6 +3527,7 @@
     font-size: 1.3rem;
     font-weight: 700;
     color: var(--color-crimson);
+    font-variant-numeric: tabular-nums;
   }
   .player-meta {
     margin-top: 0.2rem;
@@ -3652,6 +3653,7 @@
     font-size: 1.3rem;
     font-weight: 700;
     margin-bottom: 1rem;
+    font-variant-numeric: tabular-nums;
   }
   .hit .result-points {
     color: #2d5016;
@@ -3701,7 +3703,7 @@
     font-family: "Source Serif 4", Georgia, serif;
     font-size: 0.8rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
   }
 
   .game-action-btn:hover {
@@ -4489,6 +4491,7 @@
     font-size: 1.1rem;
     color: var(--color-crimson);
     margin-top: 0.25rem;
+    font-variant-numeric: tabular-nums;
   }
 
 
@@ -4508,6 +4511,7 @@
     font-size: 1.2rem;
     min-width: 2rem;
     text-align: center;
+    font-variant-numeric: tabular-nums;
   }
   .ranking-name {
     flex: 1;
@@ -4520,6 +4524,7 @@
   .ranking-score {
     font-weight: 700;
     color: var(--color-crimson);
+    font-variant-numeric: tabular-nums;
   }
   .ranking-details {
     font-size: 0.8rem;
@@ -4527,6 +4532,7 @@
     font-style: italic;
     flex-basis: 100%;
     padding-left: 2.75rem;
+    font-variant-numeric: tabular-nums;
   }
 
   /* ─── DESKTOP / MOBILE GAME TOGGLE ─── */
@@ -4659,7 +4665,7 @@
     background: var(--color-cream);
     border: 1px solid var(--color-gold);
     padding: 0.75rem 1rem;
-    transition: all 0.2s;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
   }
 
   .dt-player.active {
@@ -4709,6 +4715,7 @@
     font-weight: 700;
     color: var(--color-crimson);
     line-height: 1;
+    font-variant-numeric: tabular-nums;
   }
 
   .dt-player-meta {
@@ -4831,7 +4838,7 @@
     font-size: 0.9rem;
     cursor: pointer;
     margin-bottom: 0.75rem;
-    transition: all 0.2s;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
   }
 
   .answers-toggle:hover {

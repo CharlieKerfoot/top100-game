@@ -641,7 +641,7 @@
     text-align: center;
     cursor: pointer;
     background: var(--color-cream);
-    transition: all 0.2s;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
     font-family: inherit;
   }
 
@@ -724,6 +724,7 @@
     font-family: "Playfair Display", Georgia, serif;
     font-size: 1.4rem;
     font-weight: 700;
+    font-variant-numeric: tabular-nums;
   }
 
   .stat-label {
@@ -740,9 +741,12 @@
     color: #777;
     font-size: 0.85rem;
     cursor: pointer;
-    padding: 0;
-    margin-bottom: 1rem;
+    padding: 0.5rem 0.25rem;
+    margin: 0 -0.25rem 0.5rem;
+    min-height: 40px;
     font-family: inherit;
+    display: inline-flex;
+    align-items: center;
   }
 
   .back-btn:hover {
@@ -849,7 +853,7 @@
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
   }
 
   .tab-btn.active {
@@ -878,7 +882,7 @@
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
   }
 
   .toggle-btn.active {
@@ -899,6 +903,7 @@
     letter-spacing: 0.1em;
     text-transform: uppercase;
     font-family: "Courier New", Courier, monospace !important;
+    font-variant-numeric: tabular-nums;
   }
 
   .browse-toggle {
@@ -909,7 +914,7 @@
     color: #777;
     font-size: 0.85rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
     font-family: "Source Serif 4", Georgia, serif;
     margin-bottom: 1rem;
   }
@@ -972,6 +977,7 @@
     color: var(--color-crimson);
     background: rgba(139, 0, 0, 0.06);
     padding: 0.2rem 0.5rem;
+    font-variant-numeric: tabular-nums;
   }
 
   .pp-join-btn {
@@ -998,7 +1004,8 @@
 
   .refresh-btn {
     align-self: center;
-    padding: 0.4rem 1rem;
+    padding: 0.55rem 1rem;
+    min-height: 40px;
     border: 1px solid var(--color-gold);
     background: transparent;
     color: #777;
@@ -1128,6 +1135,7 @@
   .scoring-rank {
     font-family: "Courier New", Courier, monospace;
     min-width: 2rem;
+    font-variant-numeric: tabular-nums;
   }
 
   .scoring-name {
@@ -1137,6 +1145,7 @@
   .scoring-pts {
     text-align: right;
     white-space: nowrap;
+    font-variant-numeric: tabular-nums;
   }
 
   .scoring-low .scoring-rank {
@@ -1211,7 +1220,8 @@
   }
 
   .feedback-btn {
-    padding: 0.4rem 0.9rem;
+    padding: 0.55rem 0.9rem;
+    min-height: 40px;
     border: 1px solid var(--color-gold);
     background: transparent;
     color: #777;
@@ -1274,6 +1284,12 @@
     color: #888;
     padding: 0;
     line-height: 1;
+    min-width: 40px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: -0.5rem;
   }
 
   .contact-x:hover {

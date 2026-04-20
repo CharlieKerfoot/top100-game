@@ -46,6 +46,35 @@
     background: var(--color-parchment);
     color: var(--color-ink);
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  :global(h1),
+  :global(h2),
+  :global(h3) {
+    text-wrap: balance;
+  }
+
+  :global(p) {
+    text-wrap: pretty;
+  }
+
+  :global(button) {
+    transition-property: transform, background-color, color, border-color, box-shadow, opacity;
+    transition-duration: 0.15s;
+    transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  :global(button:not(:disabled):active) {
+    transform: scale(0.96);
+  }
+
+  :global(a) {
+    transition-property: transform, color, opacity;
+    transition-duration: 0.15s;
+    transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
   }
 
   @media (prefers-reduced-motion: reduce) {

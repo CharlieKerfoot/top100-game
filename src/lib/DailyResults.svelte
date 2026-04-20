@@ -435,6 +435,7 @@
     font-size: 3rem;
     font-weight: 900;
     line-height: 1;
+    font-variant-numeric: tabular-nums;
   }
 
   .final-score.counting {
@@ -449,6 +450,7 @@
     font-size: 0.85rem;
     color: #888;
     margin-top: 0.25rem;
+    font-variant-numeric: tabular-nums;
   }
 
   .percentile {
@@ -562,6 +564,7 @@
     font-weight: 700;
     color: var(--color-crimson);
     min-width: 2.5rem;
+    font-variant-numeric: tabular-nums;
   }
 
   .missed-name {
@@ -586,6 +589,7 @@
     font-size: 0.78rem;
     font-weight: 600;
     white-space: nowrap;
+    font-variant-numeric: tabular-nums;
   }
 
   /* ─── HISTOGRAM ─── */
@@ -690,7 +694,7 @@
     font-size: 0.9rem;
     cursor: pointer;
     margin-bottom: auto;
-    transition: all 0.2s;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
   }
 
   .answers-toggle:hover {
