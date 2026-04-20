@@ -369,6 +369,8 @@
       >
         Challenge a Friend &rarr;
       </button>
+
+      <a class="archive-cta" href="/archive">Play past dailies &rarr;</a>
     </div>
   {/if}
 </div>
@@ -771,6 +773,21 @@
   .challenge-btn:hover {
     background: var(--color-crimson);
     color: var(--color-parchment);
+  }
+
+  .archive-cta {
+    display: block;
+    text-align: center;
+    color: var(--color-crimson);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    margin-top: 0.75rem;
+    padding: 0.25rem;
+  }
+
+  .archive-cta:hover {
+    text-decoration: underline;
   }
 
   /* ─── SHARE FALLBACK ─── */

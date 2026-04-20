@@ -196,7 +196,10 @@
 
 <div class="app" class:has-game={phase === "playing"} class:has-results={phase === "results"}>
   <header>
-    <a href="/" class="back-link">&larr; Home</a>
+    <div class="top-nav">
+      <a href="/" class="back-link">&larr; Home</a>
+      <a href="/archive" class="archive-link">Archive</a>
+    </div>
     <div class="category-header">
       <h2>{list.name}</h2>
       <p class="date-line">{dateDisplay} &middot; #{dayNumber}</p>
@@ -259,16 +262,28 @@
     margin-bottom: 1.5rem;
   }
 
-  .back-link {
+  .top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .back-link,
+  .archive-link {
     display: inline-block;
     color: #777;
     text-decoration: none;
     font-size: 0.85rem;
-    margin-bottom: 0.75rem;
   }
 
-  .back-link:hover {
+  .back-link:hover,
+  .archive-link:hover {
     color: var(--color-ink);
+  }
+
+  .archive-link {
+    font-weight: 600;
   }
 
   .category-header {

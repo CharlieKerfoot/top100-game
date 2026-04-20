@@ -222,6 +222,10 @@
         <p class="stats-cta">Play your first daily!</p>
       {/if}
 
+      <p class="archive-cta">
+        <a href="/archive">Play past dailies &rarr;</a>
+      </p>
+
       <div class="section-divider"></div>
 
       <section class="info-columns" aria-label="About the game">
@@ -1018,6 +1022,22 @@
     color: #888;
     font-style: italic;
     margin: 0.5rem 0 0;
+  }
+
+  .archive-cta {
+    text-align: center;
+    font-size: 0.9rem;
+    margin: 1rem 0 0;
+  }
+
+  .archive-cta a {
+    color: var(--color-crimson);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .archive-cta a:hover {
+    text-decoration: underline;
   }
 
   /* ─── INFO COLUMNS ─── */
