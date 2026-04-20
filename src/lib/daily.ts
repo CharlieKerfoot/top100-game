@@ -1,6 +1,88 @@
 import { lists, type GameList } from './lists/index';
 import { dailySchedule } from './lists/daily-schedule';
 
+// ── Archive (past dailies) ──
+
+/** List ids that have already been a daily (strictly before today).
+ *  Today's list is intentionally excluded so the archive never spoils the
+ *  current daily. Future lists are also excluded. */
+export function getArchiveListIds(): string[] {
+  const dayN = getDayNumber();
+  if (dayN <= 1) return [];
+  return dailySchedule.slice(0, dayN - 1);
+}
+
+/** Return the 1-indexed day number a listId appeared as the daily, or null
+ *  if it is not in the schedule. */
+export function getDayNumberForList(listId: string): number | null {
+  const idx = dailySchedule.indexOf(listId);
+  return idx < 0 ? null : idx + 1;
+}
+
+/** True iff the list is a past daily (eligible for the archive). */
+export function isArchiveEligible(listId: string): boolean {
+  const dayN = getDayNumberForList(listId);
+  if (dayN === null) return false;
+  return dayN < getDayNumber();
+}
+
+const ARCHIVE_COMPLETED_KEY = 'archive_completed';
+
+export interface ArchiveResult {
+  score: number;
+  guessedRanks: number[];
+  /** Server-returned percentile at completion time. */
+  percentile?: number;
+  /** ISO timestamp of completion, for potential display / debugging. */
+  completedAt: string;
+}
+
+function loadArchiveCompleted(): Record<string, ArchiveResult> {
+  if (!isBrowser()) return {};
+  try {
+    const raw = window.localStorage.getItem(ARCHIVE_COMPLETED_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveArchiveCompleted(map: Record<string, ArchiveResult>): void {
+  if (!isBrowser()) return;
+  try {
+    window.localStorage.setItem(ARCHIVE_COMPLETED_KEY, JSON.stringify(map));
+  } catch {
+    /* quota or blocked */
+  }
+}
+
+export function getArchiveResult(listId: string): ArchiveResult | undefined {
+  return loadArchiveCompleted()[listId];
+}
+
+export function saveArchiveResult(listId: string, result: ArchiveResult): void {
+  const map = loadArchiveCompleted();
+  map[listId] = result;
+  saveArchiveCompleted(map);
+}
+
+export function updateArchivePercentile(listId: string, percentile: number): void {
+  const map = loadArchiveCompleted();
+  const entry = map[listId];
+  if (!entry) return;
+  entry.percentile = percentile;
+  saveArchiveCompleted(map);
+}
+
+/** Shared percentile math. Empty array → 0. */
+export function computePercentile(score: number, scores: number[]): number {
+  if (scores.length === 0) return 0;
+  const below = scores.filter((s) => s < score).length;
+  return Math.round((below / scores.length) * 100);
+}
+
 // ── Deterministic daily list selection ──
 //
 // The daily is driven by a frozen schedule (src/lib/lists/daily-schedule.ts).
