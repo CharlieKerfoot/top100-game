@@ -167,6 +167,7 @@
       {guessedRanks}
       {foundItems}
       restored={isRestored}
+      isArchive={true}
     />
   {/if}
 </div>

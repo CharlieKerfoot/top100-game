@@ -30,6 +30,8 @@
     }[];
     /** Whether this is a restored result (already played today) — skip celebration */
     restored?: boolean;
+    /** Whether this is an archive result — changes CTAs (no share, no challenge) */
+    isArchive?: boolean;
   }
 
   let {
@@ -47,6 +49,7 @@
     guessedRanks,
     foundItems,
     restored = false,
+    isArchive = false,
   }: Props = $props();
 
   const gridText = $derived(generateShareGrid(guessedRanks, listSize));
@@ -352,25 +355,32 @@
 
     <!-- ACTION BUTTONS: pinned to bottom -->
     <div class="action-buttons">
-      <button class="share-btn" onclick={handleShare}>
-        {shareStatus === "copied" ? "Copied!" : "Share Result"}
-      </button>
+      {#if isArchive}
+        <button class="share-btn" onclick={() => goto("/archive")}>
+          Play More Past Dailies &rarr;
+        </button>
+        <button
+          class="challenge-btn"
+          onclick={() => goto(`/?challenge=${list.id}`)}
+        >
+          Challenge a Friend &rarr;
+        </button>
+      {:else}
+        <button class="share-btn" onclick={handleShare}>
+          {shareStatus === "copied" ? "Copied!" : "Share Result"}
+        </button>
 
-      {#if shareStatus === "fallback"}
-        <div class="share-fallback">
-          <p>Copy your result:</p>
-          <textarea readonly rows="12">{shareText}</textarea>
-        </div>
+        {#if shareStatus === "fallback"}
+          <div class="share-fallback">
+            <p>Copy your result:</p>
+            <textarea readonly rows="12">{shareText}</textarea>
+          </div>
+        {/if}
+
+        <button class="challenge-btn" onclick={() => goto("/archive")}>
+          Play Past Dailies &rarr;
+        </button>
       {/if}
-
-      <button
-        class="challenge-btn"
-        onclick={() => goto(`/?challenge=${list.id}`)}
-      >
-        Challenge a Friend &rarr;
-      </button>
-
-      <a class="archive-cta" href="/archive">Play past dailies &rarr;</a>
     </div>
   {/if}
 </div>
@@ -773,21 +783,6 @@
   .challenge-btn:hover {
     background: var(--color-crimson);
     color: var(--color-parchment);
-  }
-
-  .archive-cta {
-    display: block;
-    text-align: center;
-    color: var(--color-crimson);
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-decoration: none;
-    margin-top: 0.75rem;
-    padding: 0.25rem;
-  }
-
-  .archive-cta:hover {
-    text-decoration: underline;
   }
 
   /* ─── SHARE FALLBACK ─── */
