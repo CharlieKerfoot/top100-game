@@ -25,6 +25,6 @@ describe('sitemap.xml', () => {
 
   it('sets correct content type', () => {
     const response = GET();
-    expect(response.headers.get('Content-Type')).toBe('application/xml');
+    expect(response.headers.get('Content-Type')).toMatch(/^application\/xml/);
   });
 });

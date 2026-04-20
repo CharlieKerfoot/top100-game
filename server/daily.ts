@@ -14,9 +14,10 @@ interface PersistedV2 {
   byListId: Record<string, ListStats>;
 }
 
-const DATA_DIR = process.env.DATA_DIR || './data';
-const STATS_FILE = join(DATA_DIR, 'daily-stats.json');
 const MAX_SCORES = 10000;
+
+function dataDir(): string { return process.env.DATA_DIR || './data'; }
+function statsFile(): string { return join(dataDir(), 'daily-stats.json'); }
 
 const listById = new Map(lists.map((l) => [l.id, l]));
 const statsByListId = new Map<string, ListStats>();
@@ -24,10 +25,10 @@ let loaded = false;
 
 function backupCorruptFile(reason: string): void {
   try {
-    if (!existsSync(STATS_FILE)) return;
+    if (!existsSync(statsFile())) return;
     const ts = new Date().toISOString().replace(/[:.]/g, '-');
-    const target = join(DATA_DIR, `daily-stats.corrupt-${ts}.json`);
-    renameSync(STATS_FILE, target);
+    const target = join(dataDir(), `daily-stats.corrupt-${ts}.json`);
+    renameSync(statsFile(), target);
     // eslint-disable-next-line no-console
     console.warn(`[daily] Backed up unreadable stats file to ${target} (reason: ${reason})`);
   } catch {
@@ -38,11 +39,11 @@ function backupCorruptFile(reason: string): void {
 function loadStats(): void {
   if (loaded) return;
   loaded = true;
-  if (!existsSync(STATS_FILE)) return;
+  if (!existsSync(statsFile())) return;
 
   let raw: string;
   try {
-    raw = readFileSync(STATS_FILE, 'utf-8');
+    raw = readFileSync(statsFile(), 'utf-8');
   } catch {
     return;
   }
@@ -85,14 +86,14 @@ function loadStats(): void {
 
 function saveStats(): void {
   try {
-    if (!existsSync(DATA_DIR)) {
-      mkdirSync(DATA_DIR, { recursive: true });
+    if (!existsSync(dataDir())) {
+      mkdirSync(dataDir(), { recursive: true });
     }
     const persisted: PersistedV2 = {
       version: 2,
       byListId: Object.fromEntries(statsByListId),
     };
-    writeFileSync(STATS_FILE, JSON.stringify(persisted));
+    writeFileSync(statsFile(), JSON.stringify(persisted));
   } catch {
     // Non-fatal — stats will still work in-memory for this session
   }
@@ -152,6 +153,12 @@ function computeCounts(scores: number[], edges: number[]): number[] {
     counts[idx]++;
   }
   return counts;
+}
+
+/** Reset in-memory state. Test-only. */
+export function __resetForTesting(): void {
+  statsByListId.clear();
+  loaded = false;
 }
 
 export async function handleDailyRequest(req: IncomingMessage, res: ServerResponse): Promise<boolean> {

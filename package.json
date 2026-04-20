@@ -14,9 +14,11 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test": "vitest run",
+		"test:e2e": "playwright test",
 		"validate": "bun scripts/validate-lists.ts"
 	},
 	"devDependencies": {
+		"@playwright/test": "^1.59.1",
 		"@sveltejs/kit": "^2.57.0",
 		"@sveltejs/vite-plugin-svelte": "^7.0.0",
 		"svelte": "^5.55.2",

@@ -29,3 +29,8 @@ docs/
 
 # Data persistence
 /data
+
+# Playwright
+/test-results
+/playwright-report
+/playwright/.cache
