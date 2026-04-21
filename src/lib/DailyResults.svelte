@@ -596,7 +596,7 @@
   .histogram {
     margin-bottom: 0.5rem;
     border: 1px solid var(--color-gold);
-    padding: 1rem 0.75rem 0.5rem;
+    padding: 1rem 1.75rem 0.5rem 0.75rem;
     background: var(--color-cream);
     flex: 1;
     display: flex;
@@ -694,7 +694,10 @@
     font-size: 0.9rem;
     cursor: pointer;
     margin-bottom: auto;
-    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    transition:
+      background-color 0.2s,
+      color 0.2s,
+      border-color 0.2s;
   }
 
   .answers-toggle:hover {
