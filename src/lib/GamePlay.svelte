@@ -27,15 +27,18 @@
     initial?: GameProgress;
     /** If true, show the first-time tooltip about scoring. Controlled by parent so different pages can opt in/out. */
     showOnboarding?: boolean;
+    /** If true, disable autocomplete suggestions. Two-way bound so the in-game toggle updates the parent. */
+    hardMode?: boolean;
     onDismissOnboarding?: () => void;
     onProgress?: (p: GameProgress) => void;
     onComplete: (r: GameResult) => void;
   }
 
-  const {
+  let {
     list,
     initial,
     showOnboarding = false,
+    hardMode = $bindable(false),
     onDismissOnboarding,
     onProgress,
     onComplete,
@@ -192,13 +195,12 @@
         </div>
       {/if}
       <Autocomplete
-        hints={availableHints}
+        hints={hardMode ? [] : availableHints}
         bind:value={guessValue}
         placeholder="Type your guess..."
         onsubmit={handleGuess}
       />
     </div>
-    <span class="dt-found-count">{foundItems.length} of {listSize}</span>
   </div>
 
   <div class="dt-body">
@@ -252,7 +254,7 @@
       </div>
     {/if}
     <Autocomplete
-      hints={availableHints}
+      hints={hardMode ? [] : availableHints}
       bind:value={guessValue}
       placeholder="Type your guess..."
       onsubmit={handleGuess}
@@ -315,7 +317,12 @@
     align-items: center;
     gap: 1rem;
     margin-bottom: 1.5rem;
-    height: 2.5rem;
+    min-height: 2.5rem;
+  }
+
+  .dt-top > * {
+    display: flex;
+    align-items: center;
   }
 
   .dt-category-label {
@@ -327,19 +334,18 @@
     overflow: hidden;
     text-overflow: ellipsis;
     color: #555;
+    line-height: 1;
   }
 
   .dt-strikes {
-    display: flex;
     gap: 4px;
-    align-items: center;
   }
 
   .dt-score {
-    display: flex;
     align-items: baseline;
     gap: 0.25rem;
     white-space: nowrap;
+    line-height: 1;
   }
 
   .dt-score-value {
@@ -361,11 +367,8 @@
     flex: 1;
   }
 
-  .dt-found-count {
-    font-size: 0.8rem;
-    color: var(--color-crimson);
-    font-weight: 600;
-    white-space: nowrap;
+  .dt-guess-area > :global(*) {
+    width: 100%;
   }
 
   .dt-body {
@@ -661,4 +664,5 @@
     from { opacity: 0; transform: translateY(-4px); }
     to { opacity: 1; transform: translateY(0); }
   }
+
 </style>

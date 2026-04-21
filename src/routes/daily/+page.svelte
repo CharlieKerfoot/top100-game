@@ -1,6 +1,9 @@
 <script lang="ts">
   import DailyResults from "$lib/DailyResults.svelte";
-  import GamePlay, { type GameProgress, type GameResult } from "$lib/GamePlay.svelte";
+  import GamePlay, {
+    type GameProgress,
+    type GameResult,
+  } from "$lib/GamePlay.svelte";
   import {
     getDailyList,
     getDayNumber,
@@ -41,7 +44,11 @@
   const initialProgress: GameProgress | undefined = (() => {
     if (previousResult) return undefined;
     const inProgress = loadInProgress();
-    if (inProgress && inProgress.dateKey === todayKey && inProgress.listId === list.id) {
+    if (
+      inProgress &&
+      inProgress.dateKey === todayKey &&
+      inProgress.listId === list.id
+    ) {
       return {
         score: inProgress.score,
         strikes: inProgress.strikes,
@@ -54,12 +61,16 @@
   })();
 
   // Render phase.
-  let phase = $state<"playing" | "results">(previousResult ? "results" : "playing");
+  let phase = $state<"playing" | "results">(
+    previousResult ? "results" : "playing",
+  );
 
   // Results state — populated when the game ends or restored from previousResult.
   let score = $state(previousResult?.score ?? 0);
   let guessedRanks = $state<number[]>(previousResult?.guessedRanks ?? []);
-  let foundItems = $state<{ rank: number; name: string; points: number; value?: string }[]>(
+  let foundItems = $state<
+    { rank: number; name: string; points: number; value?: string }[]
+  >(
     previousResult
       ? previousResult.guessedRanks
           .map((rank) => ({
@@ -83,6 +94,25 @@
   // Onboarding tooltip — first-time-ever tip about scoring.
   const ONBOARDING_KEY = "onboarding_seen";
   let showOnboarding = $state(false);
+
+  // Hard mode — persisted preference across sessions.
+  const HARD_MODE_KEY = "hard_mode";
+  let hardMode = $state(false);
+  if (typeof window !== "undefined") {
+    try {
+      hardMode = window.localStorage.getItem(HARD_MODE_KEY) === "1";
+    } catch {
+      /* localStorage blocked */
+    }
+  }
+  $effect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(HARD_MODE_KEY, hardMode ? "1" : "0");
+    } catch {
+      /* localStorage blocked */
+    }
+  });
 
   $effect(() => {
     if (typeof window === "undefined") return;
@@ -159,7 +189,9 @@
 
   async function fetchServerStats() {
     try {
-      const res = await fetch(`/api/daily/stats?listId=${encodeURIComponent(list.id)}`);
+      const res = await fetch(
+        `/api/daily/stats?listId=${encodeURIComponent(list.id)}`,
+      );
       if (res.ok) {
         const data = await res.json();
         histogramEdges = data.edges ?? [];
@@ -182,23 +214,60 @@
 
 <svelte:head>
   <title>Daily #{dayNumber} - {list.name} | {GAME_NAME}</title>
-  <meta name="description" content="Daily challenge #{dayNumber}: {list.name}. {list.description}" />
+  <meta
+    name="description"
+    content="Daily challenge #{dayNumber}: {list.name}. {list.description}"
+  />
   <link rel="canonical" href="{SITE_URL}/daily" />
-  <meta property="og:title" content="Daily #{dayNumber} - {list.name} | {GAME_NAME}" />
-  <meta property="og:description" content="Daily challenge #{dayNumber}: {list.name}. {list.description}" />
+  <meta
+    property="og:title"
+    content="Daily #{dayNumber} - {list.name} | {GAME_NAME}"
+  />
+  <meta
+    property="og:description"
+    content="Daily challenge #{dayNumber}: {list.name}. {list.description}"
+  />
   <meta property="og:image" content={ogImageUrl({ list: list.id })} />
   <meta property="og:url" content="{SITE_URL}/daily" />
   <meta property="og:type" content="website" />
-  <meta name="twitter:title" content="Daily #{dayNumber} - {list.name} | {GAME_NAME}" />
-  <meta name="twitter:description" content="Daily challenge #{dayNumber}: {list.name}. {list.description}" />
+  <meta
+    name="twitter:title"
+    content="Daily #{dayNumber} - {list.name} | {GAME_NAME}"
+  />
+  <meta
+    name="twitter:description"
+    content="Daily challenge #{dayNumber}: {list.name}. {list.description}"
+  />
   <meta name="twitter:image" content={ogImageUrl({ list: list.id })} />
 </svelte:head>
 
-<div class="app" class:has-game={phase === "playing"} class:has-results={phase === "results"}>
+<div
+  class="app"
+  class:has-game={phase === "playing"}
+  class:has-results={phase === "results"}
+>
   <header>
     <div class="top-nav">
       <a href="/" class="back-link">&larr; Home</a>
-      <a href="/archive" class="archive-link">Archive</a>
+      {#if phase === "playing"}
+        <button
+          type="button"
+          class="hard-mode-btn"
+          class:hard-mode-on={hardMode}
+          onclick={() => (hardMode = !hardMode)}
+          aria-pressed={hardMode}
+        >
+          <span class="hard-mode-dot" aria-hidden="true"></span>
+          Hard Mode:&nbsp;<span class="hard-mode-state"
+            >{hardMode ? "On" : "Off"}</span
+          >
+          <span class="hard-mode-info" aria-hidden="true">i</span>
+          <span class="hard-mode-tooltip" role="tooltip">
+            Hard mode hides autocomplete suggestions i.e. you must type each
+            answer exactly.
+          </span>
+        </button>
+      {/if}
     </div>
     <div class="category-header">
       <h2>{list.name}</h2>
@@ -211,6 +280,7 @@
       {list}
       initial={initialProgress}
       {showOnboarding}
+      bind:hardMode
       onDismissOnboarding={dismissOnboarding}
       onProgress={handleProgress}
       onComplete={handleComplete}
@@ -269,21 +339,15 @@
     margin-bottom: 0.75rem;
   }
 
-  .back-link,
-  .archive-link {
+  .back-link {
     display: inline-block;
     color: #777;
     text-decoration: none;
     font-size: 0.85rem;
   }
 
-  .back-link:hover,
-  .archive-link:hover {
+  .back-link:hover {
     color: var(--color-ink);
-  }
-
-  .archive-link {
-    font-weight: 600;
   }
 
   .category-header {
@@ -303,5 +367,93 @@
     font-size: 0.8rem;
     color: #888;
     margin-top: 0.25rem;
+  }
+
+  .hard-mode-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--color-cream);
+    border: 1px solid var(--color-gold);
+    color: var(--color-ink);
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 0.4rem 0.85rem;
+    cursor: pointer;
+    line-height: 1;
+    transition:
+      background 0.15s,
+      border-color 0.15s,
+      color 0.15s;
+  }
+
+  .hard-mode-btn:hover {
+    border-color: var(--color-ink);
+  }
+
+  .hard-mode-btn.hard-mode-on {
+    background: var(--color-crimson);
+    border-color: var(--color-crimson);
+    color: var(--color-parchment);
+  }
+
+  .hard-mode-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #c8bfa6;
+    transition: background 0.15s;
+  }
+
+  .hard-mode-btn.hard-mode-on .hard-mode-dot {
+    background: var(--color-gold);
+  }
+
+  .hard-mode-state {
+    font-weight: 700;
+  }
+
+  .hard-mode-info {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-style: italic;
+    font-size: 0.68rem;
+    line-height: 1;
+    opacity: 0.7;
+    margin-left: 0.1rem;
+  }
+
+  .hard-mode-tooltip {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: max-content;
+    max-width: 260px;
+    background: var(--color-ink);
+    color: var(--color-parchment);
+    padding: 0.55rem 0.7rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.4;
+    white-space: normal;
+    text-align: left;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+    z-index: 10;
+  }
+
+  .hard-mode-btn:hover .hard-mode-tooltip,
+  .hard-mode-btn:focus-visible .hard-mode-tooltip {
+    opacity: 1;
   }
 </style>
