@@ -12,7 +12,7 @@ export const bestDishesWorld: GameList = {
   difficulty: 1,
   hints: bestDishesWorldHints,
   valueLabel: 'Origin',
-  newUntil: '2026-05-14',
+  newUntil: '2026-04-14',
   aliases: {
     "Neapolitan Pizza": "Pizza Napoletana",
     "Florentine Steak": "Bistecca alla Fiorentina",

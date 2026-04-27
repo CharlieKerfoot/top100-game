@@ -53,5 +53,5 @@ export const imdbTopTvShows: GameList = {
     "8.7", "8.7", "8.7", "8.7", "8.7",
     "8.7", "8.7", "8.7", "8.7", "8.7",
   ],
-  newUntil: '2026-05-14',
+  newUntil: '2026-04-14',
 };

@@ -34,7 +34,7 @@ export const highestGrossingFranchises: GameList = {
     "$2.1B", "$2.0B", "$2.0B", "$1.9B", "$1.9B",
     "$1.9B", "$1.8B", "$1.8B", "$1.7B", "$1.6B",
   ],
-  newUntil: '2026-05-14',
+  newUntil: '2026-04-14',
   aliases: {
     "Hunger Games": "The Hunger Games",
     "Fast and Furious": "Fast & Furious",

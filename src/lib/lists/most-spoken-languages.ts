@@ -13,7 +13,7 @@ export const mostSpokenLanguages: GameList = {
   hints: mostSpokenLanguagesHints,
   valueLabel: 'Native Speakers',
   size: 50,
-  newUntil: '2026-05-14',
+  newUntil: '2026-04-14',
   items: [
     "Mandarin Chinese",
     "Spanish",

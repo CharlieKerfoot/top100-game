@@ -64,5 +64,5 @@ export const countriesByHappiness: GameList = {
     "Bosnia": "Bosnia and Herzegovina",
     "Macedonia": "North Macedonia",
   },
-  newUntil: '2026-05-14',
+  newUntil: '2026-04-14',
 };

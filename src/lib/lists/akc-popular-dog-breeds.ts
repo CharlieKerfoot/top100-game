@@ -56,5 +56,5 @@ export const akcPopularDogBreeds: GameList = {
     "Working", "Non-Sporting", "Sporting", "Non-Sporting", "Working",
     "Working", "Sporting", "Terrier", "Working", "Herding",
   ],
-  newUntil: '2026-05-14',
+  newUntil: '2026-04-14',
 };

@@ -12,7 +12,7 @@ export const bestSellingCandy: GameList = {
   hints: bestSellingCandyHints,
   valueLabel: 'Manufacturer',
   size: 100,
-  newUntil: '2026-05-14',
+  newUntil: '2026-04-14',
   items: [
     "Reese's Peanut Butter Cups",
     "M&M's",

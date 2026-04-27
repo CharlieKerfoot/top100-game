@@ -9,7 +9,7 @@ export const tallestBuildings: GameList = {
   difficulty: 2,
   hints: tallestBuildingsHints,
   valueLabel: 'Height',
-  newUntil: '2026-05-14',
+  newUntil: '2026-04-14',
   items: [
     "Burj Khalifa", "Merdeka 118", "Shanghai Tower", "Mecca Royal Clock Tower", "Ping An Finance Centre",
     "Lotte World Tower", "One World Trade Center", "Guangzhou CTF Finance Centre", "Tianjin CTF Finance Centre", "CITIC Tower",

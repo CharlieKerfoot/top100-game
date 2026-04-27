@@ -53,5 +53,5 @@ export const mostVisitedWikipedia: GameList = {
     "7M", "7M", "7M", "7M", "7M",
     "7M", "7M", "7M", "7M", "7M",
   ],
-  newUntil: '2026-05-14',
+  newUntil: '2026-04-14',
 };

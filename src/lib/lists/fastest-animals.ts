@@ -12,7 +12,7 @@ export const fastestAnimals: GameList = {
   hints: fastestAnimalsHints,
   valueLabel: 'Top Speed',
   size: 50,
-  newUntil: '2026-05-14',
+  newUntil: '2026-04-14',
   items: [
     "Peregrine Falcon",        // 1 - 242 mph (diving)
     "Golden Eagle",            // 2 - 200 mph (diving)

@@ -53,5 +53,5 @@ export const bestSellingAlbums: GameList = {
     "15M", "15M", "15M", "15M", "15M",
     "15M", "15M", "15M", "15M", "14M",
   ],
-  newUntil: '2026-05-14',
+  newUntil: '2026-04-14',
 };

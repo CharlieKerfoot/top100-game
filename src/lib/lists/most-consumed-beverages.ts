@@ -34,5 +34,5 @@ export const mostConsumedBeverages: GameList = {
     "Spirit", "Spirit", "Spirit", "Spirit", "Spirit",
     "Juice", "Energy Drink", "Sports Drink", "Juice", "Dairy",
   ],
-  newUntil: '2026-05-14',
+  newUntil: '2026-04-14',
 };

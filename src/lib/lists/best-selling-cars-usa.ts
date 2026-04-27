@@ -13,7 +13,7 @@ export const bestSellingCarsUsa: GameList = {
   hints: bestSellingCarsUsaHints,
   valueLabel: '2024 Sales',
   size: 50,
-  newUntil: '2026-05-14',
+  newUntil: '2026-04-14',
   items: [
     "Ford F-Series",
     "Chevrolet Silverado",

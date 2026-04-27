@@ -16,7 +16,7 @@ export const longestRunningTvSeries: GameList = {
   size: 50,
   hints: longestRunningTvSeriesHints,
   valueLabel: 'Episodes',
-  newUntil: '2026-05-14',
+  newUntil: '2026-04-14',
   items: [
     'Unser Sandmännchen',           // 1 — East Germany children's show, 22,200+ episodes
     'Minuto de Dios',               // 2 — Colombian religious program

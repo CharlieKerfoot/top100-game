@@ -13,7 +13,7 @@ export const mostVisitedMuseums: GameList = {
   hints: mostVisitedMuseumsHints,
   valueLabel: 'Annual Visitors',
   size: 50,
-  newUntil: '2026-05-14',
+  newUntil: '2026-04-14',
   items: [
     "Louvre",
     "National Museum of China",

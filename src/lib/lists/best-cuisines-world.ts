@@ -12,7 +12,7 @@ export const bestCuisinesWorld: GameList = {
   difficulty: 1,
   hints: bestCuisinesWorldHints,
   valueLabel: 'Region',
-  newUntil: '2026-05-14',
+  newUntil: '2026-04-14',
   aliases: {
     "Italy": "Italian",
     "Greece": "Greek",

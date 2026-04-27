@@ -12,7 +12,7 @@ export const longestRunningBroadwayShows: GameList = {
   difficulty: 2,
   hints: longestRunningBroadwayShowsHints,
   valueLabel: 'Performances',
-  newUntil: '2026-05-14',
+  newUntil: '2026-04-14',
   items: [
     "The Phantom of the Opera",
     "Chicago",

@@ -13,7 +13,7 @@ export const mostExpensivePaintings: GameList = {
   hints: mostExpensivePaintingsHints,
   valueLabel: 'Sale Price',
   size: 50,
-  newUntil: '2026-05-14',
+  newUntil: '2026-04-14',
   items: [
     "Salvator Mundi", "Interchange", "The Card Players", "Portrait of Elisabeth Lederer", "Nafea Faa Ipoipo",
     "Number 17A", "The Standard Bearer", "Shot Sage Blue Marilyn", "No. 6 (Violet, Green and Red)", "Wasserschlangen II",
