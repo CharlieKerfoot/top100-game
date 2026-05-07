@@ -2,8 +2,9 @@
 
 **The Top 100 Ranking Game**
 
+Play Here: [commoncents.fun](https://commoncents.fun)
+
 Name things from a Top 100 list. Harder answers score more. Accumulate as many points as you can.
-**Play now: https://top100-game.fly.dev/**
 
 ## How It Works
 
